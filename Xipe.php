@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.2  2002/02/07 22:03:46  mccain
+*   - added informational comment
+*
 *   Revision 1.1.1.1  2002/02/07 21:52:22  mccain
 *
 *   ##### those are my local revisions, from before moving it to sourceforge :-) #####
@@ -124,7 +127,7 @@
 */
 
 require_once('Benchmark/Timer.php');
-require_once('myPEAR/Common.php');
+require_once('SimpleTemplate/Options.php');
 require_once('SimpleTemplate/Filter/Internal.php');
 require_once('Log/Log.php');
 
@@ -139,7 +142,7 @@ require_once('Log/Log.php');
 *   @package    SimpleTemplate
 *
 */
-class SimpleTemplate_Engine extends myPEAR_Common
+class SimpleTemplate_Engine extends SimpleTemplate_Options
 {
 
 # FIXXME a problem we have here: is that if i use {include(a.php)} the varibales of this file overwrite the ones

@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.2  2002/02/07 22:03:46  mccain
+*   - added informational comment
+*
 *   Revision 1.1.1.1  2002/02/07 21:52:23  mccain
 *
 *   ##### those are my local revisions, from before moving it to sourceforge :-) #####
@@ -60,7 +63,7 @@
 *
 */
 
-require_once('myPEAR/Common.php');
+require_once('SimpleTemplate/Options.php');
 
 /**
 *   this file is intended to realize stuff like this
@@ -82,7 +85,7 @@ require_once('myPEAR/Common.php');
 *   @package    SimpleTemplate/Filter
 *   @version    01/12/15
 */
-class SimpleTemplate_Filter_TagLib extends myPEAR_Common
+class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
 {
 // i need the method setOption, that's why i extend myPEAR_Common
 
