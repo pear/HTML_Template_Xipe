@@ -50,9 +50,14 @@ class HTML_Template_Xipe_Filter_QuickForm extends HTML_Template_Xipe_Options
                         
     function process($input,&$form) 
     {
-        $input = $this->elementName($input,$form);
-        $input = $this->element($input,$form);
-        $input = $this->showOnEdit($input);
+        // do only run the methods below if we find a '<form:' string in the $input
+        // otherwise is just invain
+        if (strpos($input,'<'.$this->_namespace.':')) {
+            $input = $this->elementExists($input,$form);
+            $input = $this->elementName($input,$form);
+            $input = $this->element($input,$form);
+            $input = $this->showOnEdit($input);
+        }
         return $input;
     }
     
@@ -89,7 +94,7 @@ class HTML_Template_Xipe_Filter_QuickForm extends HTML_Template_Xipe_Options
                 }
                 $input = str_replace($tag,$elHtml,$input);
             }
-        }        
+        } 
         return $input;
     }
 
@@ -107,7 +112,7 @@ class HTML_Template_Xipe_Filter_QuickForm extends HTML_Template_Xipe_Options
                     if (!PEAR::isError($element = $form->getElement($elName))) {
                         $label = $element->getLabel();
                         if ($form->isElementRequired($elName)) {
-                            $label.= ' <font class="required">*</font>';
+                            $label.= '&nbsp;<font class="required">*</font>';
                         }
                     }
                 }
@@ -137,6 +142,31 @@ class HTML_Template_Xipe_Filter_QuickForm extends HTML_Template_Xipe_Options
             // remove the 'showOnEdit' tags, since the stuff inside there shall be shown
             $input = preg_replace('~<'.$tagName.'>~Ui','',$input);
             $input = preg_replace('~</'.$tagName.'>~Ui','',$input);
+        }
+        return $input;
+    }
+    
+    /**
+    *   This can be used to surround a piece of template code to check 
+    *   if the given element exists at all, if it is not given the piece
+    *   of code will simply be removed.
+    *
+    *
+    */
+    function elementExists($input,&$form)
+    {
+        $tagName = $this->_namespace.':elementExists';
+        preg_match_all('~<'.$tagName.'\s+name="([^"]+)".*>.*<\/'.$tagName.'>~Uis',$input,$results);
+        if (sizeof($results[1])) {
+            foreach ($results[1] as $k=>$aName) {
+                if ($form->elementExists($aName)) {
+                    // remove the <form:elementExists opening and closing XML tag
+                    $input = preg_replace('~<'.$tagName.'\s+name="'.preg_quote($aName).'".*>(.*)<\/'.$tagName.'>~Us','$1',$input);
+                } else {
+                    // remove all the content and the XML tags
+                    $input = preg_replace('~<'.$tagName.'\s+name="'.preg_quote($aName).'".*>.*<\/'.$tagName.'>~Uis','',$input);
+                }
+            }
         }
         return $input;
     }
