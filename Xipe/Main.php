@@ -202,8 +202,8 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
         // all over the template engine
         // the replacing of multiple slashes is doen because i realized that something like
         // $DOCUMENT_ROOT.'/libs/' might come out to be '/document/root//libs' depending on the apache configuration
-        $this->setOption('compileDir' , preg_replace("/\\\+|\/+/" , '/' , $this->getOption('compileDir') ));
-        $this->setOption('templateDir' , preg_replace("/\\\+|\/+/" , '/' , $this->getOption('templateDir') ));
+        $this->setOption('compileDir' , preg_replace("/\\\+|\/+/" , DIRECTORY_SEPARATOR , $this->getOption('compileDir') ));
+        $this->setOption('templateDir' , preg_replace("/\\\+|\/+/" , DIRECTORY_SEPARATOR , $this->getOption('templateDir') ));
 
     }
 
@@ -294,7 +294,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
             $this->_templateFile = str_replace( $this->getOption('templateDir') , '' , $this->_templateFile );
 
         // replace multiple slashes
-        $this->_templateFile = preg_replace( '/\/+/' , '/' , $this->_templateFile );
+        $this->_templateFile = preg_replace( '/\/+/' , DIRECTORY_SEPARATOR , $this->_templateFile );
         // set the template file property and remove leading slashes
         $this->_templateFile = preg_replace( '/^\/+/' , '' , $this->_templateFile );
 
@@ -304,7 +304,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
         if( strpos( $this->getOption('compileDir') , $_SERVER['DOCUMENT_ROOT'] )!==0 )
         {
             $compileDir = preg_replace('/^\//' , '' , $this->getOption('compileDir') ); // strip of a leading '/' to be sure not to have 2 slashes there :-)
-            $this->setOption( 'compileDir' , $this->getOption('templateDir').'/'.$compileDir);
+            $this->setOption( 'compileDir' , $this->getOption('templateDir').DIRECTORY_SEPARATOR.$compileDir);
         }
 
         $compileDir = $this->getOption('compileDir');
@@ -332,10 +332,10 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
         // i dont see no reason for hashing the directories or the filenames
         if( $directory!='.' )   // $directory is '.' also if no dir is given
         {
-            $path = explode('/',$directory);
+            $path = explode(DIRECTORY_SEPARATOR,$directory);
             foreach( $path as $aDir )
             {
-                $compileDir = $compileDir."/$aDir";
+                $compileDir = $compileDir.DIRECTORY_SEPARATOR.$aDir;
                 if( !@is_dir($compileDir) )
                 {
                     umask(0000);                        // make that the users of this group (mostly 'nogroup') can erase the compiled templates too
@@ -351,12 +351,12 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
         }
 
         // build the filename prefix, add locale only if given
-        $ret =  $this->getOption('compileDir').'/'.
+        $ret =  $this->getOption('compileDir').DIRECTORY_SEPARATOR.
                 $this->_templateFile.
                 ($this->getOption('locale') ? '.'.$this->getOption('locale') : '' ).
                 '.';
 
-        $this->_templateFile = $this->getOption('templateDir').'/'.$this->_templateFile;
+        $this->_templateFile = $this->getOption('templateDir').DIRECTORY_SEPARATOR.$this->_templateFile;
 
         return $ret;
     }
