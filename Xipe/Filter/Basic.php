@@ -82,7 +82,7 @@ class HTML_Template_Xipe_Filter_Basic extends HTML_Template_Xipe_Options
             $input = $this->removeEmptyLines($input);
             $input = $this->trimLines($input);
             $input = $this->optimizeHtmlCode($input);
-        }                        
+        }
         // this is default since, it enables you to also use 'switch case' blocks
         // if we wouldnt optimize the php here then there would be spaces printed between switch and case
         // which php doesnt allow! (only with autoBraces of course)
@@ -281,20 +281,22 @@ but this works:
     *   so i dont have to make this check in every place myself (since i mostly need the
     *   check anyway or PHP will freak if $x is an empty array)
     *   its just the same as "show a block only if it really contains data"
-    *   use as a PRE filter, works only if autoBraces is used and indention of at least 2 characters
-    *   out of this:
+    *   use as a PRE filter
+    *   out of this:       
+    *
     *     {foreach($x as $oneX)}
     *         {$oneX}
     *     {else}
     *         no x's available
+    *
     *   it makes
-    *     {if(sizeof($x))}
-    *      {foreach($x as $oneX)}
+    *
+    *     {if(sizeof($x))foreach($x as $oneX)}
     *         {$oneX}
     *     {else}
     *         no x's available
-    *   NOTE:   that you can also use {else} on a 'foreach', because it will then be used for
-    *           the 'if' because the 'foreach' gets indented on more space
+    *
+    *   NOTE:   that you can also use {else} on a 'foreach', because it will then be used for the 'if'
     *   NOTE1:  this filter can only be applied if the delimiters are not set via the xml
     *           options inside the file, this doesnt work yet ... :-(
     *           since the xml data change the delimiter, which was passed to the constructor when
@@ -307,10 +309,6 @@ but this works:
     */
     function addIfBeforeForeach($input)
     {
-        // the filter below only works if autoBraces is on!
-        if( !$this->getOption('autoBraces') )
-            return $input;
-
         return preg_replace('/\n(\s*)'.             // get the indented spaces in $1, starting at the beginning of a line (^ didnt work here, at least not for me)
                             preg_quote($this->options['delimiter'][0]).
                             '\s*foreach\s*\('.    // check for the '{foreach(' and spaces anywhere inbetween, '\s*' does that
@@ -321,12 +319,7 @@ but this works:
 
                             "\n$1".
                             $this->options['delimiter'][0].
-                            "if(is_array(@$2) && sizeof(@$2)>0)".
-                            $this->options['delimiter'][1].
-                            "\n$1 ".                // indent it one more space than before, so an 'else' goes with the 'if' :-)
-                            $this->options['delimiter'][0].
-                            "foreach($2 ",
-
+                            "if(is_array(@$2) && sizeof(@$2)>0)foreach($2 ",
                             $input);
     }
 
