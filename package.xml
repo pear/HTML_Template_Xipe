@@ -44,14 +44,13 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
     </maintainers>
 
     <release>
-        <version>1.7.3</version>
-        <date>2003-03-10</date>
+        <version>1.7.4</version>
+        <date>2003-??-??</date>
         <license>PHP License</license>
         <state>stable</state>
         <notes>
-* add forceRecache() which forces to rebuild the cached file
-  no matter of the caching-state of this file
-* include examples in package
+* now {CONSTANT} is also echoed
+* add unit test for Filter_Internal::makePhpTags(), for the printing of constant
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="HTML/Template">
@@ -135,6 +134,18 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
 
 
     <changelog>
+        <release>
+            <version>1.7.3</version>
+            <date>2003-03-10</date>
+            <license>PHP License</license>
+            <state>stable</state>
+            <notes>
+    * add forceRecache() which forces to rebuild the cached file
+    no matter of the caching-state of this file
+    * include examples in package
+            </notes>
+        </release>
+
         <release>
             <version>1.7.2</version>
             <date>2003-02-10</date>
