@@ -17,10 +17,12 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.1  2002/05/26 17:04:30  mccain
+//  - initial commit, after restructuring and enhancing the engine
+//
 //
 
 require_once('SimpleTemplate/XMLConfig.php');
-require_once('Cache/Output.php');
 
 /**
 *   this class does the caching of final pages in pure html (or anything you use it for)
