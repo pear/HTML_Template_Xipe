@@ -113,14 +113,13 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
                 </dir>
             </dir>
 
-            <deps>
-                <dep type="pkg" rel="ge" version="0.2">Tree</dep>
-            </deps>
-            <deps>
-                <dep type="pkg" rel="ge" version="1.5">Log</dep>
-            </deps>
-
         </filelist>
+
+        <deps>
+            <dep type="pkg" rel="ge" version="0.2">Tree</dep>
+            <dep type="pkg" rel="ge" version="1.5">Log</dep>
+        </deps>
+
     </release>
 
 
