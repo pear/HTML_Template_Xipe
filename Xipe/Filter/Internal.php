@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.4  2002/03/04 19:05:15  mccain
+*   - made files compatible to run on php4.1.1 with stricter php.ini settings
+*
 *   Revision 1.3  2002/02/07 22:45:55  mccain
 *   - make the options stuff work
 *
@@ -220,7 +223,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
             $numSpaces = strlen($aLine) - strlen(ltrim($aLine));
 
             $nextLine = '';
-            if( sizeof($file) >= $curLineIndex )    // check the array boundary, since php4.1 it throws a warning
+            if( sizeof($file) > $curLineIndex+1 )   // check the array boundary, since php4.1 and a stricter php.ini it throws a warning
                 $nextLine = $file[$curLineIndex+1];
             $numSpacesNextLine = strlen($nextLine) - strlen(ltrim($nextLine));
 
@@ -258,6 +261,9 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
                     }
 
                     array_shift( $openIndentions );
+                    $openIndentions_0_numSpaces = 0;
+                    if( isset($openIndentions[0]['numSpaces']) )
+                        $openIndentions_0_numSpaces = $openIndentions[0]['numSpaces'];
                 }
                 // shift out all the elements of the array until we have reached the indention that has the number of
                 // spaces as the indention in index 0, mostly its the first one, but in case
@@ -267,7 +273,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
                 //      {foreach($array as $x)}
                 //          print something here
                 //  <next line of html> or other code       ... above this line 2 indentions need to be closed
-                while( $numSpaces <= $openIndentions[0]['numSpaces'] && sizeof($openIndentions)>0 );
+                while( $numSpaces <= $openIndentions_0_numSpaces && sizeof($openIndentions)>0 );
             }
 
             //
