@@ -51,8 +51,12 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
     *   @access private
     *   @var    array   $options    the options for initializing the filter class
     */
-    var $options = array(   'delimiter'     =>  array(),    // first value of the array is the begin delimiter, second the end delimiter
-                            'templateDir'   =>  '' );       // we need the template dir for the include directive
+    var $options = array(   'delimiter'     =>  array()      // first value of the array is the begin delimiter, second the end delimiter
+                            ,'templateDir'   =>  ''          // we need the template dir for the include directive
+                            ,'templateExtension'=>  ''
+                            ,'macroExtension'=>     ''
+                            ,'autoBraces'   =>      false
+                        );
 
 // remove the constructor one day, i feel that passing the delimiters to this class makes it all somehow unclean
 // but therefore we have to move addIfBeforeForeach too, since it depends on having the delimiters
@@ -242,8 +246,7 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
         $exp =  $this->options['delimiter'][0].
                 'echo ((strlen($1) > $2))?(substr($1,0,$2)."$4"):$1'.
                 $this->options['delimiter'][1];
-        if( $extra == 'by words' )
-        {
+        if ($extra == 'by words') {
             $exp =  $this->options['delimiter'][0].
                     'echo ((strlen($1) > $2))?(substr($1,0,(($2)-(strlen(strrchr(substr($1,0,$2),\' \')))))."$4"):$1'.
                     $this->options['delimiter'][1];
@@ -305,64 +308,92 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
         $_openDel = $this->getOption('delimiter',0);
         $_closeDel = $this->getOption('delimiter',1);
 
-// FIXXXME discover all the functions that are used in the current file, so only those functions are pasted inside the code!!! //"
-        if( preg_match_all( '/'.$openDel.'%\s*include\s+(.+)\s*%'.$closeDel.'/U' , $input , $includes ) )
-        {
-//print_r($includes);
-            if(sizeof($includes[1]))
-            foreach( $includes[1] as $index=>$aInclude )
-            {
-                // get the relative path to templateDir or absolute if given
-// FIXXME unix specific!!!!
-                if( $aInclude[0] != '/' )           // add trailing slash if missing
-                    $_aInclude = '/'.$aInclude;
-                $fileToInclude = $this->options['templateDir'].$_aInclude;
+// FIXXXME discover all the functions that are used in the current file
+// BUT only if it is no template, because then we assume it is a macro file!!! or smthg like this
+// so only those functions are pasted inside the code!!! //"
+                                
+        // this var contains all the files this method has already included
+        // we count them to prevent recursive inclusion of files!
+        $justIncluded = array();
 
-                // do only include a file that really exists, otherwise the tag also stays there, so the programmer removes it
-                // do also search for the file in the include path, but as the second option only!
-                if($content = @file($fileToInclude))
-                    $contentFile = $fileToInclude;
-                else
-                    if( $content = @file($aInclude,true))
-                        $contentFile = $aInclude;
+        // $parseAgain will be true if another template was included
+        // if the last one is done $parseAgain will be set to false and the while loop quits
+        $parseAgain = true;
+        while ($parseAgain) {
+            // if there are no more {%include%} tags in the file content, then we dont have to
+            // loop again
+            if (!preg_match_all( '/'.$openDel.'%\s*include\s+(.+)\s*%'.$closeDel.'/U' , $input , $includes )) {
 
-                if( $content )
-                {
-                    // do only include the files content if we didnt include it yet
-                    // just like 'include_once' only that it does it by default :-)
-                    // this only works if we are only using one instance of the filter, which is not the case
-                    // since every file might have different options, i.e. delimiters, so i changed 
-                    // it to make a new instance for every file, which means this has almost no effect
-                    if( !in_array($contentFile,$this->_includedFiles) )
-                    {
-//print "including: $contentFile<br>";
-                        $this->_includedFiles[] = $contentFile;
-                        // read the file
-                        $fileContent = implode("\n",$content);
-                         
-                        // put an if around the entire macro file, so it wont even be parsed
-                        // if it is already once in the code, this takes care of not multiple
-                        // times defining functions (macros in this case)
-                        // it also works if you compile multiple files with different instances of this filter
-                        // since php checks the variable $___HTML_Template_Xipe_TagLib_includedFile given here
-                        // use isset to prevent E_ALL-warning
-                        $testVar = "\$___HTML_Template_Xipe_TagLib_includedFile['$fileToInclude']";
-                        $fileContent =  "$_openDel if(!isset($testVar) || !$testVar)\\\{ $_closeDel".
-                                        $fileContent.
-                                        $_openDel." \$___HTML_Template_Xipe_TagLib_includedFile['$fileToInclude']=true;\\\}".$_closeDel;
+                $parseAgain = false;
+
+            } else {
+    //print_r($includes);
+                if (sizeof($includes[1])) {
+                    foreach ($includes[1] as $index=>$aInclude) {
+                        // get the relative path to templateDir or absolute if given
+        // FIXXME unix specific!!!!
+                        if ($aInclude[0] != '/') {          // add trailing slash if missing
+                            $_aInclude = '/'.$aInclude;
+                        }
+                        $fileToInclude = $this->options['templateDir'].$_aInclude;
+                        if (in_array($fileToInclude,$justIncluded)) {
+//FIXXXME i need a nicer error handling way
+// somehow i would need to make the Xipe-Error method from the Main.php to be called statically!!!
+print "<b>Xipe-Error</b><br>The file <b>$fileToInclude</b> is included recursively, this is not possible!<br>";
+                            break(2);
+                        }
+                        $justIncluded[] = $fileToInclude;
+
+                        // do only include a file that really exists, otherwise the tag also stays there, so the programmer removes it
+                        // do also search for the file in the include path, but as the second option only!
+                        if ($content = @file($fileToInclude)) {
+                            $contentFile = $fileToInclude;
+                        } else {
+                            if ($content = @file($aInclude,true)) {
+                                $contentFile = $aInclude;
+                            }
+                        }
+
+                        if ($content) {
+                            $pathInfo = pathinfo($contentFile);
+
+                            if ($this->getOption('macroExtension')!=$pathInfo['extension']) {
+                                $fileContent = implode("\n",$content);
+                            } else {
+                                // do only include the files content if we didnt include it yet
+                                // just like 'include_once' only that it does it by default :-)
+                                // this only works if we are only using one instance of the filter, which is not the case
+                                // since every file might have different options, i.e. delimiters, so i changed
+                                // it to make a new instance for every file, which means this has almost no effect
+                                if (!in_array($contentFile,$this->_includedFiles)) {
+            //print "including: $contentFile<br>";
+                                    $this->_includedFiles[] = $contentFile;
+                                    // read the file
+                                    $fileContent = implode("\n",$content);
+
+                                    // put an if around the entire macro file, so it wont even be parsed
+                                    // if it is already once in the code, this takes care of not multiple
+                                    // times defining functions (macros in this case)
+                                    // it also works if you compile multiple files with different instances of this filter
+                                    // since php checks the variable $___HTML_Template_Xipe_TagLib_includedFile given here
+                                    // use isset to prevent E_ALL-warning
+                                    $testVar = "\$___HTML_Template_Xipe_TagLib_includedFile['$fileToInclude']";
+                                    $fileContent =  "$_openDel if(!isset($testVar) || !$testVar)\\\{ $_closeDel".
+                                                    $fileContent.
+                                                    $_openDel." \$___HTML_Template_Xipe_TagLib_includedFile['$fileToInclude']=true;\\\}".$_closeDel;
+                                } else {
+            //print "already included: $contentFile<br>";
+                                    $fileContent = '';
+                                }
+                            }
+
+                            // replace the string from $includes[0] with the file
+                            $input = preg_replace( '/'.preg_quote($includes[0][$index],'/').'/' , $fileContent , $input );
+                        }
                     }
-                    else
-                    {
-//print "already included: $contentFile<br>";
-                        $fileContent = '';
-                    }
-
-                    // replace the string from $includes[0] with the file
-                    $input = preg_replace( '/'.preg_quote($includes[0][$index],'/').'/' , $fileContent , $input );
                 }
-            }
-
-        }
+            }   // end of if-any include-tags found
+        }   // end of while
         return $input;
     }
 
@@ -506,10 +537,16 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
 
         // replace 'macro' with 'function'
         $regExp = '/'.$openDel.'%\s*(macro|function)\s+(.*)%'.$closeDel.'/Usi';
-        $input = preg_replace( $regExp , $_openDel.'function $2'.$_closeDel , $input );
+        
+        // if autoBraces is off, we need to put the opening-brace here :-)
+        if ($this->getOption('autoBraces')) {
+            $input = preg_replace( $regExp , $_openDel.'function $2'.$_closeDel , $input );
+        } else {
+            $input = preg_replace( $regExp , $_openDel.'function $2 \\{ '.$_closeDel , $input );
+        }
 
         // replace {%macroName()%} with {macroName()}
-        $regExp = '/'.$openDel.'\s*function\s+(.*)\(.*\)\s*'.$closeDel.'/Usi';
+        $regExp = '/'.$openDel.'\s*function\s+(.*)\(.*\)\s*(\\\{)?\s*'.$closeDel.'/Usi';
         preg_match_all( $regExp , $input , $macroCalls );
 
         // merge the macros found now with the macros already found
@@ -518,12 +555,16 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
         // are merged to one big php-file, so the macro will be defined and available!
         $this->_macros = array_unique(array_merge($this->_macros,$macroCalls[1]));
 
-        if( sizeof($this->_macros) )
-        foreach( $this->_macros as $aMacroCall )
-        {
-            $regExp = '/'.$openDel.'%\s*'.trim($aMacroCall).'\s*(\(.*\))%'.$closeDel.'/Ui';
-            $input = preg_replace( $regExp , $_openDel.$aMacroCall.'$1'.$_closeDel , $input );
+        if (sizeof($this->_macros)) {
+            foreach ($this->_macros as $aMacroCall) {
+                $regExp = '/'.$openDel.'%\s*'.trim($aMacroCall).'\s*(\(.*\))%'.$closeDel.'/Ui';
+                $input = preg_replace( $regExp , $_openDel.$aMacroCall.'$1'.$_closeDel , $input );
+            }
         }
+
+        // if someone has autoBraces on and uses this.... well that would be a user-mistake, or a missing doc :-)
+        $regExp = '/[^\\\]'.$openDel.'%\s*endmacro\s*%'.$closeDel.'/Ui';
+        $input = preg_replace( $regExp , $_openDel.' \\} '.$_closeDel , $input );
 
         return $input;
     }
