@@ -44,15 +44,13 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
     </maintainers>
 
     <release>
-        <version>1.7.2</version>
-        <date>2003-02-10</date>
+        <version>1.7.3</version>
+        <date>2003-0?-??</date>
         <license>PHP License</license>
         <state>stable</state>
         <notes>
-- make most of TagLib-tags work with autoBraces OFF too
-- nested include and macros work
-- made it work properly on windows
-- add some examples (which work well with autoBraces off)
+- add forceRecache() which forces to rebuild the cached file
+  no matter of the caching-state of this file
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="HTML/Template">
@@ -124,6 +122,19 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
 
 
     <changelog>
+        <release>
+            <version>1.7.2</version>
+            <date>2003-02-10</date>
+            <license>PHP License</license>
+            <state>stable</state>
+            <notes>
+    - make most of TagLib-tags work with autoBraces OFF too
+    - nested include and macros work
+    - made it work properly on windows
+    - add some examples (which work well with autoBraces off)
+            </notes>
+        </release>
+
         <release>
             <version>1.7.1</version>
             <date>2003-01-29</date>
