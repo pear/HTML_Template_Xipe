@@ -16,35 +16,7 @@
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
 //
-/*
-*
-*   ##### those are my local revisions, from before moving it to sourceforge :-) #####
-*   ##### just kept for informational reasons, might be removed one day
-*
-*   $Log$
-*   Revision 1.7  2002/01/21 23:01:53  cain
-*   - added license statement
-*
-*   Revision 1.6  2002/01/19 23:35:40  cain
-*   - added method setOptions
-*
-*   Revision 1.5  2002/01/16 13:43:22  cain
-*   - moved (copy for now) parseDSN here
-*
-*   Revision 1.4  2002/01/15 11:27:33  cain
-*   *** empty log message ***
-*
-*   Revision 1.3  2002/01/09 05:16:59  cain
-*   - added constructor, and getOption method
-*
-*   Revision 1.2  2001/12/12 18:29:57  cain
-*   - named the class properly
-*
-*   Revision 1.1  2001/12/07 11:16:49  cain
-*   *** empty log message ***
-*
-*
-*/
+//  $Log$
 
 /**
 *   this class only defines commonly used methods, etc.
@@ -62,6 +34,8 @@ class SimpleTemplate_Options
     */
     var $options = array();
 
+    var $_forceSetOption = false;
+
     /**
     *   this constructor sets the options, since i normally need this and
     *   in case the constructor doesnt need to do anymore i already have it done :-)
@@ -69,10 +43,14 @@ class SimpleTemplate_Options
     *   @version    02/01/08
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param      boolean true if loggedIn
+    *   @param      array       the key-value pairs of the options that shall be set
+    *   @param      boolean     if set to true options are also set
+    *                           even if no key(s) was/were found in the options property
     */
-    function SimpleTemplate_Options( $options=array() )
+    function SimpleTemplate_Options( $options=array() , $force=false )
     {
+        $this->_forceSetOption = $force;
+
         if( is_array($options) && sizeof($options) )
             foreach( $options as $key=>$value )
                 $this->setOption( $key , $value );
@@ -82,12 +60,35 @@ class SimpleTemplate_Options
     *
     *   @access     public
     *   @author     Stig S. Baaken
-    *   @param      
+    *   @param
+    *   @param
+    *   @param      boolean     if set to true options are also set
+    *                           even if no key(s) was/were found in the options property
     */
-    function setOption( $option , $value )
+    function setOption( $option , $value , $force=false )
     {
-        if (isset($this->options[$option])) {
-            $this->options[$option] = $value;
+        if( is_array($value) )                      // if the value is an array extract the keys and apply only each value that is set
+        {                                           // so we dont override existing options inside an array, if an option is an array
+            foreach( $value as $key=>$aValue )
+                $this->setOption( array($option , $key) , $aValue );
+            return true;
+        }
+
+        if( is_array($option) )
+        {
+            $mainOption = $option[0];
+            $options = "['".implode("']['",$option)."']";
+            $evalCode = "\$this->options".$options." = \$value;";
+        }
+        else
+        {
+            $evalCode = "\$this->options[\$option] = \$value;";
+            $mainOption = $option;
+        }
+
+        if( $this->_forceSetOption==true || $force==true || isset($this->options[$mainOption]) )
+        {
+            eval($evalCode);
             return true;
         }
         return false;
@@ -99,12 +100,18 @@ class SimpleTemplate_Options
     *   @access     public
     *   @author
     *   @param
+    *   @param      boolean     if set to true options are also set
+    *                           even if no key(s) was/were found in the options property
     */
-    function setOptions( $options )
+    function setOptions( $options , $force=false )
     {
         if( is_array($options) && sizeof($options) )
+        {
             foreach( $options as $key=>$value )
-                $this->setOption( $key , $value );
+            {
+                $this->setOption( $key , $value , $force );
+            }
+        }
     }
 
     /**
@@ -115,6 +122,15 @@ class SimpleTemplate_Options
     */
     function getOption($option)
     {
+        if( func_num_args() > 1 &&
+            is_array($this->options[$option]))
+        {
+            $args = func_get_args();
+            $evalCode = "\$ret = \$this->options['".implode( "']['" , $args )."'];";
+            eval( $evalCode );
+            return $ret;
+        }
+
         if (isset($this->options[$option])) {
             return $this->options[$option];
         }
@@ -122,5 +138,17 @@ class SimpleTemplate_Options
         return false;
     }
 
+    /**
+    *   returns all the options
+    *
+    *   @version    02/05/20
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @return     string      all options as an array
+    */
+    function getOptions()
+    {
+        return $this->options;
+    }
 } // end of class
 ?>
