@@ -85,14 +85,15 @@ class HTML_Template_Xipe_Filter_QuickForm extends HTML_Template_Xipe_Options
                             // if the current element is not frozen and if it is 
                             // not a submit button or a hidden field
                             // then we set _allFrozen to false
+                            // for some reason QF doesnt freeze a file element, so we ignore it here
                             $type = $element->getType();
-                            if (!$frozen && $type!='submit' && $type!='hidden') {
+                            if (!$frozen && $type!='submit' && $type!='hidden' && $type!='file') {
                                 $this->_allFrozen = false;
                             }
                         }
                     }
                 }
-                $input = str_replace($tag,$elHtml,$input);
+                $input = str_replace($tag,$this->_escape($elHtml),$input);
             }
         } 
         return $input;
@@ -116,7 +117,7 @@ class HTML_Template_Xipe_Filter_QuickForm extends HTML_Template_Xipe_Options
                         }
                     }
                 }
-                $input = str_replace($tag,$label,$input);
+                $input = str_replace($tag,$this->_escape($label),$input);
             }
         }        
         return $input;
@@ -187,6 +188,17 @@ class HTML_Template_Xipe_Filter_QuickForm extends HTML_Template_Xipe_Options
             }
         }
         return $ret;
+    }
+    
+    /**
+    * Escape all delimiters, since the content is not meant to be interpreted!
+    *
+    *
+    */
+    function _escape($string)
+    {
+        $string = str_replace($this->options['delimiter'][0],'\\'.$this->options['delimiter'][0],$string);
+        return str_replace($this->options['delimiter'][1],'\\'.$this->options['delimiter'][1],$string);
     }
 }
 
