@@ -51,6 +51,7 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
         <notes>
 * now {CONSTANT} is also echoed
 * add unit test for Filter_Internal::makePhpTags(), for the printing of constant
+* {@$var} does also print automatically now
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="HTML/Template">
