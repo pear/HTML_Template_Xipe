@@ -17,6 +17,10 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.4  2002/09/22 18:50:20  mccain
+//  - dont use short tags anymore, to be able to work with xml files
+//  - bugfix in dependencies
+//
 //  Revision 1.3  2002/07/31 13:43:47  mccain
 //  - change mode of the cache-file so the user can remove it too
 //
@@ -173,7 +177,7 @@ class SimpleTemplate_Cache extends SimpleTemplate_XMLConfig
         $extension = '';
         if( ($depends = $this->getOption('cache','depends')) )
         {
-#print $depends;
+//print $depends;
             $depends = explode(' ',$depends);
             // init $vars with the names that shall be cached, to be sure that if the values dont change but the names
             // we have to create a new name
@@ -182,16 +186,19 @@ class SimpleTemplate_Cache extends SimpleTemplate_XMLConfig
             {
                 // if the variable name is like $var['varName'] do only globalize '$var'
                 // even though things like _REQUEST,_SESSION, etc. dont need to be globalized - but it does no harm either
+                // and if it is a $class-> globalize only $class
                 $globalize = preg_replace('/\[.*\]/','',$aDepend);
+                $globalize = preg_replace('/->.*/','',$globalize);
                 // serilaize the var since it might also be an array or object, or whatever
-#print("global $globalize;\$var = serialize($aDepend);");
+//print("global $globalize;\$var = serialize($aDepend);<br>");
                 eval("global $globalize;\$var = serialize($aDepend);");
-#print $this->_templateFile." ... $var<br>";
+//print("$aDepend = $var<br>");
+//print $this->_templateFile." ... $var<br>";
                 $vars = md5("$vars:$var");
             }
             $extension = md5($vars).'.';
         }
-#print "extension=$extension<br>depends = ";print_r($depends);
+//print "extension=$extension<br>depends = ";print_r($depends);
 
         $cacheFileName = $this->_compiledFilePrefix.$extension.$this->getOption('cacheFileExtension');
         $this->_cachedFile = $cacheFileName;
@@ -212,7 +219,7 @@ class SimpleTemplate_Cache extends SimpleTemplate_XMLConfig
         // get the destination filename
         $file = $this->_getCacheFileName();
 
-#print '_cacheEnd write into: '.$file.' <br><br>';
+//print '_cacheEnd write into: '.$file.' <br><br>';
 
         if( file_exists($file) )
             unlink($file);
@@ -282,7 +289,7 @@ class SimpleTemplate_Cache extends SimpleTemplate_XMLConfig
         // we need to do it like this since we dont know the instance name of the template
         // engine and of this special instance neither, that's the easiest way to do it
         $GLOBALS[$this->_cacheObjReference] = &$this;
-#print "_createCacheObjRef = {$this->_cacheObjReference} for {$this->_templateFile}<br>";
+//print "_createCacheObjRef = {$this->_cacheObjReference} for {$this->_templateFile}<br>";
         return $this->_cacheObjReference;
     }
 
