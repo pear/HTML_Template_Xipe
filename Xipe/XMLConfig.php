@@ -17,6 +17,9 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.1  2002/05/26 17:04:30  mccain
+//  - initial commit, after restructuring and enhancing the engine
+//
 //
 
 require_once('SimpleTemplate/Main.php');
@@ -136,14 +139,14 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
         //  add the filters set in the xml config files
         //
 # TODO check for prefilter defines in xml config
-        if( $id = $config->getIdByPath('SimpleTemplate/preFilter') )  // are any preFilter given?
+        if( $id = $config->getIdByPath('simpletemplate/prefilter') )  // are any preFilter given?
         {
         }
 
         //
         //  apply xml given options to this class, do this after applying the filters
         //
-        if( $id = $config->getIdByPath('SimpleTemplate/options') )  // are any options given?
+        if( $id = $config->getIdByPath('simpletemplate/options') )  // are any options given?
         {
             $delimiter = $config->getElementByPath('delimiter',$id);
             if( $delimiter )// set new delimiters?
@@ -155,11 +158,11 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
                     $setOptions['delimiter'] = array(trim($begin),trim($end));
                 }
             }
-            if( $autoBraces = $config->getIdByPath('autoBraces',$id) )// set autoBraces?
+            if( $autoBraces = $config->getIdByPath('autobraces',$id) )// set autoBraces?
             {
-                $setOptions['autoBraces'] = false;
+                $setOptions['autobraces'] = false;
                 if( strtolower(trim($config->data[$autoBraces]['attributes']['value'])) == 'true' )
-                    $setOptions['autoBraces'] = true;
+                    $setOptions['autobraces'] = true;
             }
             if( $localeId = $config->getIdByPath('locale',$id) )// set locale?
             {
@@ -177,7 +180,7 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
             //
             if( $cacheId = $config->getIdByPath('cache',$id))  // cache-tag given?
             {
-                if( $config->data[$cacheId]['attributes']['dontCache']=='true' )
+                if( $config->data[$cacheId]['attributes']['dontcache']=='true' )
                 {
                     $setOptions['cache']['time'] = false;
                     $this->_log('XMLConfig: dont cache this file!');
