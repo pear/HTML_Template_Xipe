@@ -128,18 +128,34 @@ here additionally used Features:<br>
                 $options = array(<br>
                 &nbsp;&nbsp;'templateDir'   => $DOCUMENT_ROOT.'/path/to/where/the/tempaltes/are',<br>
                 &nbsp;&nbsp;'compileDir'    => $DOCUMENT_ROOT.'/path/to/a/tmp/dir');    // all compiled tpl's go here<br>
+                &nbsp;&nbsp;or even shorter<br>
+                &nbsp;&nbsp;'compileDir'    => 'tmp');    // now the compileDir is '&lt;templateDir&gt;/tmp'<br>
                 <br>
                 $tpl = new SimpleTemplate_Engine($options);<br>
             </code>
 
             <h2>Basic Filters</h2>
 
-            Make an instance of the filter class.<br><br>
+            If you are instanciating the template class it has since version 1.5 by default
+            the 'filterLevel' set to 10 (in the options), which means
+            that all filters that are normally needed are turned on. You can set it to 0 to turn off all filters.
+            <br>
+            The default filters are:<br>
+            Basic-filters<br>
+            - removeHtmlComments, removeCStyleComments, addIfBeforeForeach, removeEmptyLines, trimLines, optimizeHtmlCode<br>
+            TagLib-filters<br>
+            - includeFile, block, trimByWords, trim, repeat, applyHtmlEntites<br>
+
+
+            <br>
+            To manually add an additional or any custom filter simply make an instance of the filter class and register the filter
+            as shown in the following.
+            <br>
             <code>
                 require_once('SimpleTemplate/Filter/Basic.php');<br>
                 <br>
-                $tplFilter = new SimpleTemplate_Filter_Basic($tpl->options);<br>
-                // pre filter<br>
+                // NOTE: since version 1.5 you should use '$tpl->getOptions()' to get the options<br>
+                $tplFilter = new SimpleTemplate_Filter_Basic($tpl->getOptions());<br>
             </code>
             <h3>Pre-Filters</h3>
             Remove HTML comments and to optimize the HTML that will be delivered to the client.<br>
@@ -191,8 +207,14 @@ $repeatValue = {$repeatValue}<br>
 $trimValue = '{$trimValue}'<br>
 $loop = {print_r($loop)}<br>
 
-{foreach($tpl->options as $key=>$aOption)}
-    $tpl-&gt;options[{$key}] =&gt;&nbsp;{$aOption}
+<br>
+<b>The Template-instance options</b><br>
+{foreach($tpl->getOptions() as $key=>$aOption)}
+    $tpl-&gt;getOption('{$key}') =&gt;&nbsp;
+    {if(is_array($aOption))}
+        {print_r($aOption)}
+    {else}
+        {$aOption}
     <br>
 
 </code>
@@ -224,9 +246,9 @@ $loop = {print_r($loop)}<br>
         </td>
     </tr>
     <tr>
-        <td><code>\{$tpl-&gt;options['locale']\}</code></td>
+        <td><code>\{$tpl-&gt;getOption('locale')\}</code></td>
         <td>
-            {$tpl->options['locale']}
+            {$tpl->getOption('locale')}
         </td>
         <td>
             - simply <font>display any kind</font> of variables<br>
@@ -256,11 +278,11 @@ $loop = {print_r($loop)}<br>
 
     <tr>
         <td nowrap><code>
-            \{foreach($tpl-&gt;options['delimiter'] as $key=&gt;$value)\}<br>
+            \{foreach($tpl-&gt;getOption('delimiter') as $key=&gt;$value)\}<br>
             &nbsp; &nbsp;\{$key\} =&gt; \{$value\}&lt;br&gt;<br>
         </code></td>
         <td>
-            {foreach($tpl->options['delimiter'] as $key=>$value)}
+            {foreach($tpl->getOption('delimiter') as $key=>$value)}
                 {$key} =&gt; {$value}<br>
         </td>
         <td>
@@ -271,13 +293,13 @@ $loop = {print_r($loop)}<br>
 
     <tr>
         <td nowrap><code>
-            \{foreach($tpl-&gt;options as $key=&gt;$aOption)\}<br>
+            \{foreach($tpl-&gt;getOptions() as $key=&gt;$aOption)\}<br>
             &nbsp; \{$key\} =&gt;&nbsp;&lt;b&gt;\{%trim $aOption 10 "..."%\}<br>
             &nbsp; &lt;/b&gt;&lt;br&gt;
 
         </code></td>
         <td>
-            {foreach($tpl->options as $key=>$aOption)}
+            {foreach($tpl->getOptions() as $key=>$aOption)}
                 {$key} =&gt;&nbsp;<b>{%trim $aOption 10 "..."%}
                 </b><br>
         </td>
@@ -349,7 +371,7 @@ $loop = {print_r($loop)}<br>
                 require_once('SimpleTemplate/Filter/TagLib.php');<br><br>
                 // $tpl is the instance of SimpleTemplate_Engine,<br>
                 // passing this parameter passes all the options to the created instance<br>
-                $tagLib = new SimpleTemplate_Filter_TagLib($tpl->options);<br><br>
+                $tagLib = new SimpleTemplate_Filter_TagLib($tpl->getOptions());<br><br>
             </code>
         </td>
     </tr>
@@ -498,6 +520,32 @@ $loop = {print_r($loop)}<br>
         </td>
     </tr>
 
+
+    <!--
+     |
+     |  examples for "trimByWords"
+     |
+     +-->
+    <tr>
+        <td rowspan="2">TagLib, trimByWords</td>
+        <td colspan="3" class="comment">
+            <b>to activate this functionality</b><br><br>
+            <code>
+                $tpl->registerPrefilter(array(&$tagLib,'trimByWords'));<br>
+            </code>
+        </td>
+    </tr>
+    <tr>
+        <td><code>\{%trim $trimValue by words after 5 characters and add "..."%\}</code></td>
+        <td>
+            {%trim $trimValue by words after 5 characters and add "..."%}
+        </td>
+        <td>
+            - trims a string but only at spaces, if there is no space
+              at the given offset, it goes back in the string, so that the max-length
+              is not longer than the given one
+        </td>
+    </tr>
 
     <!--
      |
