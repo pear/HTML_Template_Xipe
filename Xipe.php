@@ -19,6 +19,10 @@
 /**
 *
 *   $Log$
+*   Revision 1.10  2002/04/07 17:51:50  mccain
+*   - only add the language to the compiled templates extension when a language is given
+*      *not tested*
+*
 *   Revision 1.9  2002/04/02 23:09:59  mccain
 *   - additional check in isUpToDate
 *
@@ -360,11 +364,11 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
 
         // this filter does all the default replacement of the delimiters
         $internalFilters = array();                 // empty them every time, in case this method is called multiple times in one script
-        $internalFilters[] = array('makePhpTags',$defaultFilter);
+        $internalFilters[] = array(&$defaultFilter,'makePhpTags');
         // if the option autoBraces is on apply the _first_ postFilter right here
         // which does the autBracing
         if( $this->options['autoBraces'] == true )
-            $internalFilters[] = array('autoBraces',$defaultFilter);
+            $internalFilters[] = array(&$defaultFilter,'autoBraces');
 
         $fileContent = $this->applyFilters( $fileContent , $internalFilters );
 
@@ -605,28 +609,15 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
     *   @access     public
     *   @version    01/12/03
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param      string  $functionName   the funtion to call
+    *   @param      string  $functionName   the funtion to call, or an array(&$object,'methodname')
     *   @param      object  $object         if given the function is meant to be a method of this object
     */
     function registerPrefilter( $functionName , $params=null )
     {
         if( $params != null )
         {
-            // use a reference to the object $params here, so the filters can also set internal properties
-            // and the next call to this filter still sees it, if we used no reference
-            // TagLib->block i.e. wouldnt work
-            if( !is_array($params) )
-                $this->preFilters[] = array($functionName,&$params);   // use reference here !!! see comment above in registerPrefilter
-            else
-            {
-                if( is_object($params[0]) )
-                {
-                    $params[0] = &$params[0];       // be sure to use references, reason, see above
-                    $this->preFilters[] = array($functionName,$params);
-                }
-                else
-                    $this->preFilters[] = array($functionName,$params);
-            }
+            settype($params,'array');
+            $this->preFilters[] = array($functionName,$params);   // use reference here !!! see comment above in registerPrefilter
         }
         else
             $this->preFilters[] = $functionName;
@@ -640,25 +631,15 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
     *   @access     public
     *   @version    01/12/07
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param      string  $functionName   the funtion to call
+    *   @param      string  $functionName   the funtion to call, or an array(&$object,'methodname')
     *   @param      object  $object         if given the function is meant to be a method of this object
     */
     function registerPostfilter( $functionName , $params=null )
     {
         if( $params != null )
         {
-            if( !is_array($params) )
-                $this->postFilters[] = array($functionName,&$params);   // use reference here !!! see comment above in registerPrefilter
-            else
-            {
-                if( is_object($params[0]) )
-                {
-                    $params[0] = &$params[0];
-                    $this->postFilters[] = array($functionName,$params);
-                }
-                else
-                    $this->postFilters[] = array($functionName,$params);
-            }
+            settype($params,'array');
+            $this->postFilters[] = array($functionName,$params);
         }
         else
             $this->postFilters[] = $functionName;
@@ -684,28 +665,24 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
             $startTime = $startTime[1]+$startTime[0];
             $sizeBefore = strlen($input);
 
-            if( !is_array($aFilter) )
-                $input = call_user_func( $aFilter , $input );
+            if( !is_array($aFilter) ||  // is it not an array so it is simply a function name
+                ( is_array($aFilter) && is_object($aFilter[0]) )    // or is it an array(&$object,'methodname')?
+              )
+            {
+                $input = call_user_func_array( $aFilter , array($input) );
+
+                $appliedFilter = $aFilter;
+                if( is_array($aFilter) )
+                    $appliedFilter = $aFilter[1];
+            }
             else
             {
-                if( !is_array($aFilter[1]) )
-                {
-                    $input = call_user_func( array($aFilter[1],$aFilter[0]) , $input );
-                }
-                else        // if $aFilter[1] is an array then additional parameters shall be passed to the function/method
-                {
-                    if( !is_object($aFilter[1][0]) )
-                    {                                   // not tested...
-                        array_unshift( $aFilter[1] , $input );  // input is always the first parameter, so put it at first !!!
-                        $input = call_user_func_array( $aFilter , $aFilter[1] );
-                    }
-                    else
-                    {
-                        $object = &$aFilter[1][0];   // get the object-reference!!! that shall be called
-                        array_splice( $aFilter[1] , 0 , 1 , $input );  // replace the object with $input, so the first paramter is $input !!!
-                        $input = call_user_method_array( $aFilter[0] , $object , $aFilter[1] );
-                    }
-                }
+                array_unshift($aFilter[1],$input);
+                $input = call_user_func_array( $aFilter[0] , $aFilter[1] );
+
+                $appliedFilter = $aFilter[0];
+                if( is_array($aFilter[0]) )
+                    $appliedFilter = $aFilter[0][1];
             }
 
             $sizeAfter = strlen($input);
@@ -713,10 +690,6 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
             $endTime = split(" ",microtime());
             $endTime = $endTime[1]+$endTime[0];
             $itTook = ($endTime - $startTime)*100;
-            if( is_array($aFilter) )
-                $appliedFilter = $aFilter[0];
-            else
-                $appliedFilter = $aFilter;
 
             if( $this->getOption('logLevel') > 0 )
                 $this->logObject->log("applying filter: '$appliedFilter' \ttook=$itTook ms, \tsize before: $sizeBefore Byte, \tafter: $sizeAfter Byte");
@@ -968,26 +941,21 @@ print '_cacheEnd write into: '.$this->_cachedOutput.' <br><br>';
     */
     function applyOptionsToFilterClasses($setOptions)
     {
-        $filters = array();
-
         // go thru all filters and get each class ONCE in the variable $filters
         $allFilters = array_merge( $this->preFilters , $this->postFilters );
         foreach( $allFilters as $aFilter )
-#        foreach( $this->preFilters as $aFilter )
         {
-            if( is_array($aFilter[1]) )
-                $curClass = &$aFilter[1][0];
-            else
-                $curClass = &$aFilter[1];
-
-# obviously each reference to the filter classes is different, its not enough to set
-# the options just once for each class that is used for the filter :-(
-# i dont really understand how php does that, or why, may be i have some error somewhere too :-)
-
-#            if( !$filters[get_class($curClass)] )
+            if( !is_array($aFilter) ||  // is it not an array so it is simply a function name
+                ( is_array($aFilter) && is_object($aFilter[0]) )    // or is it an array(&$object,'methodname')?
+              )
             {
-                $filters[get_class($curClass)] = true;
-                call_user_func( array($curClass,'setOptions') , $setOptions );
+                if( is_array($aFilter) )
+                    call_user_func( array(&$aFilter[0],'setOptions') , $setOptions );
+            }
+            else
+            {
+                if( is_array($aFilter[0]) )
+                    call_user_func( array(&$aFilter[0][0],'setOptions') , $setOptions );
             }
         }
     }
