@@ -18,6 +18,9 @@
 //
 //
 //  $Log$
+//  Revision 1.16  2002/06/21 20:53:22  mccain
+//  - added _activateFilterLevel method
+//
 //  Revision 1.15  2002/05/26 17:05:25  mccain
 //  - moved actual content to Main.php
 //  - this is now the wrapper to make the tpl-engine useable with multiple files,
@@ -116,6 +119,8 @@ class SimpleTemplate_Engine
     */
     function _activateFilterLevel()
     {
+# FIXXME all filters that get registered before $tpl->setOption('filterLevel',x) will be lost !!!!
+# because of the following line!!!
         $this->_defaultObject->unregisterFilter();
         $filterLevel = $this->_defaultObject->getOption('filterLevel');
         if( $filterLevel > 0 )
