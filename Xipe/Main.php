@@ -18,6 +18,9 @@
 //
 //  restarting to write log messages at version 1.5
 //  $Log$
+//  Revision 1.8  2002/11/03 12:52:40  mccain
+//  - preperation for version 1.6.1
+//
 //  Revision 1.7  2002/11/02 19:43:03  mccain
 //  - whitespaces
 //
@@ -302,7 +305,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
         if( !@is_dir($compileDir) )                 // check if the compile dir has been created
         {
             return $this->_error(   "'compileDir' could not be accessed <br>".
-                                    "1. pleace create the 'compileDir' which is: <b>'$compileDir'</b><br>2. give write-rights to it" ,
+                                    "1. please create the 'compileDir' which is: <b>'$compileDir'</b><br>2. give write-rights to it" ,
                                     PEAR_ERROR_DIE );
         }
 
@@ -310,7 +313,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
 // i dont know how to check if "enter" rights are given
         {
             return $this->_error(   "can not write to 'compileDir', which is <b>'$compileDir'</b><br>".
-                                    "1. pleace give write and enter-rights to it" , PEAR_ERROR_DIE );
+                                    "1. please give write and enter-rights to it" , PEAR_ERROR_DIE );
         }
 
 //print "file=$file<br>";
