@@ -77,7 +77,7 @@ class HTML_Template_Xipe_Filter_Internal extends HTML_Template_Xipe_Options
 //                                '{$1$GLOBALS[\'$3\']$4 /*...1=$1...2=$2...3=$3....4=$4....5=$5.... */}' ,
 //                                $input );
 
-        // replace { by < ?php  ({ is the delimiter)
+        // replace '{' by < ?php  ('{' is the delimiter)
         $regExp = "/(^|[^\\\])$qBegin([^%])/Um";    // modifier m makes '{foo}{bar}' on one line work too
         $input = preg_replace(  $regExp ,
                                 '$1<?php $2' ,
@@ -92,6 +92,14 @@ class HTML_Template_Xipe_Filter_Internal extends HTML_Template_Xipe_Options
         $input = preg_replace(  $regExp ,
                                 '<?php echo $' ,
                                 $input );
+        // replace all php tags, where there is only one space after it
+        // by echoing the stuff that follows, but not if a control structure follows
+        // actually we only do this for CONSTANTS now. And they have to be capital, at least the first letter!!!
+        $regExp = "/<\?php\s([A-Z]+)/Um";
+        $input = preg_replace(  $regExp ,
+                                '<?php echo $1' ,
+                                $input );
+         
 
         //
         // replace escaped delimiters like \{ or \}
