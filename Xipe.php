@@ -19,6 +19,10 @@
 /**
 *
 *   $Log$
+*   Revision 1.11  2002/04/15 20:25:35  mccain
+*   - changed the way methods and objects are passed to a filter !!!
+*   - !! caching doesnt work yet either !!
+*
 *   Revision 1.10  2002/04/07 17:51:50  mccain
 *   - only add the language to the compiled templates extension when a language is given
 *      *not tested*
@@ -158,7 +162,7 @@
 require_once('Benchmark/Timer.php');
 require_once('SimpleTemplate/Options.php');
 require_once('SimpleTemplate/Filter/Internal.php');
-require_once('Log/Log.php');
+require_once('Log.php');
 
 /**
 *   the intention is to use normal php in the template without the need to write
@@ -479,15 +483,13 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
         $recompile = false;
         if( $this->getOption('forceCompile') )
         {
-            if( $this->getOption('logLevel') > 0 )
-                $this->logObject->log('recompile because option "forceCompile" is true');
+            $this->_log('recompile because option "forceCompile" is true');
             return true;
         }
 
         if( !$this->isUpToDate() )              // check if the template has changed
         {
-            if( $this->getOption('logLevel') > 0 )
-                $this->logObject->log('recompile because tpl has changed/was removed: '.$this->currentTemplate);
+            $this->_log('recompile because tpl has changed/was removed: '.$this->currentTemplate);
             return true;
         }
         return false;
@@ -549,13 +551,12 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
         $startTime = split(" ",microtime());
         $startTime = $startTime[1]+$startTime[0];
 
-        $this->logObject = Log::factory('file',$this->_logFileName);
 // actually the above line should work :-(
 #require_once('Log/Log/file.php');
 #$this->logObject = new Log_file($logFile);
 
-        $this->logObject->log('compilation/deliverance started');
-        $this->logObject->log('Locale:'.$this->options['locale']);
+        $this->_log('compilation/deliverance started');
+        $this->_log('Locale:'.$this->options['locale']);
 
         if( $this->_needsRecompile() || $this->_applyXmlConfigIfNeeded() )
             if( !$this->parse() )
@@ -564,8 +565,7 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
         $endTime = split(" ",microtime());
         $endTime = $endTime[1]+$endTime[0];
         $itTook = ($endTime - $startTime)*100;
-        if( $this->getOption('logLevel') > 0 )
-            $this->logObject->log("(compilation and) deliverance took: $itTook ms\n");
+        $this->_log("(compilation and) deliverance took: $itTook ms\n");
 
         $timer->stop();
         $this->compileTime = $timer->timeElapsed();
@@ -691,8 +691,7 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
             $endTime = $endTime[1]+$endTime[0];
             $itTook = ($endTime - $startTime)*100;
 
-            if( $this->getOption('logLevel') > 0 )
-                $this->logObject->log("applying filter: '$appliedFilter' \ttook=$itTook ms, \tsize before: $sizeBefore Byte, \tafter: $sizeAfter Byte");
+            $this->_log("applying filter: '$appliedFilter' \ttook=$itTook ms, \tsize before: $sizeBefore Byte, \tafter: $sizeAfter Byte");
         }
 
 
@@ -820,8 +819,7 @@ print '_cacheEnd write into: '.$this->_cachedOutput.' <br><br>';
                     if( !$this->isUpToDate($possibleConfigFile) )   // check if one of the xml config files is newer than the compiled template
                     {
                         $this->xmlConfigUpdated = true;             // if so remember that so the template gets recompiled
-                        if( $this->getOption('logLevel') > 0 )
-                            $this->logObject->log('recompile because XML-config file is newer than compiled template: '.$possibleConfigFile);
+                        $this->_log('recompile because XML-config file is newer than compiled template: '.$possibleConfigFile);
                     }
                 }
             }
@@ -993,6 +991,26 @@ print '_cacheEnd write into: '.$this->_cachedOutput.' <br><br>';
         echo '<span style="color:008000; background-color:FBFEA1;">';
         echo $message;
         echo '</span><br><br>';
+    }
+
+    /**
+    *   logs errors depending on the loglevel it does either write them
+    *   in a file or leaves it all the way
+    *
+    *   @access     public
+    *   @version    02/05/13
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  the log message
+    */
+    function _log( $message )
+    {
+        if( $this->getOption('logLevel') == 0 )     // if logLevel is 0 nothing shall be logged
+            return;
+
+        if( !is_object($this->logObject) && $this->_logFileName )
+            $this->logObject = Log::factory('file',$this->_logFileName);
+
+        $this->logObject->log($message);
     }
 }
 ?>
