@@ -17,6 +17,9 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.4  2002/10/02 19:01:28  mccain
+//  - replace # by //
+//
 //  Revision 1.3  2002/09/22 18:51:55  mccain
 //  - make xml-config for autoBraces work, was buggy
 //  - enable applying filters via xml-config
@@ -291,7 +294,7 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
 // FIXXME we only handle a tiny bit of all possible settings yet
             $class = $treeObj->data[$aFilter]['attributes']['class'];
             $classFile = $treeObj->data[$aFilter]['attributes']['classFile'];
-            // do we have a class name? then make an instance of it and apply all[Pre|Post]Filters
+            // do we have a class name? then make an instance of it and apply all(Pre|Post)Filters
             if( $class )
             {
                 if( !$classFile )
