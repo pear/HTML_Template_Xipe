@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.7  2002/05/21 23:01:55  mccain
+*   - added a filter which invokes all pre filters and one for all post filters too
+*
 *   Revision 1.6  2002/05/13 11:56:07  mccain
 *   - added filter which converts everything to proper html by default
 *
@@ -128,9 +131,6 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
     *   @var    array   $options    the options for initializing the filter class
     */
     var $options = array(   'delimiter'     => array() );   // first value of the array is the begin delimiter, second the end delimiter
-
-# remove the constructor one day, i feel that passing the delimiters to this class makes it all somehow unclean
-# but therefore we have to move addIfBeforeForeach too, since it depends on having the delimiters
 
     /**
     *   apply (almost) all filters available in this class
