@@ -149,6 +149,7 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
         $closeDel = preg_quote($this->getOption('delimiter',1));
         $_openDel = $this->getOption('delimiter',0);
         $_closeDel = $this->getOption('delimiter',1);
+        $autoBraces = $this->getOption('autoBraces');
         
         // find those repeats which dont have no variable that is given as the loop variable
         // we need to do this, since the next regExp needs this variable name, because
@@ -176,7 +177,7 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
                                 '/',
 
                                 "\n$1".$_openDel.
-                                "for($5=0;$5<$2;$5++)".
+                                "for($5=0;$5<$2;$5++)".($autoBraces?'':':').
                                 $_closeDel,
 
                                 //"REPEAT:<br>1='$1'<br>2='$2'<br>3='$3'<br>4='$4'<br>5='$5'<br>6='$6'<br>" , // for testing
@@ -184,7 +185,7 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
 
         // if someone has autoBraces on and uses this.... well that would be a user-mistake, or a missing doc :-)
         $regExp = '/[^\\\]'.$openDel.'%\s*endrepeat\s*%'.$closeDel.'/Ui';
-        $input = preg_replace( $regExp , $_openDel.' \\} '.$_closeDel , $input );
+        $input = preg_replace( $regExp , $_openDel.($autoBraces?' \\} ':' endfor ').$_closeDel , $input );
         
         return $input;
         /* TESTS
@@ -320,6 +321,8 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
 // FIXXXME discover all the functions that are used in the current file
 // BUT only if it is no template, because then we assume it is a macro file!!! or smthg like this
 // so only those functions are pasted inside the code!!! //"
+// OTHER IDEA
+// may be just compile the files that shall be included and replace the {%include by a php-include
                                 
         // this var contains all the files this method has already included
         // we count them to prevent recursive inclusion of files!
@@ -330,11 +333,9 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
         $parseAgain = true;
         while ($parseAgain) {
             // if there are no more {%include%} tags in the file content, then we dont have to
-            // loop again
-            if (!preg_match_all( '/'.$openDel.'%\s*include\s+(.+)\s*%'.$closeDel.'/U' , $input , $includes )) {
-
+            // loop again. This is to handle included files that have includes inside.
+            if (!preg_match_all( '/'.$openDel.'%\s*include\s+(.+)\s*%'.$closeDel.'/U',$input,$includes)) {
                 $parseAgain = false;
-
             } else {
     //print_r($includes);
                 if (sizeof($includes[1])) {
@@ -348,27 +349,25 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
                         if (in_array($fileToInclude,$justIncluded)) {
 //FIXXXME i need a nicer error handling way
 // somehow i would need to make the Xipe-Error method from the Main.php to be called statically!!!
-print "<b>Xipe-Error</b><br>The file <b>$fileToInclude</b> is included recursively, this is not possible!<br>";
+print "<b>Xipe-Error</b><br>The file <b>{$_aInclude}</b> is included recursively, this is not possible!<br>";
                             break(2);
                         }
                         $justIncluded[] = $fileToInclude;
 
                         // do only include a file that really exists, otherwise the tag also stays there, so the programmer removes it
                         // do also search for the file in the include path, but as the second option only!
-                        if ($content = @file($fileToInclude)) {
+                        if ($fileContent = @file_get_contents($fileToInclude)) {
                             $contentFile = $fileToInclude;
                         } else {
-                            if ($content = @file($aInclude,true)) {
+                            if ($fileContent = @file_get_contents($aInclude,true)) {
                                 $contentFile = $aInclude;
                             }
                         }
 
-                        if ($content) {
+                        if ($fileContent) {
                             $pathInfo = pathinfo($contentFile);
 
-                            if ($this->getOption('macroExtension')!=$pathInfo['extension']) {
-                                $fileContent = implode("\n",$content);
-                            } else {
+                            if ($this->getOption('macroExtension')==$pathInfo['extension']) {
                                 // do only include the files content if we didnt include it yet
                                 // just like 'include_once' only that it does it by default :-)
                                 // this only works if we are only using one instance of the filter, which is not the case
@@ -377,9 +376,6 @@ print "<b>Xipe-Error</b><br>The file <b>$fileToInclude</b> is included recursive
                                 if (!in_array($contentFile,$this->_includedFiles)) {
             //print "including: $contentFile<br>";
                                     $this->_includedFiles[] = $contentFile;
-                                    // read the file
-                                    $fileContent = implode("\n",$content);
-
                                     // put an if around the entire macro file, so it wont even be parsed
                                     // if it is already once in the code, this takes care of not multiple
                                     // times defining functions (macros in this case)
