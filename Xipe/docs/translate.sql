@@ -29,7 +29,7 @@ INSERT INTO translate_de VALUES (1, 'hier zusätzlich benutzte Features:', '0');
 INSERT INTO translate_de VALUES (2, 'Quellcode', '0');
 INSERT INTO translate_de VALUES (3, 'englisch', '0');
 INSERT INTO translate_de VALUES (4, 'deutsch', '0');
-INSERT INTO translate_de VALUES (5, 'übersetzen (z.B. in $2 )', '0');
+INSERT INTO translate_de VALUES (5, 'übersetzen (z.B. in $1 )', '0');
 INSERT INTO translate_de VALUES (6, 'dann solltest Du SimpleTemplate ausprobieren.', '0');
 INSERT INTO translate_de VALUES (7, 'nebenbei konvertiert translate auch alle Texte in korrektes HTML wenn Du magst, wobei in DB alles normal abgelegt ist', '0');
 # --------------------------------------------------------
