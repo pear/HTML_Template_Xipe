@@ -18,6 +18,11 @@
 //
 //
 //  $Log$
+//  Revision 1.15  2002/05/26 17:05:25  mccain
+//  - moved actual content to Main.php
+//  - this is now the wrapper to make the tpl-engine useable with multiple files,
+//    which are internally handled as an instance each
+//
 //
 
 /**
@@ -94,23 +99,39 @@ class SimpleTemplate_Engine
         // set it to a defined value so methods like 'getOption' is available after the constructor call
         $this->_lastUsedObject = &$this->_defaultObject;
 
-        // copy all the options in here, so external use of $tpl->options work properly - deprectated
+        // copy all the options in here, so external use of $tpl->options work properly - using $tpl->options is deprectated!!!
         // ATTENTION: use $tpl->getOption() instead
         $this->options = $this->_defaultObject->getOptions();
 
-        if( $this->_defaultObject->getOption('filterLevel') == 10 )
+        $this->_activateFilterLevel();
+    }
+
+    /**
+    *   this method handles the filterlevel, since that is a thing, that is
+    *   handled in this file, not in the Main.php
+    *
+    *   @access     public
+    *   @version    02/06/21
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    */
+    function _activateFilterLevel()
+    {
+        $this->_defaultObject->unregisterFilter();
+        $filterLevel = $this->_defaultObject->getOption('filterLevel');
+        if( $filterLevel > 0 )
         {
             require_once('SimpleTemplate/Filter/TagLib.php');
             // pass the options used in the template class, so we set the same delimiters in the filter
             $tagLib = new SimpleTemplate_Filter_TagLib($this->_defaultObject->getOptions());
-            $this->registerPrefilter(array(&$tagLib,'allPrefilters'));
+            $this->registerPrefilter(array(&$tagLib,'allPrefilters'),$filterLevel);
 
             require_once('SimpleTemplate/Filter/Basic.php');
             $tplFilter = new SimpleTemplate_Filter_Basic($this->_defaultObject->getOptions());
-            $this->registerPrefilter(array(&$tplFilter,'allPrefilters'));
-            $this->registerPostfilter(array(&$tplFilter,'allPostfilters'));
+            $this->registerPrefilter(array(&$tplFilter,'allPrefilters'),$filterLevel);
+            $this->registerPostfilter(array(&$tplFilter,'allPostfilters'),$filterLevel);
         }
     }
+
 
     /**
     *
@@ -293,7 +314,10 @@ class SimpleTemplate_Engine
     }
     function setOption( $option , $value , $force=false )
     {
-        return $this->_lastUsedObject->setOption( $option , $value , $force );
+        $ret = $this->_lastUsedObject->setOption( $option , $value , $force );
+        if( $option == 'filterLevel' ) // handle the filterLevel special, since it is handled in this file here!!!
+            $this->_activateFilterLevel();
+        return $ret;
     }
 
 
