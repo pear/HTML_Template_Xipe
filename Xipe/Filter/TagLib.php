@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.14  2002/11/08 22:51:28  mccain
+*   - removed 's' modifier in macro method, which is not needed anyway and caused problems with multiple appearances
+*
 *   Revision 1.13  2002/10/16 19:00:44  mccain
 *   - include every macro only once, so i set a if-def kinda around it
 *
@@ -186,6 +189,10 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
         $input = $this->repeat($input);
 
         $input = $this->applyHtmlEntites($input);
+
+        $input = $this->loop($input);
+        $input = $this->condition($input);
+        $input = $this->end($input);
 
         return $input;
     }
@@ -602,6 +609,45 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
         return $input;
     }
 
+    function loop( $input )
+    {
+        $input = $this->_replaceName( $input , 'while' );
+        $input = $this->_replaceName( $input , 'for' );
+        return $this->_replaceName( $input , 'foreach' );
+    }
+
+    function condition( $input )
+    {
+        return $this->_replaceName( $input , 'if' );
+    }
+
+    function _replaceName( $input , $name )
+    {
+        $openBrace = '{';
+        if( $this->getOption('delimiter',0) == '{' )
+            $openBrace = '\{';
+
+        $input = preg_replace(  '/'.preg_quote($this->getOption('delimiter',0)).
+                                '%\s*'.$name.'\s*\((.*)\)\s*%'.preg_quote($this->getOption('delimiter',1)).
+                                '/Ui' ,
+                                "<?php $name($1) $openBrace ?>" ,
+                                $input );
+        return $input;
+    }
+
+    function end( $input )
+    {
+        $closeBrace = '}';
+        if( $this->getOption('delimiter',0) == '{' )
+            $closeBrace = '\}';
+
+        $input = preg_replace(  '/'.preg_quote($this->getOption('delimiter',0)).
+                                '%\s*end\s*%'.preg_quote($this->getOption('delimiter',1)).
+                                '/Umi' ,
+                                "<?php $closeBrace ?>" ,
+                                $input );
+        return $input;
+    }
 }
 
 ?>
