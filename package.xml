@@ -43,14 +43,13 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
         </maintainer>
     </maintainers>
     <release>
-        <version>1.7.5</version>
-        <date>2003-09-22</date>
+        <version>1.7.6</version>
+        <date>2003-12-06</date>
         <license>PHP License</license>
         <state>stable</state>
         <notes>
-* obviously PEAR::Log has changed, thanks for the hint to Tom Van de Velde
-  now using writeOut() to write to the log file
-* added experimental QuickForm filter, not documented!
+* fix for new Log-API
+* minimal bugfixes
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="HTML/Template">
@@ -128,13 +127,25 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
 
         <deps>
             <dep type="pkg" rel="ge" version="0.2">Tree</dep>
-            <dep type="pkg" rel="ge" version="1.6">Log</dep>
+            <dep type="pkg" rel="ge" version="1.8">Log</dep>
         </deps>
 
     </release>
 
 
     <changelog>
+        <release>
+            <version>1.7.5</version>
+            <date>2003-09-22</date>
+            <license>PHP License</license>
+            <state>stable</state>
+            <notes>
+    * obviously PEAR::Log has changed, thanks for the hint to Tom Van de Velde
+    now using writeOut() to write to the log file
+    * added experimental QuickForm filter, not documented!
+            </notes>
+        </release>
+
         <release>
             <version>1.7.4</version>
             <date>2003-06-17</date>
