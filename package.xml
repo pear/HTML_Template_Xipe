@@ -45,7 +45,7 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
 
     <release>
         <version>1.7</version>
-        <date>2003-01-14</date>
+        <date>2003-01-16</date>
         <license>PHP License</license>
         <state>stable</state>
         <notes>
