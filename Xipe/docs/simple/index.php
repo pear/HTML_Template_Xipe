@@ -8,14 +8,22 @@
     require_once('SimpleTemplate/Engine.php');
     require_once('SimpleTemplate/Filter/Basic.php');
 
-
-
     #####################################
     #
     #   make template class instance
     #
     $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/simple',
-                        'compileDir'    => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/simple/tmp');
+                        'compileDir'    => 'tmp',   // use the compile dir 'tmp' under the tempalte dir
+                        // or use the following line to specifiy a complete path
+                        //'compileDir'    => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/simple/tmp',
+
+                        'verbose'   => true,    // this is default too
+                        'locale'    => '',      // there is no language stuff here
+                        'logLevel'  => 1,
+
+                        // let me define the filters i want to use
+                        'filterLevel'   => 0
+                        );
     $tpl = new SimpleTemplate_Engine($options);
 
 
@@ -24,7 +32,7 @@
     #
     #   make filter class instance
     #
-    $tplFilter = new SimpleTemplate_Filter_Basic($tpl->options);
+    $tplFilter = new SimpleTemplate_Filter_Basic($tpl->getOptions());
     // pre filter
     $tpl->registerPrefilter(array(&$tplFilter,'removeHtmlComments'));
     $tpl->registerPrefilter(array(&$tplFilter,'removeCStyleComments'));
@@ -62,6 +70,6 @@
     #   show the template
     #
     $tpl->compile('index.tpl');
-    include($tpl->compiledTemplate);
+    include($tpl->getCompiledTemplate());
 
 ?>

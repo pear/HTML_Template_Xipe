@@ -11,11 +11,15 @@
     require_once('SimpleTemplate/Engine.php');
 
     $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/fullFeatured',
-                        'compileDir'    => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/fullFeatured/tmp');
+                        'compileDir'    => 'tmp');
 
     $tpl = new SimpleTemplate_Engine($options);
 
 
+/*
+    you dont need to add every filter manually anymore,
+    one of the default-options is now: 'filterLevel' => 10
+    if this is set to 10 all default filters are applied
 
     #####################################
     #
@@ -23,7 +27,7 @@
     #
     require_once('SimpleTemplate/Filter/Basic.php');
 
-    $tplFilter = new SimpleTemplate_Filter_Basic($tpl->options);
+    $tplFilter = new SimpleTemplate_Filter_Basic($tpl->getOptions());
     // pre filter
     $tpl->registerPrefilter(array(&$tplFilter,'removeHtmlComments'));
     $tpl->registerPrefilter(array(&$tplFilter,'removeCStyleComments'));
@@ -48,7 +52,7 @@
     $tpl->registerPrefilter(array(&$tagLib,'trim'));
     $tpl->registerPrefilter(array(&$tagLib,'repeat'));
     $tpl->registerPrefilter(array(&$tagLib,'applyHtmlEntites'));
-
+*/
 
 
     #####################################
@@ -81,7 +85,7 @@
         // but only within the $translator->possibleMarkUpDelimiters, so not every
         // < ?= is translated !!! since that is not wanted anyway,
         // i.e. think of "<td colspan={$colspan}>" - doesnt need translation
-        $translateFilter = new SimpleTemplate_Filter_Translate($tpl->options);
+        $translateFilter = new SimpleTemplate_Filter_Translate($tpl->getOptions());
         $tpl->registerPostfilter(   array(&$translateFilter,'applyTranslateFunction'),
                                     array('translateAndPrint',$translator->possibleMarkUpDelimiters) );
 
@@ -115,6 +119,6 @@
     #   show the template
     #
     $tpl->compile('index.tpl');
-    include($tpl->compiledTemplate);
+    include($tpl->getCompiledTemplate());
 
 ?>

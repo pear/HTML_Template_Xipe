@@ -15,7 +15,9 @@
     #   make template class instance
     #
     $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/xmlConfig',
-                        'compileDir'    => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/xmlConfig/tmp');
+                        'compileDir'    => 'tmp',
+                        'enable-XMLConfig'=>true,
+                        'logLevel'      => 1 );
     $tpl = new SimpleTemplate_Engine($options);
 
 #$tpl->setOption('forceCompile',true);
@@ -24,7 +26,7 @@
     #
     #   make filter class instance
     #
-    $tplFilter = new SimpleTemplate_Filter_Basic($tpl->options);
+    $tplFilter = new SimpleTemplate_Filter_Basic($tpl->getOptions());
     // pre filter
     $tpl->registerPrefilter(array(&$tplFilter,'removeHtmlComments'));
     $tpl->registerPrefilter(array(&$tplFilter,'removeCStyleComments'));
@@ -62,6 +64,6 @@
     #   show the template
     #
     $tpl->compile('index.tpl');
-    include($tpl->compiledTemplate);
+    include($tpl->getCompiledTemplate());
 
 ?>
