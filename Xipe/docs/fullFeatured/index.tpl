@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Example - SimpleTemplate</title>
+        <title>Example - HTML_Template_Xipe</title>
         <link href="../style.css" type="text/css" rel="StyleSheet">
     </head>
 
@@ -12,10 +12,6 @@
     </style>
 <body>
 
-<a href="http://sourceforge.net/projects/simpletpl/">DOWNLOAD</a><br>
-<a href="{$viewClassCodeUrl}">class SimpleTemplate</a> source code<br>
-<a href="{$viewFilterCodeUrl}">class SimpleTemplate_Filter_Basic</a> source code</a><br>
-<a href="{$viewTagLibCodeUrl}">class SimpleTemplate_Filter_TagLib</a> source code</a><br>
 <br>
 
 here additionally used Features:<br>

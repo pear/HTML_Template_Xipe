@@ -248,9 +248,9 @@ font
     padding:7px;
 }
 
-code
+code, .code
 {
     font-style: Courier;
-    background-color:lightgrey;
-    color:#AC1D2E;
+    background-color: #EEEEFE;
+    color: #AC1D2E;
 }
