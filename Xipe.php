@@ -243,7 +243,7 @@ class HTML_Template_Xipe
         // if we are on a windows, which we check using the directory-separator (is there an easier way?)
         // we better work with case independent filenames, apache converts
         // i.e. the doc-root to lower case (at least on my test machine)
-        if (DIRECTORY_SEPARATOR=='\\') {
+        if (OS_WINDOWS) {
             $filename = strtolower($filename);
             $templateDir = strtolower($templateDir);
         }
