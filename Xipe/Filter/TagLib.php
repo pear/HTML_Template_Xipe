@@ -145,38 +145,47 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
     */
     function repeat( $input )
     {
+        $openDel = preg_quote($this->getOption('delimiter',0));
+        $closeDel = preg_quote($this->getOption('delimiter',1));
+        $_openDel = $this->getOption('delimiter',0);
+        $_closeDel = $this->getOption('delimiter',1);
+        
         // find those repeats which dont have no variable that is given as the loop variable
         // we need to do this, since the next regExp needs this variable name, because
         // we can not use the $5 to check if it is given (down there in the second regExp)... bummer
         $counterName = '$_someUniqueVariableName';  // generate something here
-        $input = preg_replace(  '/'.preg_quote($this->options['delimiter'][0]).
-                                '%\s*repeat\s+([^\s%]+)([^\$]*)%'.preg_quote($this->options['delimiter'][1]).
+        $input = preg_replace(  '/'.$openDel.
+                                '%\s*repeat\s+([^\s%]+)([^\$]*)%'.$closeDel.
                                 '/',
 
                                 //"PRE-REPEAT:<br>1='$1'<br>2='$2'<br>3='$3'<br>4='$4'<br>5='$5'<br>" , // for testing
-                                $this->options['delimiter'][0].
+                                $_openDel.
                                 "%repeat $1 $counterName%".
-                                $this->options['delimiter'][1],
+                                $_closeDel,
 
                                 $input);
 
         $input = preg_replace(  '/\n(.*)'.          // save the indention in $1
-                                preg_quote($this->options['delimiter'][0]).
+                                $openDel.
                                 '%\s*repeat\s+'.    // find begin delimiter repeat at least one space behind and variable spaces before
                                 '([^\s]+)'.         // find everything until the next space, which is the count variable $2
                                 '(([^\$%]*)?(\$[^\s]+)?)?'. // find the loop varibale name $5, a lot of stuff around it is optional (?)
                                                     // the variable name has to start with a $ and spaces are excluded, so we trim it too
                                 '\s*%'.             // optional numbner of spaces before closing delimiter
-                                preg_quote($this->options['delimiter'][1]).
+                                $closeDel.
                                 '/',
 
-                                "\n$1".$this->options['delimiter'][0].
+                                "\n$1".$_openDel.
                                 "for($5=0;$5<$2;$5++)".
-                                $this->options['delimiter'][1],
+                                $_closeDel,
 
                                 //"REPEAT:<br>1='$1'<br>2='$2'<br>3='$3'<br>4='$4'<br>5='$5'<br>6='$6'<br>" , // for testing
                                 $input);  // replace unnecessary spaces, so the next regexp is shorter and easier
 
+        // if someone has autoBraces on and uses this.... well that would be a user-mistake, or a missing doc :-)
+        $regExp = '/[^\\\]'.$openDel.'%\s*endrepeat\s*%'.$closeDel.'/Ui';
+        $input = preg_replace( $regExp , $_openDel.' \\} '.$_closeDel , $input );
+        
         return $input;
         /* TESTS
 
