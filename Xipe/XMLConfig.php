@@ -177,7 +177,7 @@ class HTML_Template_Xipe_XMLConfig extends HTML_Template_Xipe_Main
             //
             if( $cacheId = $config->getIdByPath('cache',$id))  // cache-tag given?
             {
-                if( $config->data[$cacheId]['attributes']['dontcache']=='true' )
+                if( @$config->data[$cacheId]['attributes']['dontcache']=='true' )
                 {
                     $setOptions['cache']['time'] = false;
                     $this->_log('XMLConfig: dont cache this file!');
@@ -278,8 +278,8 @@ class HTML_Template_Xipe_XMLConfig extends HTML_Template_Xipe_Main
         foreach( $filters as $aFilter )
         {
 // FIXXME we only handle a tiny bit of all possible settings yet
-            $class = $treeObj->data[$aFilter]['attributes']['class'];
-            $classFile = $treeObj->data[$aFilter]['attributes']['classFile'];
+            $class = @$treeObj->data[$aFilter]['attributes']['class'];
+            $classFile = @$treeObj->data[$aFilter]['attributes']['classFile'];
             // do we have a class name? then make an instance of it and apply all(Pre|Post)Filters
             if( $class )
             {

@@ -706,19 +706,21 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
     */
     function _log( $message )
     {
-        if( $this->getOption('logLevel') == 0 )
-            return;
+        if ($this->getOption('logLevel') == 0) {
+            return;                             
+        }
 
-        if( $this->getOption('debug') > 0 )
+        if ($this->getOption('debug') > 0) {
             print("LOG MESSAGE: $message.<br>");
+        }
         // dont log the same messages multiple times
-        if( $this->_loggedMessages[md5($message)] )
+        if (!empty($this->_loggedMessages[md5($message)])) {
             return;
+        }
 
         $this->_loggedMessages[md5($message)] = true;
 
-        if( !is_object($this->logObject) || !$this->_logFileName )
-        {
+        if ((!empty($this->logObject) && !is_object($this->logObject)) || !$this->_logFileName ) {
             $this->_logFileName = $this->_compiledFilePrefix.$this->getOption('logFileExtension');
             $this->logObject = Log::factory('file',$this->_logFileName);
             $this->_log('---------------------');
