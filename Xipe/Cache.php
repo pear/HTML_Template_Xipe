@@ -17,6 +17,9 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.3  2002/07/31 13:43:47  mccain
+//  - change mode of the cache-file so the user can remove it too
+//
 //  Revision 1.2  2002/06/02 23:15:11  mccain
 //  - removed not needed require
 //
@@ -170,15 +173,20 @@ class SimpleTemplate_Cache extends SimpleTemplate_XMLConfig
         $extension = '';
         if( ($depends = $this->getOption('cache','depends')) )
         {
+#print $depends;
             $depends = explode(' ',$depends);
             // init $vars with the names that shall be cached, to be sure that if the values dont change but the names
             // we have to create a new name
             $vars = $depends;
             foreach( $depends as $aDepend )
             {
+                // if the variable name is like $var['varName'] do only globalize '$var'
+                // even though things like _REQUEST,_SESSION, etc. dont need to be globalized - but it does no harm either
+                $globalize = preg_replace('/\[.*\]/','',$aDepend);
                 // serilaize the var since it might also be an array or object, or whatever
-                eval("global \$aDepend;\$var = serialize($aDepend);");
-#print $var;
+#print("global $globalize;\$var = serialize($aDepend);");
+                eval("global $globalize;\$var = serialize($aDepend);");
+#print $this->_templateFile." ... $var<br>";
                 $vars = md5("$vars:$var");
             }
             $extension = md5($vars).'.';
@@ -248,7 +256,7 @@ class SimpleTemplate_Cache extends SimpleTemplate_XMLConfig
     */
     function _makeCacheable( $input )
     {
-        $input = sprintf(   '<'.'? ob_start() ?'.'>%s<'.'? $%s->_cacheEnd() ?'.'>' ,
+        $input = sprintf(   '<'.'?php ob_start() ?'.'>%s<'.'?php $%s->_cacheEnd() ?'.'>' ,
                             $input ,
                             $this->_createCacheObjRef() );
         return $input;
