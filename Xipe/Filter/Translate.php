@@ -17,6 +17,9 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.1  2002/04/15 20:24:09  mccain
+//  - initial commit, moved here from Basic
+//
 //
 
 require_once('SimpleTemplate/Options.php');
@@ -63,20 +66,52 @@ class SimpleTemplate_Filter_Translate extends SimpleTemplate_Options
 # but must become better
 
             $input = preg_replace(
-                                    // $ [^ ? >]    takes care of only applying the method to the proper block, i think there is some reg-exp modifier for that too, but dont know yet
+                                    // $ [^ ? >]    takes care of only applying the method to the proper block,
+                                    //              i think there is some reg-exp modifier for that too, but dont know yet
                                     // (->)?        takes care of class operators to be included in the translation
-                                    '/('.$begin.'<\?=)(\$([^?>](->)?)*)(\?>'.$end.')/i' ,
+                                    '/('.$begin.'<\?php\secho\s)(\$([^?>](->)?)*)(\?>'.$end.')/i' ,
                                     "$1$functionName($2)$5" ,
                                     $input );
         }
         return $input;
 
 /*
-    TEST CASES THAT PASSED:
+    TEST CASES THAT PASSED: "
     1. the problem here was the class-operator '->', since the '>' is also in the possibleMarkUpDelimiter
     <td class="listContent">< ?=$language->getName($aBookmark['language'])? ></td>
 
 */
+    }
+
+    /**
+    *   this function will simply search variables that have the additional prefix $markString
+    *   and applies the translate function to them, and only to them
+    *   example:
+    *       - your variable that shall be translated is $foo
+    *       - your $functionName is 'translateMe', the function that translates the string
+    *       - you have set the mark string to 'T_' (same as default)
+    *       now all the varibales in the code, where you have written
+    *       $T_foo instead of $foo
+    *       will be replaced by 'translateMe($foo)'
+    *       so that {$T_foo} will finally become '<? php echo translateMe($foo) ? >'
+    *   that's all it does. note that the variable name will be reset to what
+    *   it actually shall be, the 'T_' is only kind of a mark, which indicates
+    *   translate this variable. There doesnt have to exist a variable with this name
+    *
+    *   @param
+    *   @param
+    *   @param  string  this is a short string, that marks how a variable name
+    *                   has to start, if this is found the value will be translated
+    *                   otherwise it will be left alone
+    *
+    */
+    function translateMarkedOnly( $input , $functionName , $markString='T_' )
+    {
+        $regExp = '/\\$'.preg_quote($markString).'([a-z0-9_\->]*)/i';
+
+        $input = preg_replace( $regExp , "$functionName($$1)" , $input );
+
+        return $input;
     }
 
 }
