@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.10  2002/06/26 18:48:25  mccain
+*   - remove unnecessary spaces
+*
 *   Revision 1.9  2002/06/21 20:52:53  mccain
 *   - added macro filter
 *
@@ -351,7 +354,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
     */
     function includeFile( $input )
     {
-# FIXXXME discover all the functions that are used in the current file, so only those functions are pasted inside the code!!!
+# FIXXXME discover all the functions that are used in the current file, so only those functions are pasted inside the code!!! //"
 
         if( preg_match_all( '/{%\s*include\s+(.+)\s*%}/U' , $input , $includes ) )
         {
@@ -361,13 +364,15 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
             {
                 // get the relative path to templateDir or absolute if given
                 if( $aInclude[0] != '/' )           // add trailing slash if missing
-                    $aInclude = '/'.$aInclude;
-                $fileToInclude = $this->options['templateDir'].$aInclude;
+                    $_aInclude = '/'.$aInclude;
+                $fileToInclude = $this->options['templateDir'].$_aInclude;
 
-                if( file_exists($fileToInclude) )   // do only include a file that really exists, otherwise the tag also stays there, so the programmer removes it
+                // do only include a file that really exists, otherwise the tag also stays there, so the programmer removes it
+                // do also search for the file in the include path, but as the second option only!
+                if( ($content = @file($fileToInclude)) || ($content = @file($aInclude,true)) )
                 {
                     // read the file
-                    $fileContent = implode("\n",file($fileToInclude));
+                    $fileContent = implode("\n",$content);
                     // replace the string from $includes[0] with the file
                     $input = preg_replace( '/'.preg_quote($includes[0][$index],'/').'/' , $fileContent , $input );
                 }
