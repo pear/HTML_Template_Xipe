@@ -6,7 +6,7 @@
 
 <body>
 
-<a href="http://wolfram.kriesing.de/programming/index.php#download">DOWNLOAD</a><br>
+<a href="http://sourceforge.net/projects/simpletpl/">DOWNLOAD</a><br>
 <a href="{$viewClassCodeUrl}">class SimpleTemplate</a> source code<br>
 <a href="{$viewFilterCodeUrl}">class SimpleTemplate_Filter_Basic</a> source code</a><br>
 <a href="{$viewTagLibCodeUrl}">class SimpleTemplate_Filter_TagLib</a> source code</a><br>

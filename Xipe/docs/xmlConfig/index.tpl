@@ -16,7 +16,7 @@
 
 <h2>XML-configured template</h2>
 
-<a href="http://wolfram.kriesing.de/programming/index.php#download">DOWNLOAD</a><br>
+<a href="http://sourceforge.net/projects/simpletpl/">DOWNLOAD</a><br>
 This example uses both possible ways to configure this template, it first reads the
 <a href="[$viewConfigXmlUrl]">config.xml which is in the same directory as the template</a>
 and it reads the xml-data which are inside
@@ -28,7 +28,7 @@ it will be applied.
 
 This is the XML-part which configures this template, either in the
 <a href="[$viewConfigXmlUrl]">config.xml</a> or/and in this
-<a href="[$viewTemplateCodeUrl]">tpl-file</a>.<br>
+<a href="[$viewTemplateCodeUrl]">template-file (index.tpl)</a>.<br>
 <code>
 &lt;SimpleTemplate&gt;<br>
  &nbsp; &lt;options override="yes"&gt;<br>

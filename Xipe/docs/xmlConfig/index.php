@@ -14,8 +14,8 @@
     #
     #   make template class instance
     #
-    $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/examples/SimpleTemplate/xmlConfig',
-                        'compileDir'    => $DOCUMENT_ROOT.'/libs/php/examples/SimpleTemplate/xmlConfig/tmp');
+    $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/xmlConfig',
+                        'compileDir'    => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/xmlConfig/tmp');
     $tpl = new SimpleTemplate_Engine($options);
 
 #$tpl->setOption('forceCompile',true);
@@ -48,7 +48,7 @@
                         'the braces: "{" and "}", since they could be replaced by proper indention',
                         'to learn a new template language');
 
-    $url = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/examples/SimpleTemplate/xmlConfig/";
+    $url = 'http://www.kriesing.de/showsource.php?domain=wolfram.kriesing.de&file=/libs/php/SimpleTemplate/examples/xmlConfig/';
     $viewSourceCodeUrl = $url.'index.php';
     $viewTemplateCodeUrl = $url.'index.tpl';
     $viewCompiledTemplate = $url.'tmp/index.tpl.en.php';

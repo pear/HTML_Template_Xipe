@@ -14,8 +14,8 @@
     #
     #   make template class instance
     #
-    $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/examples/SimpleTemplate/simple',
-                        'compileDir'    => $DOCUMENT_ROOT.'/libs/php/examples/SimpleTemplate/simple/tmp');
+    $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/simple',
+                        'compileDir'    => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/simple/tmp');
     $tpl = new SimpleTemplate_Engine($options);
 
 
@@ -49,11 +49,11 @@
                         'the braces: "{" and "}", since they could be replaced by proper indention',
                         'to learn a new template language');
 
-    $viewSourceCodeUrl = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/examples/SimpleTemplate/simple/index.php";
-    $viewTemplateCodeUrl = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/examples/SimpleTemplate/simple/index.tpl";
-    $viewClassCodeUrl = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/SimpleTemplate/Engine.php";
-    $viewCompiledTemplate = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/examples/SimpleTemplate/simple/tmp/index.tpl.en.php";
-    $viewTemplateLog = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/examples/SimpleTemplate/simple/tmp/index.tpl.log";
+    $viewSourceCodeUrl = 'http://www.kriesing.de/showsource.php?domain=wolfram.kriesing.de&file=/libs/php/SimpleTemplate/examples/simple/index.php';
+    $viewTemplateCodeUrl = 'http://www.kriesing.de/showsource.php?domain=wolfram.kriesing.de&file=/libs/php/SimpleTemplate/examples/simple/index.tpl';
+    $viewClassCodeUrl = 'http://www.kriesing.de/showsource.php?domain=wolfram.kriesing.de&file=/libs/php/SimpleTemplate/Engine.php';
+    $viewCompiledTemplate = 'http://www.kriesing.de/showsource.php?domain=wolfram.kriesing.de&file=/libs/php/SimpleTemplate/examples/simple/tmp/index.tpl.en.php';
+    $viewTemplateLog = 'http://www.kriesing.de/showsource.php?domain=wolfram.kriesing.de&file=/libs/php/SimpleTemplate/examples/simple/tmp/index.tpl.log';
 
 
 

@@ -1,7 +1,7 @@
 <?php
 
 
-    require_once('../../config.php');
+    require_once('../../../examples/config.php');
 
 
     #####################################
@@ -10,8 +10,8 @@
     #
     require_once('SimpleTemplate/Engine.php');
 
-    $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/examples/SimpleTemplate/fullFeatured',
-                        'compileDir'    => $DOCUMENT_ROOT.'/libs/php/examples/SimpleTemplate/fullFeatured/tmp');
+    $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/fullFeatured',
+                        'compileDir'    => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/fullFeatured/tmp');
 
     $tpl = new SimpleTemplate_Engine($options);
 
@@ -54,9 +54,12 @@
     #
     #   apply translating filters to the template
     #
-    require_once('Language/Translate.php');
+    // this is in PEAR, get the newest version from the cvs
+    // for more info see: http://www.php.net/anoncvs.php
+    // source is at: http://cvs.php.net/cvs.php/pear/I18N
+    require_once('I18N/Messages/Translate.php');
 
-    $translator = new Language_Translate($DB_DSN,array('tablePrefix'=>'translate_'));
+    $translator = new I18N_Messages_Translate($DB_DSN,array('tablePrefix'=>'translate_'));
 
     function translateAndPrint( $string )
     {
@@ -90,16 +93,18 @@
     $trimValue = 'Hi guys, how is it going?';
     $loop = array('one','two','three');
 
-    $viewSourceCodeUrl = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/examples/SimpleTemplate/fullFeatured/index.php";
-    $viewTemplateCodeUrl = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/examples/SimpleTemplate/fullFeatured/index.tpl";
-    $viewCompiledTemplate = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/examples/SimpleTemplate/fullFeatured/tmp/index.tpl.en.php";
-    $viewCompiledTemplateDe = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/examples/SimpleTemplate/fullFeatured/tmp/index.tpl.de.php";
-    $viewTemplateLog = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/examples/SimpleTemplate/fullFeatured/tmp/index.tpl.log";
-    $viewDbFile = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/examples/SimpleTemplate/translate.sql";
+    $url = 'http://www.kriesing.de/showsource.php?domain=wolfram.kriesing.de&file=/libs/php/SimpleTemplate/examples/';
+    $viewSourceCodeUrl = $url.'fullFeatured/index.php';
+    $viewTemplateCodeUrl = $url.'fullFeatured/index.tpl';
+    $viewCompiledTemplate = $url.'fullFeatured/tmp/index.tpl.en.php';
+    $viewCompiledTemplateDe = $url.'fullFeatured/tmp/index.tpl.de.php';
+    $viewTemplateLog = $url.'fullFeatured/tmp/index.tpl.log';
+    $viewDbFile = $url.'translate.sql';
 
-    $viewClassCodeUrl = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/SimpleTemplate/Engine.php";
-    $viewFilterCodeUrl = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/SimpleTemplate/Filter/Basic.php";
-    $viewTagLibCodeUrl = "http://www.kriesing.de/showsource.php?domain=$HTTP_HOST&file=/libs/php/SimpleTemplate/Filter/TagLib.php";
+    $url = 'http://www.kriesing.de/showsource.php?domain=wolfram.kriesing.de&file=/libs/php/SimpleTemplate/';
+    $viewClassCodeUrl = $url.'Engine.php';
+    $viewFilterCodeUrl = $url.'Filter/Basic.php';
+    $viewTagLibCodeUrl = $url.'Filter/TagLib.php';
 
     #####################################
     #

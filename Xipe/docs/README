@@ -1,0 +1,31 @@
+S i m p l e T e m p l a t e   -  Examples
+
+
+The directories listed represent each a single example.
+Inside every directory, there is a file such as "index.php"
+simply click it and you can see the example at work.
+
+What the examples do:
+
+simple
+------
+Shows a simple example of how to use SimpleTemplate to create
+a web page. It shows the most common functionality.
+
+xmlConfig
+---------
+This example uses the XML-File config feature, which allows
+you to configure the template environment by using either an
+- XML-file in the same directory as where the template is
+- or by using a chunk of XML inside the template
+which then configures the current template.
+Configuring the template means setting the delimiter string
+used in the template and many other things.
+
+fullFeatured
+------------
+This shows a lot of the available features SimpleTemplate has to offer.
+It also serves as a short documentation of how to use SimpleTemplate,
+the filters and the tagLib.
+
+
