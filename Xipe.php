@@ -240,14 +240,19 @@ class HTML_Template_Xipe
     function _methodWrapper( $filename , $method )
     {
         $templateDir = $this->getOption('templateDir');
-        if( strpos( $filename , $templateDir ) !== 0 )
-        {
+        // if we are on a windows, which we check using the directory-separator (is there an easier way?)
+        // we better work with case independent filenames, apache converts
+        // i.e. the doc-root to lower case (at least on my test machine)
+        if (DIRECTORY_SEPARATOR=='\\') {
+            $filename = strtolower($filename);
+            $templateDir = strtolower($templateDir);
+        }
+        if (strpos( $filename , $templateDir ) !== 0) {
             $filename = $templateDir.$filename;
         }
 
         $objKey = md5( $filename );
-        if( !isset($this->_objectPool[$objKey]) )
-        {
+        if (!isset($this->_objectPool[$objKey])) {
             // use __clone in php5
             // copy the default object with all its properties, yes COPY,
             // this is important we dont want a reference here
@@ -260,8 +265,9 @@ class HTML_Template_Xipe
 //print "$objKey .... $filename, call: $method<br>";
 //        return $this->_objectPool[$objKey];
 
-        if( PEAR::isError($ret=$obj->setup( $filename )) )
+        if( PEAR::isError($ret=$obj->setup( $filename )) ) {
             return $ret;
+        }
 
         // check if the method exists, this might be necessary if 'enable-Cache' is false but someone calls 'isCached'
         if( method_exists($obj,$method) )
