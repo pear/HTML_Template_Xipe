@@ -31,6 +31,15 @@ require_once 'HTML/Template/Xipe/Options.php';
 class HTML_Template_Xipe_Filter_Modifier extends HTML_Template_Xipe_Options
 {
 
+    /**
+    *   for passing values to the class, i.e. like the delimiters
+    *   @access private
+    *   @var    array   $options    the options for initializing the filter class
+    */
+    var $options = array(   'delimiter'     =>  array()      // first value of the array is the begin delimiter, second the end delimiter
+                        );
+
+
     var $_imgDirs = array();
     var $_imgFiles = array();
 
@@ -189,6 +198,8 @@ class HTML_Template_Xipe_Filter_Modifier extends HTML_Template_Xipe_Options
 
 
     /**
+    *   Replace PHP_SELF by {$_SERVER['PHP_SELF']} if it occurs in a link.
+    *   TODO
     *   correct all links, if they are not proper like www.home.de
     *   then they will be corrected to be http://www.home.de
     *   a link checker could be implemented too :-/
@@ -196,11 +207,37 @@ class HTML_Template_Xipe_Filter_Modifier extends HTML_Template_Xipe_Options
     *   @version    02/06/27
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      string  the original template code
-    *   @param      string  the virtual image path
     *   @return     string  the modified template
     */
-    function aHref( $input )
+    function aHref($input)
     {
+        if (preg_match_all('~<a.*href=.*>~iU',$input,$_linkTags)) {
+            $linkTags = array_unique($_linkTags[0]);
+            
+            // replace each tag with the given attributes
+            foreach ($linkTags as $aTag) {
+                $p = xml_parser_create();
+                xml_parse_into_struct($p,$aTag,$vals);
+                xml_parser_free($p);  
+                $attribs = array();
+                if (isset($vals[0]['attributes'])) {
+                    $attribs = $vals[0]['attributes'];
+                }
+                // replace PHP_SELF by {$_SERVER['PHP_SELF']}
+                if (isset($attribs['HREF']) && strpos($attribs['HREF'],'PHP_SELF')===0) {
+                    $newSelf =  $this->getOption('delimiter',0).'$_SERVER[\'PHP_SELF\']'.
+                                $this->getOption('delimiter',1);
+                    $attribs['HREF'] = str_replace('PHP_SELF',$newSelf,$attribs['HREF']);
+                }
+                // build the new tag
+                $newTag = '<a';
+                foreach ($attribs as $key=>$val) {
+                    $newTag.= " $key=\"$val\"";
+                }
+                $input = str_replace($aTag,$newTag.'>',$input);      
+            }
+        }
+        return $input;
     }
 
     /**
@@ -225,6 +262,54 @@ class HTML_Template_Xipe_Filter_Modifier extends HTML_Template_Xipe_Options
                                     '$1<a href="'.$link.'" target="_blank">$2</a>$3' ,
                                     $input );
         }
+        return $input;
+    }
+    
+    /**
+    *   Add missing attributes as given. If none given it will place
+    *   action="{$_SERVER['PHP_SELF']}" and method="POST" in the form tag.
+    *
+    *   
+    */
+    function form($input,$attributes=array())
+    {
+        if (preg_match_all('~<form.*>~iU',$input,$_formTags)) {
+            $formTags = array_unique($_formTags[0]);
+
+            if (!isset($attributes['action'])) {
+                $attributes['action'] = $this->getOption('delimiter',0).
+                                        '$_SERVER[\'PHP_SELF\']'.
+                                        $this->getOption('delimiter',1);
+            }
+            if (!isset($attributes['method'])) {
+                $attributes['method'] = 'POST';
+            }
+            // set all attribute names to uppercase, since the XML-parser does it too
+            // and if we want to merge them later, they should be same case
+            foreach ($attributes as $key=>$val) {
+                unset($attributes[$key]);
+                $attributes[strtoupper($key)] = $val;
+            }
+
+            // replace each tag with the given attributes
+            foreach ($formTags as $aTag) {
+                $p = xml_parser_create();
+                xml_parse_into_struct($p,$aTag,$vals);
+                xml_parser_free($p);
+                $attribs = array();
+                if (isset($vals[0]['attributes'])) {
+                    $attribs = $vals[0]['attributes'];
+                }
+                $attribs = array_merge($attributes,$attribs);
+                // build the new tag
+                $newTag = '<form';
+                foreach ($attribs as $key=>$val) {
+                    $newTag.= " $key=\"$val\"";
+                }
+                $input = str_replace($aTag,$newTag.'>',$input);
+            }
+            
+        }        
         return $input;
     }
 }
