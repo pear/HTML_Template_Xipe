@@ -151,6 +151,10 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
         $_closeDel = $this->getOption('delimiter',1);
         $autoBraces = $this->getOption('autoBraces');
         
+        // if someone has autoBraces on and uses this.... well that would be a user-mistake, or a missing doc :-)
+        $regExp = '/[^\\\]'.$openDel.'%\s*endrepeat\s*%'.$closeDel.'/Ui';
+        $input = preg_replace( $regExp , $_openDel.($autoBraces?' \\} ':' endfor ').$_closeDel , $input );
+                
         // find those repeats which dont have no variable that is given as the loop variable
         // we need to do this, since the next regExp needs this variable name, because
         // we can not use the $5 to check if it is given (down there in the second regExp)... bummer
@@ -182,11 +186,7 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
 
                                 //"REPEAT:<br>1='$1'<br>2='$2'<br>3='$3'<br>4='$4'<br>5='$5'<br>6='$6'<br>" , // for testing
                                 $input);  // replace unnecessary spaces, so the next regexp is shorter and easier
-
-        // if someone has autoBraces on and uses this.... well that would be a user-mistake, or a missing doc :-)
-        $regExp = '/[^\\\]'.$openDel.'%\s*endrepeat\s*%'.$closeDel.'/Ui';
-        $input = preg_replace( $regExp , $_openDel.($autoBraces?' \\} ':' endfor ').$_closeDel , $input );
-        
+                
         return $input;
         /* TESTS
 
