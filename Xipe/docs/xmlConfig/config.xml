@@ -5,6 +5,11 @@
         <delimiter begin="[" end="]"/>
         <autoBraces value="true"/>
         <locale value="en"/>
+
+        <cache>
+            <time value="10" unit="minutes">
+        </cache>
+
     </options>
 
 
