@@ -184,6 +184,8 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
     */
     var $_compiled = false;
 
+    var $logObject = null;
+    
     /**
     *   the constructor, pass the options to it as needed
     *
@@ -729,7 +731,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
     *   @param      string  the log message
     *   @param      int     the log level of the message
     */
-    function _log( $message )
+    function _log($message)
     {
         if ($this->getOption('logLevel') == 0) {
             return;                             
@@ -742,10 +744,10 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
         if (!empty($this->_loggedMessages[md5($message)])) {
             return;
         }
-
+        
         $this->_loggedMessages[md5($message)] = true;
 
-        if ((!empty($this->logObject) && !is_object($this->logObject)) || !$this->_logFileName ) {
+        if ($this->logObject==null || !is_object($this->logObject) || !$this->_logFileName) {
             $this->_logFileName = $this->_compiledFilePrefix.$this->getOption('logFileExtension');
             $this->logObject = Log::factory('file',$this->_logFileName);
             $this->_log('---------------------');
@@ -754,7 +756,9 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
             $this->_log( 'current logLevel is: '.$this->getOption('logLevel') );
         }
 
+//FIXXME this writes out the log data every time, which is really ineffective
         $this->logObject->log($message);
+        $this->logObject->writeOut();
     }
 }
 ?>
