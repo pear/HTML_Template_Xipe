@@ -45,12 +45,13 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
 
     <release>
         <version>1.7.3</version>
-        <date>2003-0?-??</date>
+        <date>2003-03-10</date>
         <license>PHP License</license>
         <state>stable</state>
         <notes>
-- add forceRecache() which forces to rebuild the cached file
+* add forceRecache() which forces to rebuild the cached file
   no matter of the caching-state of this file
+* include examples in package
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="HTML/Template">
@@ -77,17 +78,23 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
                 <dir name="autoBracesOff">
                     <file role="doc" name="index.php"/>
                     <file role="doc" name="index.tpl"/>
-                    <dir name="tmp"/>
+                    <dir role="doc" name="tmp">
+                        <file role="doc" name=".htaccess"/>
+                    </dir>
                 </dir>
                 <dir name="Cache">
                     <file role="doc" name="index.php"/>
                     <file role="doc" name="index.tpl"/>
-                    <dir name="tmp"/>
+                    <dir role="doc" name="tmp">
+                        <file role="doc" name=".htaccess"/>
+                    </dir>
                 </dir>
                 <dir name="fullFeatured">
                     <file role="doc" name="index.php"/>
                     <file role="doc" name="index.tpl"/>
-                    <dir name="tmp"/>
+                    <dir role="doc" name="tmp">
+                        <file role="doc" name=".htaccess"/>
+                    </dir>
                 </dir>
                 <dir name="includes">
                     <file role="doc" name="index.php"/>
@@ -96,18 +103,24 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
                     <file role="doc" name="include.mcr"/>
                     <file role="doc" name="include1.mcr"/>
                     <file role="doc" name="include1.tpl"/>
-                    <dir name="tmp"/>
+                    <dir role="doc" name="tmp">
+                        <file role="doc" name=".htaccess"/>
+                    </dir>
                 </dir>
                 <dir name="simple">
                     <file role="doc" name="index.php"/>
                     <file role="doc" name="index.tpl"/>
-                    <dir name="tmp"/>
+                    <dir role="doc" name="tmp">
+                        <file role="doc" name=".htaccess"/>
+                    </dir>
                 </dir>
                 <dir name="xmlConfig">
                     <file role="doc" name="config.xml"/>
                     <file role="doc" name="index.php"/>
                     <file role="doc" name="index.tpl"/>
-                    <dir name="tmp"/>
+                    <dir role="doc" name="tmp">
+                        <file role="doc" name=".htaccess"/>
+                    </dir>
                 </dir>
             </dir>
 
