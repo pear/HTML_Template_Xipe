@@ -19,6 +19,12 @@
 /**
 *
 *   $Log$
+*   Revision 1.8  2002/03/13 19:47:59  mccain
+*   - alpha version !!! dont use
+*   - started to add caching stuff
+*   - splitted some functionality into different methods
+*   - added warning if tree-class was not found
+*
 *   Revision 1.7  2002/03/06 23:03:26  mccain
 *   - start to implement caching stuff
 *   - use call_user_func since ..._method is deprecated
@@ -577,6 +583,7 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
             $checkFile = $fileToCheckAgainst;
 
         if( !file_exists( $this->compiledTemplate ) ||
+            !file_exists( $checkFile ) ||
             filemtime( $checkFile ) > filemtime( $this->compiledTemplate )
           )
         {
