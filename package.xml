@@ -44,12 +44,15 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
     </maintainers>
 
     <release>
-        <version>1.7.1</version>
-        <date>2003-01-29</date>
+        <version>1.7.2</version>
+        <date>2003-02-??</date>
         <license>PHP License</license>
         <state>stable</state>
         <notes>
-maintenance release fixed hopefully all the E_ALL issues
+- make most of TagLib-tags work with autoBraces OFF too
+- nested include and macros work
+- made it work properly on windows
+
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="HTML/Template">
@@ -102,23 +105,39 @@ maintenance release fixed hopefully all the E_ALL issues
                 </dir>
             </dir>
 -->
+        <deps>
+            <dep type="pkg" rel="ge" version="0.2">Tree</dep>
+        </deps>
+        <deps>
+            <dep type="pkg" rel="ge" version="1.5">Log</dep>
+        </deps>
 
         </filelist>
     </release>
 
 
     <changelog>
-    <release>
-        <version>1.7</version>
-        <date>2003-01-16</date>
-        <license>PHP License</license>
-        <state>stable</state>
-        <notes>
-- porting SimpleTemplate into PEAR, where it is called HTML_Template_Xipe
-  changing all the class names and file names
-- the XML-Root-Tag is not 'SimpleTemplate' any longer, now it is 'HTML_Template_Xipe'
-        </notes>
-    </release>
+        <release>
+            <version>1.7.1</version>
+            <date>2003-01-29</date>
+            <license>PHP License</license>
+            <state>stable</state>
+            <notes>
+    maintenance release fixed hopefully all the E_ALL issues
+            </notes>
+        </release>
+
+        <release>
+            <version>1.7</version>
+            <date>2003-01-16</date>
+            <license>PHP License</license>
+            <state>stable</state>
+            <notes>
+    - porting SimpleTemplate into PEAR, where it is called HTML_Template_Xipe
+    changing all the class names and file names
+    - the XML-Root-Tag is not 'SimpleTemplate' any longer, now it is 'HTML_Template_Xipe'
+            </notes>
+        </release>
     </changelog>
 
 </package>
