@@ -271,7 +271,7 @@ class HTML_Template_Xipe_Filter_Modifier extends HTML_Template_Xipe_Options
     *
     *   
     */
-    function form($input,$attributes=array())
+    function form($input,$attributes=array(),$options=array())
     {
         if (preg_match_all('~<form(\s.*)?>~iU',$input,$_formTags)) {
             $formTags = array_unique($_formTags[0]);
@@ -301,6 +301,26 @@ class HTML_Template_Xipe_Filter_Modifier extends HTML_Template_Xipe_Options
                     $attribs = $vals[0]['attributes'];
                 }
                 $attribs = array_merge($attributes,$attribs);
+
+/* this is really experimental ...                
+                // if the option 'addHiddenGet' is given, then this adds the get parameters to the 
+                // form as hidden values, this way you can submit a get-form, which still contains 
+                // all the GET-parameters from before
+                $htmlAfterForm = '';
+                if (strtolower(@$attribs['METHOD'])=='get' && 
+                    isset($options['addHiddenGet']) && is_array($options['addHiddenGet'])) {
+                    foreach ($options['addHiddenGet'] as $k=>$v) {
+                        // if the value is an array, extract it and add each single value properly
+                        if (is_array($v)) {
+                            foreach ($v as $k1=>$v1) {
+                                $htmlAfterForm .= '<input type="hidden" name="'.$k.'['.$k1.']'.'" value="'.urlencode($v1).'">';
+                            }
+                        } else {
+                            $htmlAfterForm .= '<input type="hidden" name="'.$k.'" value="'.urlencode($v).'">';
+                        }
+                    }
+                }
+*/                
                 // build the new tag
                 $newTag = '<form';
                 foreach ($attribs as $key=>$val) {
