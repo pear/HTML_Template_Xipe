@@ -17,6 +17,10 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.3  2002/09/22 18:51:55  mccain
+//  - make xml-config for autoBraces work, was buggy
+//  - enable applying filters via xml-config
+//
 //  Revision 1.2  2002/06/02 22:35:44  mccain
 //  - made the tags lower case, since the Tree-XML converts them to lower case by default now
 //
@@ -116,7 +120,7 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
     */
     function _setOptionsByXmlConfig( $configFileOrString , $isString=false )
     {
-#print '_setOptionsByXmlConfig ... '.nl2br(htmlentities($configFileOrString))." , $isString<br>";
+//print '_setOptionsByXmlConfig ... '.nl2br(htmlentities($configFileOrString))." , $isString<br>";
         // include this so i can get the xml file prepared in the tree shape
         // and i can use the tree methods to retreive the options i need to set :-)
         if( !@include_once('Tree/Tree.php') )
@@ -141,7 +145,7 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
         //
         //  add the filters set in the xml config files
         //
-# TODO check for prefilter defines in xml config
+// TODO check for prefilter defines in xml config
         if( $id = $config->getIdByPath('simpletemplate/prefilter') )  // are any preFilter given?
         {
             $this->_applyFiltersFromXMLConfig( $config , $id , true );
@@ -209,7 +213,7 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
                                 case 'second':  break;
                             }
                         }
-        #print "XML: cache this page for $time seconds<br><br>";
+        //print "XML: cache this page for $time seconds<br><br>";
                         // if a valid time was found parse also the other tags, valid is also 0, that's why this strange check
                         // accept only integers
                         if( $time == (int)$time )

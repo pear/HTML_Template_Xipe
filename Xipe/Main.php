@@ -18,6 +18,10 @@
 //
 //  restarting to write log messages at version 1.5
 //  $Log$
+//  Revision 1.5  2002/09/22 20:36:32  mccain
+//  - encapsulated registerPre/Postfilter methods
+//  - enable language-filters
+//
 //  Revision 1.4  2002/08/04 16:16:48  mccain
 //  - changed a comment
 //
@@ -54,32 +58,32 @@ if( !@include_once('Log/Log.php') )
 class SimpleTemplate_Main extends SimpleTemplate_Options
 {
 
-# FIXXME a problem we have here: is that if i use {include(a.php)} the varibales of this file overwrite the ones
-# set for the template where it is included, ... ***create a namespace for each file*** somehow, which is unique for every tempalte ... but how
-# without the need for the user to change its programming behaviour,
-# one solution would be copying everything from $GLOBALS into a unique varibale and replacing all variables in the
-# template using this unique variable, but this makes it a HUGE overhead, but would work
+// FIXXME a problem we have here: is that if i use {include(a.php)} the varibales of this file overwrite the ones
+// set for the template where it is included, ... ***create a namespace for each file*** somehow, which is unique for every tempalte ... but how
+// without the need for the user to change its programming behaviour,
+// one solution would be copying everything from $GLOBALS into a unique varibale and replacing all variables in the
+// template using this unique variable, but this makes it a HUGE overhead, but would work
 
-# FIXXME2 by testing a site i realized, that a lot of php tags inside a tempalte slow slow down rendering
-# very much, somehoe it seems php is not too good in rendering html-pages with a lot of php tags inside
-# so we can write a filter, which can be applied that translates the entire template to use echo's only :-)
-# some work ha?
+// FIXXME2 by testing a site i realized, that a lot of php tags inside a tempalte slow slow down rendering
+// very much, somehoe it seems php is not too good in rendering html-pages with a lot of php tags inside
+// so we can write a filter, which can be applied that translates the entire template to use echo's only :-)
+// some work ha?
 
-# TODO
-# - enable a taglib/filter for sql statements inside the template, even though i will never use it :-)
-#   if we put that in a seperate file we can load it only on request, saves some php-compiling time
-# - add a taglib/filter for translate, smthg like: {%t $phpValue %}, to explicitly translate a string
-#   in case someone doesnt like to use the filter "applyTranslateFunction"
-# - add a filter for converting strings to html-entities, could work like "applyTranslateFunction" on
-#   mark up delimiters, or could be a taglib-tag too ... whatever
-#
-# MAY BE features
-# - url obfuscating (or whatever that is called), rewrite urls and decode them when retreiving a call to a specific page ... somehow
-#   i dont know if that belongs in a template engine, may be just write in the tutorial how to attach those products easily
-#   using a filter or whatever
-# -
-#
-#
+// TODO
+// - enable a taglib/filter for sql statements inside the template, even though i will never use it :-)
+//   if we put that in a seperate file we can load it only on request, saves some php-compiling time
+// - add a taglib/filter for translate, smthg like: {%t $phpValue %}, to explicitly translate a string
+//   in case someone doesnt like to use the filter "applyTranslateFunction"
+// - add a filter for converting strings to html-entities, could work like "applyTranslateFunction" on
+//   mark up delimiters, or could be a taglib-tag too ... whatever
+//
+// MAY BE features
+// - url obfuscating (or whatever that is called), rewrite urls and decode them when retreiving a call to a specific page ... somehow
+//   i dont know if that belongs in a template engine, may be just write in the tutorial how to attach those products easily
+//   using a filter or whatever
+// -
+//
+//
     /**
     *   for customizing the class
     *   @access private
@@ -216,12 +220,12 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
         }
         $this->_compiledFilePrefix = $ret;
 
-#print "this->_templateFile = $this->_templateFile<br>this->_compiledFilePrefix = $this->_compiledFilePrefix<br><br>";
+//print "this->_templateFile = $this->_templateFile<br>this->_compiledFilePrefix = $this->_compiledFilePrefix<br><br>";
 
         $this->_compiledTemplate = $this->_compiledFilePrefix.'php';
 
-#print ".........BEFORE SETUP METHOD..........<br>";
-#print_r($this);print "<br><br>";
+//print ".........BEFORE SETUP METHOD..........<br>";
+//print_r($this);print "<br><br>";
         //
         //  do all the xml config stuff
         //
@@ -242,8 +246,8 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
 */
         }
 
-#print ".........END OF SETUP METHOD..........<br>";
-#print_r($this);print "<br><br>";
+//print ".........END OF SETUP METHOD..........<br>";
+//print_r($this);print "<br><br>";
 
         $this->_didSetup = true;
         return true;
@@ -290,13 +294,13 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
         }
 
         if( !@is_writeable($compileDir))
-# i dont know how to check if "enter" rights are given
+// i dont know how to check if "enter" rights are given
         {
             return $this->_error(   "can not write to 'compileDir', which is <b>'$compileDir'</b><br>".
                                     "1. pleace give write and enter-rights to it" , PEAR_ERROR_DIE );
         }
 
-#print "file=$file<br>";
+//print "file=$file<br>";
         $directory = dirname( $this->_templateFile );
         $filename = basename( $this->_templateFile );
 
@@ -617,7 +621,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
         if( sizeof($filters) )
         foreach( $filters as $aFilter )
         {
-# FIXXME use log class
+// FIXXME use log class
             $startTime = split(" ",microtime());
             $startTime = $startTime[1]+$startTime[0];
             $sizeBefore = strlen($input);
@@ -643,7 +647,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
             }
 
             $sizeAfter = strlen($input);
-# FIXXME use log class
+// FIXXME use log class
             $endTime = split(" ",microtime());
             $endTime = $endTime[1]+$endTime[0];
             $itTook = ($endTime - $startTime)*100;
@@ -708,6 +712,8 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
             $this->_logFileName = $this->_compiledFilePrefix.$this->getOption('logFileExtension');
             $this->logObject = Log::factory('file',$this->_logFileName);
             $this->_log('---------------------');
+//FIXXME write the options in the log-file but nicer!!! than here
+            $this->_log('options: '.serialize($this->options));
             $this->_log( 'current logLevel is: '.$this->getOption('logLevel') );
         }
 
