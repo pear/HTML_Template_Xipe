@@ -321,7 +321,7 @@ but this works:
 
                             "\n$1".
                             $this->options['delimiter'][0].
-                            "if(is_array($2) && sizeof($2)>0)".
+                            "if(is_array(@$2) && sizeof(@$2)>0)".
                             $this->options['delimiter'][1].
                             "\n$1 ".                // indent it one more space than before, so an 'else' goes with the 'if' :-)
                             $this->options['delimiter'][0].

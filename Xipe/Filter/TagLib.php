@@ -344,8 +344,10 @@ class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
                         // if it is already once in the code, this takes care of not multiple
                         // times defining functions (macros in this case)
                         // it also works if you compile multiple files with different instances of this filter
-                        // since php checks the variable $___SimpleTemplate_TagLib_includedFile given here
-                        $fileContent =  "$_openDel if(!\$___HTML_Template_Xipe_TagLib_includedFile['$fileToInclude'])\\\{ $_closeDel".
+                        // since php checks the variable $___HTML_Template_Xipe_TagLib_includedFile given here
+                        // use isset to prevent E_ALL-warning
+                        $testVar = "\$___HTML_Template_Xipe_TagLib_includedFile['$fileToInclude']";
+                        $fileContent =  "$_openDel if(!isset($testVar) || !$testVar)\\\{ $_closeDel".
                                         $fileContent.
                                         $_openDel." \$___HTML_Template_Xipe_TagLib_includedFile['$fileToInclude']=true;\\\}".$_closeDel;
                     }
