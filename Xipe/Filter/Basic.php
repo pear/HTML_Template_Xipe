@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.10  2002/08/04 16:16:25  mccain
+*   - some optimization in optimizeHtmlCode
+*
 *   Revision 1.9  2002/06/21 20:52:16  mccain
 *   - check filter level
 *
@@ -122,7 +125,7 @@ require_once('SimpleTemplate/Options.php');
 /**
 *   the default filter(s) i use and SimpleTemplate needs
 *
-*   @package    SimpleTemplate/Filter
+*   @package    SimpleTemplate_Filter
 *   @access     public
 *   @version    01/12/10
 *   @author     Wolfram Kriesing <wolfram@kriesing.de>
@@ -136,7 +139,8 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
     *   @access private
     *   @var    array   $options    the options for initializing the filter class
     */
-    var $options = array(   'delimiter'     => array() );   // first value of the array is the begin delimiter, second the end delimiter
+    var $options = array(   'delimiter'     => array(), // first value of the array is the begin delimiter, second the end delimiter
+                            'autoBraces'    => true );  // we need to check this for some filters, since some depend on it or have to behave differently
 
     /**
     *   apply (almost) all filters available in this class
@@ -157,6 +161,7 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
         {
             $input = $this->removeHtmlComments($input);
             $input = $this->removeCStyleComments($input);
+            $input = $this->decodeHtmlEntities($input);
         }
         $input = $this->addIfBeforeForeach($input);
         return $input;
@@ -179,6 +184,7 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
             $input = $this->removeEmptyLines($input);
             $input = $this->trimLines($input);
             $input = $this->optimizeHtmlCode($input);
+            $input = $this->optimizePhpTags($input);
         }
         return $input;
     }
@@ -195,7 +201,13 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
     */
     function optimizePhpTags($input)
     {
-        return preg_replace('/\?>\s*<\?php/Us','',$input);
+        // replace ' } ? > <spaces> < ?php' by '}' AND
+        // replace ' { ? > <spaces> < ?php' by '}'
+        // since the big number of php tags only takes up a lot of parsing by php
+        // NOTE: the space before the $1 is important, since PHP freaks out with '< ?php}' it needs '< ?php }'
+        $input = preg_replace( '/\s*({|})(\s*)\?>(\s*)<\?php/U' , ' $1' , $input ); //"
+
+        return $input;
     }
 
     /**
@@ -388,6 +400,10 @@ but this works:
     */
     function addIfBeforeForeach($input)
     {
+        // the filter below only works if autoBraces is on!
+        if( !$this->getOption('autoBraces') )
+            return $input;
+
         return preg_replace('/\n(\s*)'.             // get the indented spaces in $1, starting at the beginning of a line (^ didnt work here, at least not for me)
                             preg_quote($this->options['delimiter'][0]).
                             '\s*foreach\s*\('.    // check for the '{foreach(' and spaces anywhere inbetween, '\s*' does that
@@ -438,7 +454,27 @@ but this works:
     */
     function applyHtmlEntites($input)
     {
-        return preg_replace( '/(<\?php=|<\?=)\$(.*)\?>/sU' , '<?=htmlentities($$2)?>' , $input );
+        return preg_replace( '/(<\?php=|<\?=)\$(.*)\?>/sU' , '<?=htmlentities($$2)?>' , $input );   //"
+    }
+
+    /**
+    *   converts &apos; &lt; &gt; &quot; etc. back to normal characters
+    *   this is needed i.e. if you have an xml-file from Openoffice.org
+    */
+    function decodeHtmlEntities( $input )
+    {
+        $open = preg_quote($this->getOption('delimiter',0));
+        $close = preg_quote($this->getOption('delimiter',1));
+
+        $transTable = get_html_translation_table (HTML_SPECIALCHARS);
+        $transTable = array_flip ($transTable);
+        $transTable['&apos;'] = '\'';
+
+        $input = preg_replace(  '/([^\\\]'.$open.'.*[^\\\]'.$close.')/Ue',
+                                "strtr('$1',\$transTable)",
+                                $input );
+
+        return $input;
     }
 
 }
