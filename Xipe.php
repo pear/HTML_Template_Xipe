@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.3  2002/02/07 22:45:55  mccain
+*   - make the options stuff work
+*
 *   Revision 1.2  2002/02/07 22:03:46  mccain
 *   - added informational comment
 *
@@ -151,6 +154,26 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
 # one solution would be copying everything from $GLOBALS into a unique varibale and replacing all variables in the
 # template using this unique variable, but this makes it a HUGE overhead, but would work
 
+# FIXXME2 by testing a site i realized, that a lot of php tags inside a tempalte slow slow down rendering
+# very much, somehoe it seems php is not too good in rendering html-pages with a lot of php tags inside
+# so we can write a filter, which can be applied that translates the entire template to use echo's only :-)
+# some work ha?
+
+# TODO
+# - enable a taglib/filter for sql statements inside the template, even though i will never use it :-)
+#   if we put that in a seperate file we can load it only on request, saves some php-compiling time
+# - add a taglib/filter for translate, smthg like: {%t $phpValue %}, to explicitly translate a string
+#   in case someone doesnt like to use the filter "applyTranslateFunction"
+# - add a filter for converting strings to html-entities, could work like "applyTranslateFunction" on
+#   mark up delimiters, or could be a taglib-tag too ... whatever
+#
+# MAY BE features
+# - url obfuscating (or whatever that is called), rewrite urls and decode them when retreiving a call to a specific page ... somehow
+#   i dont know if that belongs in a template engine, may be just write in the tutorial how to attach those products easily
+#   using a filter or whatever
+# -
+#
+#
     /**
     *   for customizing the class
     *   @access private
@@ -274,7 +297,7 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
             include( $this->compiledTemplate );
         }
         else
-            print("ERROR: couldnt get compiled template!!!<br>");
+            $this->showError("ERROR: couldnt get compiled template!!!<br>");
     }
 
     /**
@@ -362,23 +385,40 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
         if( $file[0] == '/' )
             $file = substr($file,1);
 
-        $compileDest = $this->options['compileDir'];
+        $compileDest = $this->getOption('compileDir');
+        if( !@is_dir($compileDest) )                // check if the compile dir has been created
+        {
+            $this->showError(   "'compileDir' could not be accessed<br>".
+                                "1. pleace create the 'compileDir' which is: <b>'$compileDest'</b><br>2. give write-rights to it");
+        }
+
+        if( !is_writeable($compileDest))
+# i dont know how to check if "enter" rights are given
+        {
+            $this->showError(   "can not write to 'compileDir', which is <b>'$compileDest'</b><br>".
+                                "1. pleace give write and enter-rights to it");
+        }
+
         $directory = dirname( $file );
         $filename = basename($file);
 
         // extract dirname to create directori(es) in compileDir in case they dont exist yet
         // we just keep the directory structure as the application uses it, so we dont get into conflict with names
         // i dont see no reason for hashing the directories or the filenames
-        $path = explode('/',$directory);
-        foreach( $path as $aDir )
+        if( $directory!='.' )   // it is '.' also if no dir is given
         {
-            $compileDest = $compileDest."/$aDir";
-            if( !@is_dir($compileDest) )
+            $path = explode('/',$directory);
+            foreach( $path as $aDir )
             {
-                umask(0000);                        // make that the users of this group (mostly 'nogroup') can erase the compiled templates too
-                if( !@mkdir($compileDest,0770) )
+                $compileDest = $compileDest."/$aDir";
+                if( !@is_dir($compileDest) )
                 {
-                    print "<i>SimpleTemplate: couldn't make directory: '$compileDest', please give permission to the 'compileDir'</i><br>";
+                    umask(0000);                        // make that the users of this group (mostly 'nogroup') can erase the compiled templates too
+                    if( !@mkdir($compileDest,0770) )
+                    {
+                        $this->showError(   "couldn't make directory: <b>'$aDir'</b> under <b>'".$this->getOption('compileDir')."'</b><br>".
+                                            "1. please give write permission to the 'compileDir', so SimpleTemplate can create directories inside");
+                    }
                 }
             }
         }
@@ -765,5 +805,20 @@ else
         return $fileContent;
     }
 
+    /**
+    *   show an error on the html page, format it, so it is obvious
+    *
+    *   @access     public
+    *   @version    02/02/25
+    *   @param      string  $message    the error message
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    */
+    function showError( $message )
+    {
+        echo '<span style="color:red; background-color:FBFEA1; font-weight:bold;">SimpleTemplate ERROR</span><br>';
+        echo '<span style="color:008000; background-color:FBFEA1;">';
+        echo $message;
+        echo '</span><br><br>';
+    }
 }
 ?>
