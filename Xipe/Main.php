@@ -65,45 +65,76 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
 //
     /**
     *   for customizing the class
+    *
+    *   compileDir'    =>  'tmp',  // by default its always the same one as where the template lies in, this might not be desired
+    *   delimiter'     =>  array('{','}'),
+    *   templateDir'   =>  '',
+    *   autoBraces'    =>  true,   // see method 'autoBraces' for explaination
+    *   makePhpTags'   =>  true,   // set this to false if you dont want the delimiters to be translated to php tags automativally
+    *   forceCompile'  =>  false,  // only suggested for debugging
+    *   xmlConfigFile' =>  'config.xml', // name of the xml config file which might be found anywhere in the directory structure
+    *   locale'        =>  'en',   // default language
+    *   cache'         =>  array(
+                               'time'      => false// set this to the number of seconds for which the final (html-)file shall be cached
+                                                    // false means the file is not cached at all
+                                                    // if you set it to 0 it is cached forever
+                                ,'depends'  => 0    // what does it depend on if the cache file can be reused
+                                                    // i.e. could be $_REQUEST $_COOKIES
+                                ),
+    *   logLevel'      =>  1,      // 1 - only logs new compiles, 0 - logs nothing, 2 - logs everything even only deliveries
+    *   filterLevel'   =>  10,     // 0    is no filter, use this if u want to register each filter u need yourself
+                                    // 1-7  can still be defined :-)
+                                    // 8    comments stay in the code
+                                    // 9    as 10 only that the resulting HTML-code stays readable
+                                    // 10   use all default filters, uses the allPre/Postfilters methods of each filter class
+    *   enable-XMLConfig'=>false,
+    *   enable-Cache'  =>  false,  // if you only turn on the Cache XMLConfig will be turned on too, since it is needed
+
+    *   verbose'       =>  true,   // set this to true if the engine shall output errors on the screen
+                                    // in addition to returning a PEAR_Error
+                                    // this makes getting the engine running easier
+                                    // on a production system you should turn this off
+
+    *   logFileExtension'=>'log',  // the extension for the log file
+    *   cacheFileExtension'=>'html',// file extension for the cached file
+    *   compiledTemplateExtension'=>'php',// the extension the generated template shall have
+    *
+    *   The templateExtension is currently used in the Filter/TagLib, for determining if
+    *   an included file is a template file or a macro file. Templates are handled a bit
+    *   differently, they are included as often as the {%include%} tag occurs.
+    *   Macro-files are surrounded by an if() clause, to prevent multiple declarations
+    *   of macros (which are simply php-functions)
+    *   <br>
+    *       'templateExtension'=>   'tpl',<br>
+    *       'macroExtension'=>      'mcr'
+    *
     *   @access private
     *   @var    array   $options    the options for initializing the template class
     */
-
-    var $options = array(   'compileDir'    =>  'tmp',  // by default its always the same one as where the template lies in, this might not be desired
+    var $options = array(
+                            'compileDir'    =>  'tmp',
                             'delimiter'     =>  array('{','}'),
                             'templateDir'   =>  '',
-                            'autoBraces'    =>  true,   // see method 'autoBraces' for explaination
-                            'makePhpTags'   =>  true,   // set this to false if you dont want the delimiters to be translated to php tags automativally
-                            'forceCompile'  =>  false,  // only suggested for debugging
-                            'xmlConfigFile' =>  'config.xml', // name of the xml config file which might be found anywhere in the directory structure
-                            'locale'        =>  'en',   // default language
+                            'autoBraces'    =>  true,
+                            'makePhpTags'   =>  true,
+                            'forceCompile'  =>  false,
+                            'xmlConfigFile' =>  'config.xml',
+                            'locale'        =>  'en',
                             'cache'         =>  array(
-                                                    'time'      => false// set this to the number of seconds for which the final (html-)file shall be cached
-                                                                        // false means the file is not cached at all
-                                                                        // if you set it to 0 it is cached forever
-                                                    ,'depends'  => 0    // what does it depend on if the cache file can be reused
-                                                                        // i.e. could be $_REQUEST $_COOKIES
+                                                    'time'      => false
+                                                    ,'depends'  => 0
                                                      ),
-                            'logLevel'      =>  1,      // 1 - only logs new compiles, 0 - logs nothing, 2 - logs everything even only deliveries
-                            'filterLevel'   =>  10,     // 0    is no filter, use this if u want to register each filter u need yourself
-                                                        // 1-7  can still be defined :-)
-                                                        // 8    comments stay in the code
-                                                        // 9    as 10 only that the resulting HTML-code stays readable
-                                                        // 10   use all default filters, uses the allPre/Postfilters methods of each filter class
+                            'logLevel'      =>  1,
+                            'filterLevel'   =>  10,
                             'enable-XMLConfig'=>false,
-                            'enable-Cache'  =>  false,  // if you only turn on the Cache XMLConfig will be turned on too, since it is needed
-
-                            'verbose'       =>  true,   // set this to true if the engine shall output errors on the screen
-                                                        // in addition to returning a PEAR_Error
-                                                        // this makes getting the engine running easier
-                                                        // on a production system you should turn this off
-
-                            'logFileExtension'=>'log',  // the extension for the log file
-                            'cacheFileExtension'=>'html',// file extension for the cached file
-                            'compiledTemplateExtension'=>'php',// the extension the generated template shall have
-
-                            'debug'         =>  0
-
+                            'enable-Cache'  =>  false,
+                            'verbose'       =>  true,
+                            'logFileExtension'=>'log',
+                            'cacheFileExtension'=>'html',
+                            'compiledTemplateExtension'=>'php',
+                            'debug'         =>  0,
+                            'templateExtension'=>   'tpl',
+                            'macroExtension'=>      'mcr'
                         );
 
     /**
