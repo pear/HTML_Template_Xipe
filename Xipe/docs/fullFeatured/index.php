@@ -1,5 +1,9 @@
 <?php
 
+    #
+    #   author      wolfram@kriesing.de
+    #
+    # $Id$
 
     require_once('../../../examples/config.php');
 
@@ -16,45 +20,6 @@
                         );
 
     $tpl = new SimpleTemplate_Engine($options);
-
-
-/*
-    you dont need to add every filter manually anymore,
-    one of the default-options is now: 'filterLevel' => 10
-    if this is set to 10 all default filters are applied
-
-    #####################################
-    #
-    #   apply basic filters to the template
-    #
-    require_once('SimpleTemplate/Filter/Basic.php');
-
-    $tplFilter = new SimpleTemplate_Filter_Basic($tpl->getOptions());
-    // pre filter
-    $tpl->registerPrefilter(array(&$tplFilter,'removeHtmlComments'));
-    $tpl->registerPrefilter(array(&$tplFilter,'removeCStyleComments'));
-    $tpl->registerPrefilter(array(&$tplFilter,'addIfBeforeForeach'));   // this filter makes the foreach-blocks conditional, so they are only shown if they contain data, see api-doc
-    // post filter
-    $tpl->registerPostfilter(array(&$tplFilter,'trimLines'));
-    $tpl->registerPostfilter(array(&$tplFilter,'optimizeHtmlCode'));
-
-
-
-    #####################################
-    #
-    #   apply TagLib filters to the template
-    #
-    require_once('SimpleTemplate/Filter/TagLib.php');
-
-    $tagLib = new SimpleTemplate_Filter_TagLib($tpl->options);
-    $tpl->registerPrefilter(array(&$tagLib,'includeFile'));
-    $tpl->registerPrefilter(array(&$tagLib,'block'));
-    // do 'block' and 'include' before other tags, so the other tags also work
-    // when they were used in a block !!!
-    $tpl->registerPrefilter(array(&$tagLib,'trim'));
-    $tpl->registerPrefilter(array(&$tagLib,'repeat'));
-    $tpl->registerPrefilter(array(&$tagLib,'applyHtmlEntites'));
-*/
 
     #####################################
     #

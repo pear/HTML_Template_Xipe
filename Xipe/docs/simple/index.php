@@ -19,10 +19,10 @@
 
                         'verbose'   => true,    // this is default too
                         'locale'    => '',      // there is no language stuff here
-                        'logLevel'  => 1,
+                        'logLevel'  => 1,       // write log-file
 
                         // let me define the filters i want to use
-                        'filterLevel'   => 0
+                        'filterLevel'   => 0    // level 0 means no filter by default
                         );
     $tpl = new SimpleTemplate_Engine($options);
 
@@ -31,6 +31,7 @@
     #####################################
     #
     #   make filter class instance
+    #   and apply filters as needed
     #
     $tplFilter = new SimpleTemplate_Filter_Basic($tpl->getOptions());
     // pre filter
