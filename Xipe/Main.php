@@ -18,6 +18,11 @@
 //
 //  restarting to write log messages at version 1.5
 //  $Log$
+//  Revision 1.2  2002/06/21 20:54:38  mccain
+//  - added filterLevels 8,9
+//  - added option which lets you turn off making php tags, so the engine can be used for individual means too
+//  - added method unregisterFilter
+//
 //  Revision 1.1  2002/05/26 17:04:30  mccain
 //  - initial commit, after restructuring and enhancing the engine
 //
@@ -301,7 +306,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
                 if( !@is_dir($compileDir) )
                 {
                     umask(0000);                        // make that the users of this group (mostly 'nogroup') can erase the compiled templates too
-                    if( !@mkdir($compileDir,0770) )
+                    if( !@mkdir($compileDir,0777) )
                     {
                         return $this->_error(   "couldn't make directory: <b>'$aDir'</b> under <b>'".
                                                 $this->getOption('compileDir')."'</b><br>".
@@ -400,7 +405,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
         {
             fwrite($cfp,$fileContent);
             fclose($cfp);
-            chmod($this->_compiledTemplate,0770);
+            chmod($this->_compiledTemplate,0777);
         }
 
         return true;
