@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.8  2002/05/26 17:07:00  mccain
+*   - remove old comment
+*
 *   Revision 1.7  2002/05/21 23:01:55  mccain
 *   - added a filter which invokes all pre filters and one for all post filters too
 *
@@ -142,12 +145,16 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
     *   @version    02/05/22
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      string  the actual input string, to which the filters will be applied
+    *   @param      int     the filter level
     *   @return     string  the resulting string
     */
-    function allPrefilters( $input )
+    function allPrefilters( $input , $filterLevel )
     {
-        $input = $this->removeHtmlComments($input);
-        $input = $this->removeCStyleComments($input);
+        if( $filterLevel > 8 )  // see Main.php for what the filter levels are supposed to do
+        {
+            $input = $this->removeHtmlComments($input);
+            $input = $this->removeCStyleComments($input);
+        }
         $input = $this->addIfBeforeForeach($input);
         return $input;
     }
@@ -159,13 +166,17 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
     *   @version    02/05/22
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      string  the actual input string, to which the filters will be applied
+    *   @param      int     the filter level
     *   @return     string  the resulting string
     */
-    function allPostfilters( $input )
+    function allPostfilters( $input , $filterLevel )
     {
-        $input = $this->removeEmptyLines($input);
-        $input = $this->trimLines($input);
-        $input = $this->optimizeHtmlCode($input);
+        if( $filterLevel > 9 )  // see Main.php for what the filter levels are supposed to do
+        {
+            $input = $this->removeEmptyLines($input);
+            $input = $this->trimLines($input);
+            $input = $this->optimizeHtmlCode($input);
+        }
         return $input;
     }
 
