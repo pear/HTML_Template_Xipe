@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<SimpleTemplate>
+<simpletemplate>
     <options override="yes">
         <delimiter begin="[" end="]"/>
         <autoBraces value="true"/>
@@ -47,4 +47,4 @@
 
     </preFilter>
 
-</SimpleTemplate>
+</simpletemplate>

@@ -1,14 +1,17 @@
 <!--
     $Log: not supported by cvs2svn $
+    Revision 1.3  2002/05/26 17:12:19  mccain
+    - added log
+
 -->
 
-<SimpleTemplate>
+<simpletemplate>
     <options override="yes">
         <delimiter begin="[" end="]"/>
         <autoBraces value="true"/>
         <locale value="en"/>
     </options>
-</SimpleTemplate>
+</simpletemplate>
 
 <html>
     <head>
@@ -34,13 +37,13 @@ This is the XML-part which configures this template, either in the
 <a href="[$viewConfigXmlUrl]">config.xml</a> or/and in this
 <a href="[$viewTemplateCodeUrl]">template-file (index.tpl)</a>.<br>
 <code>
-&lt;SimpleTemplate&gt;<br>
+&lt;simpletemplate&gt;<br>
  &nbsp; &lt;options override="yes"&gt;<br>
  &nbsp;  &nbsp; &lt;delimiter begin="\[" end="\]"/&gt;<br>
  &nbsp;  &nbsp; &lt;autoBraces value="true"/&gt;<br>
  &nbsp;  &nbsp; &lt;locale value="en"/&gt;<br>
  &nbsp; &lt;/options&gt;<br>
-&lt;/SimpleTemplate&gt;<br>
+&lt;/simpletemplate&gt;<br>
 </code>
 
 <br><br>
@@ -107,6 +110,23 @@ then you should try SimpleTemplate.<br><br>
     <a href="[$viewCompiledTemplate]">and the complied template</a><br>
     <a href="[$viewTemplateLog]">template log file</a><br>
     <br><br>
+
+
+<h2>all the currently possible and working xml-options - overview</h2>
+<code>
+&lt;simpletemplate&gt;<br>
+ &nbsp; &lt;options&gt;<br>
+ &nbsp;  &nbsp; &lt;delimiter begin="\[" end="\]"/&gt;<br>
+ &nbsp;  &nbsp; &lt;autoBraces value="true"/&gt;<br>
+ &nbsp;  &nbsp; &lt;locale value="en"/&gt;<br>
+ &nbsp;  &nbsp; &lt;cache&gt;<br>
+ &nbsp;  &nbsp;  &nbsp; &lt;time value="x" unit="week|weeks|day|days|hour|hours|minute|minutes|second"/&gt;<br>
+ &nbsp;  &nbsp;  &nbsp; &lt;depends value="$someVar $anotherVar $_nextVar"/&gt;<br>
+ &nbsp;  &nbsp; &lt;/cache&gt;<br>
+ &nbsp; &lt;/options&gt;<br>
+&lt;/simpletemplate&gt;<br>
+</code>
+
 
 </body>
 </html>

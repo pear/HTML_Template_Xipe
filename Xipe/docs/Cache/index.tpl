@@ -1,14 +1,17 @@
 <!--
     $Log: not supported by cvs2svn $
+    Revision 1.1  2002/06/02 22:34:28  mccain
+    - initial commit
+
 -->
 
-<SimpleTemplate>
+<simpletemplate>
     <options>
         <cache>
             <time value="10" />
         </cache>
     </options>
-</SimpleTemplate>
+</simpletemplate>
 
 
 <html>
@@ -39,13 +42,13 @@ found on the way are applied in the same order. The last config that gets applie
 one in the template itself if given.<br>
 The configuration of a template is as easy as you can see in the following:
 <pre><code>
-&lt;SimpleTemplate&gt;
+&lt;simpletemplate&gt;
 &nbsp;  &lt;options&gt;
 &nbsp;      &lt;cache&gt;
 &nbsp;          &lt;time value="100" /&gt;
 &nbsp;      &lt;/cache&gt;
 &nbsp;  &lt;/options&gt;
-&lt;/SimpleTemplate&gt;
+&lt;/simpletemplate&gt;
 </code></pre>
 this would simply cache the template's output (the final html file) for 100 seconds.<br>
 
@@ -56,14 +59,14 @@ Therefore you can use the additional tag 'depends' inside the 'cache' tag, which
 kind of varible that is deinfed in the global namespace.<br>
 For example:<br>
 <pre><code>
-&lt;SimpleTemplate&gt;
+&lt;simpletemplate&gt;
 &nbsp;  &lt;options&gt;
 &nbsp;      &lt;cache&gt;
 &nbsp;          &lt;time value="1" unit="week" /&gt;
 &nbsp;          &lt;depends value="$_SESSION $myVar $anyVar" /&gt;
 &nbsp;      &lt;/cache&gt;
 &nbsp;  &lt;/options&gt;
-&lt;/SimpleTemplate&gt;
+&lt;/simpletemplate&gt;
 </code></pre>
 <br>
 BE WARNED: letting a cache-file depend on i.e. $_REQUEST makes it possible to
@@ -76,14 +79,14 @@ this might flood your webservers diskspace.
 <h2>Syntax</h2>
 The syntax of the caching tag is:<br>
 <pre><code>
-&lt;SimpleTemplate&gt;
+&lt;simpletemplate&gt;
 &nbsp;  &lt;options&gt;
 &nbsp;      &lt;cache&gt;
 &nbsp;          &lt;time value="x" [unit="week|weeks|day|days|hour|hours|minute|minutes|second"]/&gt;
 &nbsp;          [&lt;depends value="$_SESSION $myVar $anyVar" /&gt;]
 &nbsp;      &lt;/cache&gt;
 &nbsp;  &lt;/options&gt;
-&lt;/SimpleTemplate&gt;
+&lt;/simpletemplate&gt;
 </code></pre>
 
 </body></html>

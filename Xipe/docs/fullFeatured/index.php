@@ -11,7 +11,9 @@
     require_once('SimpleTemplate/Engine.php');
 
     $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/fullFeatured',
-                        'compileDir'    => 'tmp');
+                        'compileDir'    => 'tmp'    //
+                        #,'debug'=>true
+                        );
 
     $tpl = new SimpleTemplate_Engine($options);
 
@@ -53,7 +55,6 @@
     $tpl->registerPrefilter(array(&$tagLib,'repeat'));
     $tpl->registerPrefilter(array(&$tagLib,'applyHtmlEntites'));
 */
-
 
     #####################################
     #
