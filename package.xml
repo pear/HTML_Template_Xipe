@@ -45,13 +45,18 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
 
     <release>
         <version>1.7.4</version>
-        <date>2003-??-??</date>
+        <date>2003-06-17</date>
         <license>PHP License</license>
         <state>stable</state>
         <notes>
+* added getRenderedTemplate()
 * now {CONSTANT} is also echoed
 * add unit test for Filter_Internal::makePhpTags(), for the printing of constant
 * {@$var} does also print automatically now
+* exclude addIfBeforeForeach when autoBraces is off
+* use {endmacro} for ending a macro with autoBraces off
+* fix some windows issues
+* various smaller bugfixes
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="HTML/Template">
