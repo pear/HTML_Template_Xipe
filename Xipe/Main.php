@@ -18,6 +18,9 @@
 //
 //  restarting to write log messages at version 1.5
 //  $Log$
+//  Revision 1.7  2002/11/02 19:43:03  mccain
+//  - whitespaces
+//
 //  Revision 1.6  2002/10/02 19:01:26  mccain
 //  - replace # by //
 //
@@ -124,6 +127,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
 
                             'logFileExtension'=>'log',  // the extension for the log file
                             'cacheFileExtension'=>'html',// file extension for the cached file
+                            'compiledTemplateExtension'=>'php',// the extension the generated template shall have
 
                             'debug'         =>  0
 
@@ -215,7 +219,13 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
         //
 
         $this->_templateFile = $filename;
+/*
+        $pathInfo = pathinfo($this->_templateFile);
+        if( in_array($pathInfo['extension'],array('sxw','sxc','sxi','sxd')) )
+        {
 
+        }
+*/
         // build the filename-prefix that will be used for the compiled file
         if( PEAR::isError( $ret = $this->_getCompiledFilePrefix() ) )
         {
@@ -225,7 +235,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
 
 //print "this->_templateFile = $this->_templateFile<br>this->_compiledFilePrefix = $this->_compiledFilePrefix<br><br>";
 
-        $this->_compiledTemplate = $this->_compiledFilePrefix.'php';
+        $this->_compiledTemplate = $this->_compiledFilePrefix.$this->getOption('compiledTemplateExtension');
 
 //print ".........BEFORE SETUP METHOD..........<br>";
 //print_r($this);print "<br><br>";
