@@ -251,7 +251,7 @@ class HTML_Template_Xipe
     *   @param      string      the file name for which the object shall be retreived
     *   @return     object      a reference to an object from the object pool
     */
-    function _methodWrapper($filename,$method)
+    function _methodWrapper(&$filename,$method)
     {
         $templateDir = $this->getOption('templateDir');
         // if we are on a windows, which we check using the directory-separator (is there an easier way?)
@@ -261,11 +261,11 @@ class HTML_Template_Xipe
             $filename = strtolower($filename);
             $templateDir = strtolower($templateDir);
         }
-        if (strpos( $filename , $templateDir ) !== 0) {
+        if (strpos($filename ,$templateDir) !== 0) {
             $filename = $templateDir.$filename;
         }
 
-        $objKey = md5( $filename );
+        $objKey = md5($filename);
         if (!isset($this->_objectPool[$objKey])) {
             // use __clone in php5
             // copy the default object with all its properties, yes COPY,
