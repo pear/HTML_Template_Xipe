@@ -1,3 +1,15 @@
+1.7.2
+- including templates using {%include /template/path/file.tpl%}
+  can be nested to any depth
+- nested macros are possible too
+- macros do also work with autoBraces OFF
+- addIfBeforeForeach works for autoBraces OFF too
+                            
+
+1.7.1
+- fix a lot of E_ALL and CS issues
+
+
 Version 1.7
 - porting SimpleTemplate into PEAR, where it is called HTML_Template_Xipe
   changing all the class names and file names
