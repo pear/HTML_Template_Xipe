@@ -1,45 +1,41 @@
 <?php
 
 
-    #####################################
-    #
-    #   include the files needed
-    #
-    require_once('SimpleTemplate/Engine.php');
-    require_once('SimpleTemplate/Filter/Basic.php');
+    //
+    //   include the files needed
+    //
+    require_once('HTML/Template/Xipe.php');
+    require_once('HTML/Template/Xipe/Filter/Basic.php');
 
 
 
-    #####################################
-    #
-    #   make template class instance
-    #
+    //
+    //   make template class instance
+    //
     $options = array(   'templateDir'   => dirname(__FILE__),
                         'enable-XMLConfig'=>true,
                         'logLevel'      => 1 );
-    $tpl = new SimpleTemplate_Engine($options);
+    $tpl = new HTML_Template_Xipe($options);
 
-#$tpl->setOption('forceCompile',true);
+//$tpl->setOption('forceCompile',true);
 
-    #####################################
-    #
-    #   make filter class instance
-    #
-/*    $tplFilter = new SimpleTemplate_Filter_Basic($tpl->getOptions());
+    //
+    //   make filter class instance
+    //
+/*    $tplFilter = new HTML_Template_Xipe_Filter_Basic($tpl->getOptions());
     // pre filter
     $tpl->registerPrefilter(array(&$tplFilter,'removeHtmlComments'));
     $tpl->registerPrefilter(array(&$tplFilter,'removeCStyleComments'));
     $tpl->registerPrefilter(array(&$tplFilter,'addIfBeforeForeach'));   // this filter makes the foreach-blocks conditional, so they are only shown if they contain data, see api-doc
 */
     // post filter
-#    $tpl->registerPostfilter('trimLines',$tplFilter);
-#    $tpl->registerPostfilter('optimizeHtmlCode',$tplFilter);
+//    $tpl->registerPostfilter('trimLines',$tplFilter);
+//    $tpl->registerPostfilter('optimizeHtmlCode',$tplFilter);
 
-    #####################################
-    #
-    #   fill variables used in the template
-    #   no assign-method necessary
-    #
+    //
+    //   fill variables used in the template
+    //   no assign-method necessary
+    //
     $advantages = array(    'clean HTML-code',
                             'ALL the power of PHP inside a template',
                             'a compiled template',
@@ -58,10 +54,9 @@
 
 
 
-    #####################################
-    #
-    #   show the template
-    #
+    //
+    //   show the template
+    //
     $tpl->compile('index.tpl');
     include($tpl->getCompiledTemplate());
 

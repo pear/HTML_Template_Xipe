@@ -4,7 +4,7 @@
     /*
     *   include the files needed
     */
-    require_once('SimpleTemplate/Engine.php');
+    require_once('HTML/Template/Xipe.php');
 
     /*
     *   make template class instance
@@ -16,7 +16,7 @@
 //                        'makePhpTags'=>false,
                         'logLevel'=>2
                         );
-    $tpl = new SimpleTemplate_Engine($options);
+    $tpl = new HTML_Template_Xipe($options);
 
     /*
     *   fill some vars

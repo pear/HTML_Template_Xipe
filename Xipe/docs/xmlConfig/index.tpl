@@ -1,21 +1,25 @@
 <!--
     $Log: not supported by cvs2svn $
+    Revision 1.4  2002/06/02 22:38:56  mccain
+    - convert all config-tags to lower case, this is secure for now
+      also if the Tree-package is not updated
+
     Revision 1.3  2002/05/26 17:12:19  mccain
     - added log
 
 -->
 
-<simpletemplate>
+<HTML_Template_Xipe>
     <options override="yes">
         <delimiter begin="[" end="]"/>
         <autoBraces value="true"/>
         <locale value="en"/>
     </options>
-</simpletemplate>
+</HTML_Template_Xipe>
 
 <html>
     <head>
-        <title>Example - SimpleTemplate, XML-configured</title>
+        <title>Example - HTML_Template_Xipe, XML-configured</title>
         <link href="../style.css" type="text/css" rel="StyleSheet">
     </head>
 
@@ -37,13 +41,13 @@ This is the XML-part which configures this template, either in the
 <a href="[$viewConfigXmlUrl]">config.xml</a> or/and in this
 <a href="[$viewTemplateCodeUrl]">template-file (index.tpl)</a>.<br>
 <code>
-&lt;simpletemplate&gt;<br>
+&lt;HTML_Template_Xipe&gt;<br>
  &nbsp; &lt;options override="yes"&gt;<br>
  &nbsp;  &nbsp; &lt;delimiter begin="\[" end="\]"/&gt;<br>
  &nbsp;  &nbsp; &lt;autoBraces value="true"/&gt;<br>
  &nbsp;  &nbsp; &lt;locale value="en"/&gt;<br>
  &nbsp; &lt;/options&gt;<br>
-&lt;/simpletemplate&gt;<br>
+&lt;/HTML_Template_Xipe&gt;<br>
 </code>
 
 <br><br>
@@ -95,7 +99,7 @@ This is the XML-part which configures this template, either in the
         </td>
     </tr>
 </table>
-then you should try SimpleTemplate.<br><br>
+then you should try HTML_Template_Xipe.<br><br>
 
 <br><br>
 
@@ -114,7 +118,7 @@ then you should try SimpleTemplate.<br><br>
 
 <h2>all the currently possible and working xml-options - overview</h2>
 <code>
-&lt;simpletemplate&gt;<br>
+&lt;HTML_Template_Xipe&gt;<br>
  &nbsp; &lt;options&gt;<br>
  &nbsp;  &nbsp; &lt;delimiter begin="\[" end="\]"/&gt;<br>
  &nbsp;  &nbsp; &lt;autoBraces value="true"/&gt;<br>
@@ -124,7 +128,7 @@ then you should try SimpleTemplate.<br><br>
  &nbsp;  &nbsp;  &nbsp; &lt;depends value="$someVar $anotherVar $_nextVar"/&gt;<br>
  &nbsp;  &nbsp; &lt;/cache&gt;<br>
  &nbsp; &lt;/options&gt;<br>
-&lt;/simpletemplate&gt;<br>
+&lt;/HTML_Template_Xipe&gt;<br>
 </code>
 
 

@@ -1,20 +1,20 @@
-<SimpleTemplate>
+<HTML_Template_Xipe>
     <options>
         <autoBraces value="false"/>
     </options>
     <preFilter>
         <!--
             if 'class' is given it's assumed, that the class name
-            represents also the path name, so SimpleTemplate_Filter_SimpleTag
-            means the file is in SimpleTemplate/Filter/SimpleTag.php
+            represents also the path name, so HTML_Template_Xipe_Filter_SimpleTag
+            means the file is in HTML/Template/Xipe/Filter/SimpleTag.php
             which means (mostly) the file has to be in the include path!
 
             if 'classFile' is given it will be used for including the proper file
-            so it could also be     classFile="SimpleTemplate/Filter/SimpleTag.php"
+            so it could also be     classFile="HTML/Template/Xipe/Filter/SimpleTag.php"
         -->
-        <register class="SimpleTemplate_Filter_SimpleTag"/>
+        <register class="HTML_Template_Xipe_Filter_SimpleTag"/>
     </preFilter>
-</SimpleTemplate>
+</HTML_Template_Xipe>
 
 
 <html>

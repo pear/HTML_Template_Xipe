@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<simpletemplate>
+<HTML_Template_Xipe>
     <options override="yes">
         <delimiter begin="[" end="]"/>
         <autoBraces value="true"/>
@@ -48,4 +48,4 @@
 
     </preFilter>
 
-</simpletemplate>
+</HTML_Template_Xipe>
