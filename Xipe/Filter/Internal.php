@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.8  2002/09/22 18:49:20  mccain
+*   - changed internal methods to be able to work with xml-files (dont use short tags anymore)
+*
 *   Revision 1.7  2002/06/26 09:30:02  mccain
 *   - fixed bug in autoBraces
 *
@@ -129,27 +132,26 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
         $qEnd = preg_quote($end);
 
         // replace all varibales with $GLOBALS around it, so we can use the method "show"
-# dont replace $GLOBALS
-#        $input = preg_replace(  #'/\{(.*)\$([^(GLOBALS)]+)([^a-zA-Z0-9_].*)\}/U' , works fine but doesnt replace multiple $x inside one php tag
-#                                '/\{(.*)\$([^(GLOBALS)]+)([^a-zA-Z0-9_].*)\}/U' ,
-#                                '{$1$GLOBALS[\'$3\']$4 /*...1=$1...2=$2...3=$3....4=$4....5=$5.... */}' ,
-#                                $input );
+// dont replace $GLOBALS
+//       $input = preg_replace(  #'/\{(.*)\$([^(GLOBALS)]+)([^a-zA-Z0-9_].*)\}/U' , works fine but doesnt replace multiple $x inside one php tag
+//                                '/\{(.*)\$([^(GLOBALS)]+)([^a-zA-Z0-9_].*)\}/U' ,
+//                                '{$1$GLOBALS[\'$3\']$4 /*...1=$1...2=$2...3=$3....4=$4....5=$5.... */}' ,
+//                                $input );
 
-        //
-        //  replace the print tags, like: {$var}
-        //
-        // dont replace escaped delimiter \} or \{ and tagLib endtags %}
-        $input = preg_replace(  '/([^\\\])'.$qBegin.'\$(.*)([^\\\%])'.$qEnd.'/U' ,
-                                '$1<?php echo $$2$3; ?>' ,
+        // replace { by < ?php  ({ is the delimiter)
+        $regExp = "/([^\\\])$qBegin([^%])/Um";    // modifier m makes '{foo}{bar}' on one line work too
+        $input = preg_replace(  $regExp ,
+                                '$1<?php $2' ,
                                 $input );
-
-        //
-        //  replace all other delimiter
-        //
-        //$regExp = '/([^\\\])'.$qBegin.'([^%])/U';
-        //$input = preg_replace( $regExp , '$1<?php $2' , $input );
-        $input = preg_replace(  "/([^\\\])$qBegin([^%])(.*)([^\\\%])$qEnd/U" ,
-                                '$1<?php $2$3$4 ?>' ,
+        // replace } by ? >  (} is the delimiter)
+        $regExp = "/([^\\\%])$qEnd/Um";    // modifier m makes '{foo}{bar}' on one line work too
+        $input = preg_replace(  $regExp ,
+                                '$1 ?>' ,
+                                $input );
+        // replace '< ?php $' by '< ?php echo $'
+        $regExp = "/<\?php\s\\$/Um";
+        $input = preg_replace(  $regExp ,
+                                '<?php echo $' ,
                                 $input );
 
         //
@@ -187,24 +189,24 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
     function autoBraces( $input )
     {
 
-# FIXXXXME  the following fucks it up, because of the indented next line, but the echo doesnt need a {
-# see proxy/modules/convert/templates/phpManual/default.tpl
-# maybe check for words which require braces, like if, foreach and so on ... but this limits it again :-/ and if we
-# forgot one its fucked
-# and what it does wrong too, is it puts the { behind: $aBookmark['url'], see compiled template
-#                         <a href="{$aBookmark['url']}" target="main" title="{echo htmlentities($aBookmark['selection'])}">
-#                            {$aBookmark['title']}
-#                                {if($aBookmark[$orderBy] && $orderBy!='title')}
-#                                    ({$aBookmark[$orderBy]})
-#                        </a>
-# this fails too, though it is not correct, since the second line doesnt need to be indented
-# {%trim $x 20 ''%}
-#   {%trim $x 20 ''%}
-#
-# ths is also buggy the '{%' is translated to be '< ? php }' even though the '>' is before, the '}' should go before the '>'
-#     {if($aFolder['id'] == $fid)}
-#        class="curFolder"
-#     >{%trim $aFolder['extName'] after 40 "..."%}
+// FIXXXXME  the following fucks it up, because of the indented next line, but the echo doesnt need a {
+// see proxy/modules/convert/templates/phpManual/default.tpl
+// maybe check for words which require braces, like if, foreach and so on ... but this limits it again :-/ and if we
+// forgot one its fucked
+// and what it does wrong too, is it puts the { behind: $aBookmark['url'], see compiled template
+//                         <a href="{$aBookmark['url']}" target="main" title="{echo htmlentities($aBookmark['selection'])}">
+//                            {$aBookmark['title']}
+//                                {if($aBookmark[$orderBy] && $orderBy!='title')}
+//                                    ({$aBookmark[$orderBy]})
+//                        </a>
+// this fails too, though it is not correct, since the second line doesnt need to be indented
+// {%trim $x 20 ''%}
+//   {%trim $x 20 ''%}
+//
+// ths is also buggy the '{%' is translated to be '< ? php }' even though the '>' is before, the '}' should go before the '>'
+//     {if($aFolder['id'] == $fid)}
+//        class="curFolder"
+//     >{%trim $aFolder['extName'] after 40 "..."%}
 
 
         $openDel = $this->getOption('delimiter',0);
@@ -247,7 +249,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
                 $numSpaces <= $openIndentions[0]['numSpaces']
               )
             {
-#print("end indention ".htmlentities($file[$curLineIndex]).'<br>');
+//print("end indention ".htmlentities($file[$curLineIndex]).'<br>');
                 do
                 {
                     $spaces = '';
@@ -261,7 +263,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
                     //  <br>{somePhpCode}       // dont add the brace in the {somePhpCode} but before the <br> otherwise the logic would be false!
                     if( preg_match( '/^\s*'.preg_quote($begin).'.+[^echo].*'.preg_quote($end).'/U' , $file[$curLineIndex] ) )
                     {
-#print "line = $curLineIndex --- ".htmlentities($file[$curLineIndex]);
+//print "line = $curLineIndex --- ".htmlentities($file[$curLineIndex]);
                         // this also fixes the problem i had with the 'else', which doesnt except closing the php-tag before or after it
                         // since we are always writing the braces inside the existing php-tag now :-)
                         // replace only the first $begin with "$begin }" and dont forget to put the spaces back!! ($1)
@@ -270,10 +272,10 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
                     }
                     else    // no delimiters on this line, so we new once
                     {
-#print "else line = $curLineIndex --- ".htmlentities($file[$curLineIndex]);
+//print "else line = $curLineIndex --- ".htmlentities($file[$curLineIndex]);
                         $file[$curLineIndex] = $spaces.$begin.' }'.$end."\n".$file[$curLineIndex];
                     }
-#print " ....... after = $curLineIndex --- ".htmlentities($file[$curLineIndex])."<br>";
+//print " ....... after = $curLineIndex --- ".htmlentities($file[$curLineIndex])."<br>";
 
                     array_shift( $openIndentions );
                     $openIndentions_0_numSpaces = 0;
@@ -311,7 +313,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
                     array_unshift( $openIndentions , array('numSpaces'=>$numSpaces,'lineNumber'=>$curLineIndex) );
                     // write the opening brace in the
                     $file[$curLineIndex] = str_replace( $end , ' { '.$end , $file[$curLineIndex] );
-#print("started indention ".htmlentities($file[$curLineIndex]).'<br>');
+//print("started indention ".htmlentities($file[$curLineIndex]).'<br>');
                 }
             }
 
