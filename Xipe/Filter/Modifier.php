@@ -17,6 +17,9 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.2  2002/07/02 11:17:44  mccain
+//  - made imgSrc more flexible, now it also resolves paths with ../ in them
+//
 //  Revision 1.1  2002/06/27 16:04:47  mccain
 //  - added method imgSrc
 //
@@ -39,14 +42,22 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
     var $_imgFiles = array();
 
     /**
-    *   this filter trys to read all the <img src> tags and replaces the src tags with the complete file name
+    *   this filter trys to read all the following tags and replaces the src tags
+    *   with the complete file name (w/o the http://domain)
+    *       <img src> <input src>
     *   Using this filter makes it easier to work without looking up
     *   where the image really is located every time
     *   You simply need to give the image name and this filter searches for
     *   the image in the image root and rewrites the image name including
     *   the complete path to the image, so this saves time when developing and
     *   no php processing is necessary anymore when you have image tags like this:
-    *   <img src="{$imgRoot}/dir/name/image">
+    *   &lt;img src="{$imgRoot}/dir/name/image"&gt;<br>
+    *   <p>
+    *   Why not make the resulting link relative to the current URL (PHP_SELF)?<br>
+    *   Because a compiled template might be included from multiple places, so the
+    *   relative path would not always be the same. Thats why we make it absolute
+    *   w/o the protocol and domain in front.
+    *   </p>
     *
     *   @version    02/06/27
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
@@ -70,7 +81,11 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
 
         $found = array();
 
-        $regExp = '/<img.+src="(.*)"/Ui';
+        // modify the vImgRoot not to contain the 'http://domain' string in front
+        // since this is only unnecessary text
+        $vImgRoot = preg_replace('/^http.?:\/\/[^\/]+/','',$vImgRoot);
+
+        $regExp = '/<[img|input].+src="(.*)"/Ui';
         preg_match_all($regExp,$input,$images);
         if(sizeof($images[1]))
         {
@@ -120,8 +135,8 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
         foreach( $this->_imgFiles as $file=>$vName )
         {
             $_file = str_replace('/','\\/',preg_quote($file));  //"
-            $regExp = '/<img(.+)src="'.$_file.'"/Ui';
-            $input = preg_replace($regExp,'<img$1src="'.$vName.'"',$input);
+            $regExp = '/<(img|input)(.+)src="'.$_file.'"/Ui';
+            $input = preg_replace($regExp,'<$1$2src="'.$vName.'"',$input);
         }
 
         return $input;
