@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.13  2002/11/02 19:40:40  mccain
+*   - finsished decodeHtmlEntities, finally :-)
+*
 *   Revision 1.12  2002/09/27 16:57:43  mccain
 *   - removed experimental not working new feature :-)
 *
@@ -172,6 +175,7 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
         }
         $input = $this->decodeHtmlEntities($input);
         $input = $this->addIfBeforeForeach($input);
+        $input = $this->escapeShortTags($input);
         return $input;
     }
 
@@ -511,7 +515,7 @@ but this works:
         }
 
         foreach( $replaced as $key=>$aReplaced )
-        {
+        {                                                                
             $input = preg_replace( '/'.preg_quote($allReplaceables[$key]).'/' , $aReplaced , $input );
         }
 
@@ -537,6 +541,28 @@ but this works:
         }
 */
 
+        return $input;
+    }
+
+        
+
+    /**
+    *   replace < ?xml by printing them via php, so short_open_tags can be left on
+    *   since we can not turn it off anyway :-)
+    *
+    *   @version    02/11/05
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  $input  the original template code
+    *   @return     string  the modified template
+    */
+    function escapeShortTags( $input )
+    {
+        if( ini_get('short_open_tag') )
+        {             
+            $input = preg_replace(  '/<\?xml/i',
+                                    $this->getOption('delimiter',0).' echo "<?xml"'.$this->getOption('delimiter',1),
+                                    $input);
+        }
         return $input;
     }
 
