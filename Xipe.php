@@ -71,10 +71,10 @@ class HTML_Template_Xipe
         // just to let the constructor run once, so it can do some integrity checks (if needed)
         $tplClass = 'Main';
 
-        if( $options['enable-XMLConfig'] )
+        if( isset($options['enable-XMLConfig']) && $options['enable-XMLConfig'] )
             $tplClass = 'XMLConfig';
 
-        if( $options['enable-Cache'] )  // if the cache is on XMLConfig is needed, turn it on just to have the options properly set
+        if( isset($options['enable-Cache']) && $options['enable-Cache'] )  // if the cache is on XMLConfig is needed, turn it on just to have the options properly set
         {
             $options['enable-XMLConfig'] = true;
             $tplClass = 'Cache';

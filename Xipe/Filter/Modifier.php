@@ -98,7 +98,7 @@ class HTML_Template_Xipe_Filter_Modifier extends HTML_Template_Xipe_Options
             // go thru all the images we have found and find their path
             foreach( $images[1] as $aImage)
             {
-                if( $this->_imgFiles[$aImage] )
+                if( isset($this->_imgFiles[$aImage]) && $this->_imgFiles[$aImage] )
                     $found[$aImage] = $this->_imgFiles[$aImage];
                 else
                 {
@@ -108,7 +108,7 @@ class HTML_Template_Xipe_Filter_Modifier extends HTML_Template_Xipe_Options
                         // using pathinfo returns also the file's extension
                         $fileInfo = pathinfo($aImage);
                         // if there is an extension we assume that this one is used
-                        $_imgTypes = $fileInfo['extension'] ? array('') : $imgTypes;
+                        $_imgTypes = isset($fileInfo['extension']) && $fileInfo['extension'] ? array('') : $imgTypes;
                         foreach( $_imgTypes as $aType ) // if no file extension given loop through all possible imgTypes
                         {
                             $aType = $aType ? ".$aType" : '';
