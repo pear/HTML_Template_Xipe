@@ -47,6 +47,7 @@
     // when they were used in a block !!!
     $tpl->registerPrefilter(array(&$tagLib,'trim'));
     $tpl->registerPrefilter(array(&$tagLib,'repeat'));
+    $tpl->registerPrefilter(array(&$tagLib,'applyHtmlEntites'));
 
 
 
