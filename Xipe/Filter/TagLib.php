@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.9  2002/06/21 20:52:53  mccain
+*   - added macro filter
+*
 *   Revision 1.8  2002/06/10 18:43:39  mccain
 *   - fix bug in applyHtmlEntities, was not greedy before
 *
@@ -515,7 +518,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
 
         // replace 'macro' with 'function'
         $regExp = '/'.$openDel.'%\s*(macro|function)\s+(.*)%'.$closeDel.'/Usi';
-        $input = preg_replace( $regExp , "$_openDel function $2 $_closeDel" , $input );
+        $input = preg_replace( $regExp , $_openDel.'function $2'.$_closeDel , $input );
 
         // replace {%macroName()%} with {macroName()}
         $regExp = '/'.$openDel.'\s*function\s+(.*)\(.*\)\s*'.$closeDel.'/Usi';
@@ -525,7 +528,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
         foreach( $macroCalls[1] as $aMacroCall )
         {
             $regExp = '/'.$openDel.'%\s*'.trim($aMacroCall).'\s*(\(.*\))%'.$closeDel.'/Uis';
-            $input = preg_replace( $regExp , "$_openDel $aMacroCall $1 $_closeDel" , $input );
+            $input = preg_replace( $regExp , $_openDel.$aMacroCall.'$1'.$_closeDel , $input );
         }
 
         return $input;
