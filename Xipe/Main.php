@@ -18,6 +18,9 @@
 //
 //  restarting to write log messages at version 1.5
 //  $Log$
+//  Revision 1.1  2002/05/26 17:04:30  mccain
+//  - initial commit, after restructuring and enhancing the engine
+//
 //
 
 require_once('PEAR.php');
@@ -76,6 +79,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
                             'delimiter'     =>  array('{','}'),
                             'templateDir'   =>  '',
                             'autoBraces'    =>  true,   // see method 'autoBraces' for explaination
+                            'makePhpTags'   =>  true,   // set this to false if you dont want the delimiters to be translated to php tags automativally
                             'forceCompile'  =>  false,  // only suggested for debugging
                             'xmlConfigFile' =>  'config.xml', // name of the xml config file which might be found anywhere in the directory structure
                             'locale'        =>  'en',   // default language
@@ -88,7 +92,9 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
                                                      ),
                             'logLevel'      =>  1,      // 1 - only logs new compiles, 0 - logs nothing, 2 - logs everything even only deliveries
                             'filterLevel'   =>  10,     // 0    is no filter, use this if u want to register each filter u need yourself
-                                                        // 1-9  can still be defined :-)
+                                                        // 1-7  can still be defined :-)
+                                                        // 8    comments stay in the code
+                                                        // 9    as 10 only that the resulting HTML-code stays readable
                                                         // 10   use all default filters, uses the allPre/Postfilters methods of each filter class
                             'enable-XMLConfig'=>false,
                             'enable-Cache'  =>  false,  // if you only turn on the Cache XMLConfig will be turned on too, since it is needed
@@ -373,7 +379,8 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
         if( $this->getOption('enable-XMLConfig') == true )
             $internalFilters[] = array(&$defaultFilter,'removeXmlConfigString' );
 
-        $internalFilters[] = array(&$defaultFilter,'makePhpTags');
+        if( $this->getOption('makePhpTags') == true )
+            $internalFilters[] = array(&$defaultFilter,'makePhpTags');
 
         // if the option autoBraces is on apply the _first_ postFilter right here
         // which does the autBracing
@@ -543,6 +550,23 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
         }
         else
             $this->_postFilters[] = $functionName;
+    }
+
+    /**
+    *   unregister a filter
+    *
+    *   @access     public
+    *   @version    02/06/21
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string      the filter name, if not given all filters are unregistered
+    */
+    function unregisterFilter( $name=null )
+    {
+        if( $name==null )
+        {
+            $this->_postFilters = array();
+            $this->_preFilters = array();
+        }
     }
 
     /**
