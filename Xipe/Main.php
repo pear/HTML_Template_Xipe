@@ -309,16 +309,14 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
 
         $compileDir = $this->getOption('compileDir');
 
-        if( !@is_dir($compileDir) )                 // check if the compile dir has been created
-        {
+        if (!@is_dir($compileDir)) {                 // check if the compile dir has been created
             return $this->_error(   "'compileDir' could not be accessed <br>".
                                     "1. please create the 'compileDir' which is: <b>'$compileDir'</b><br>2. give write-rights to it" ,
                                     PEAR_ERROR_DIE );
         }
 
-        if( !@is_writeable($compileDir))
+        if (!@is_writeable($compileDir)) {
 // i dont know how to check if "enter" rights are given
-        {
             return $this->_error(   "can not write to 'compileDir', which is <b>'$compileDir'</b><br>".
                                     "1. please give write and enter-rights to it" , PEAR_ERROR_DIE );
         }
@@ -330,17 +328,13 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
         // extract dirname to create directorie(s) in compileDir in case they dont exist yet
         // we just keep the directory structure as the application uses it, so we dont get into conflict with names
         // i dont see no reason for hashing the directories or the filenames
-        if( $directory!='.' )   // $directory is '.' also if no dir is given
-        {
+        if ($directory!='.') {  // $directory is '.' also if no dir is given
             $path = explode(DIRECTORY_SEPARATOR,$directory);
-            foreach( $path as $aDir )
-            {
+            foreach ($path as $aDir) {
                 $compileDir = $compileDir.DIRECTORY_SEPARATOR.$aDir;
-                if( !@is_dir($compileDir) )
-                {
+                if (!@is_dir($compileDir)) {
                     umask(0000);                        // make that the users of this group (mostly 'nogroup') can erase the compiled templates too
-                    if( !@mkdir($compileDir,0777) )
-                    {
+                    if (!@mkdir($compileDir,0777)) {
                         return $this->_error(   "couldn't make directory: <b>'$aDir'</b> under <b>'".
                                                 $this->getOption('compileDir')."'</b><br>".
                                                 "1. please give write permission to the 'compileDir', ".
