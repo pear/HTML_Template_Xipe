@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.3  2002/02/07 22:45:55  mccain
+*   - make the options stuff work
+*
 *   Revision 1.2  2002/02/07 22:03:46  mccain
 *   - added informational comment
 *
@@ -361,7 +364,7 @@ but this works:
         if( sizeof($possibleMarkUpDelimiters) )
         foreach( $possibleMarkUpDelimiters as $begin=>$end )  // go thru all the delimiters and try to translate the strings
         {
-# FIXXME the [ ^ ? > ] makes it unpossible to translate the following
+# FIXXME the [ ^ ? > ] makes it impossible to translate the following string
 # automatically: < ?=$key? > --- < ?=$aLoop? >
 # if i had left a "." instead there it would result in: < ?=translateMathod($key? > --- < ?=$aLoop)? >
 # but now we have the problem that ONLY to stuff inside the $possibleMarkUpDelimiters
@@ -369,12 +372,22 @@ but this works:
 # we dont want to translate every < ?=.. tag, since those might also just be formatting
 # things or in a style sheet simply a path or whatsoever, so $possibleMarkUpDelimiters IS DEFINITELY NEEDED
 # but must become better
-#
-            $input = preg_replace(  '/('.$begin.'<\?=)(\$[^?>]*)(\?>'.$end.')/i' ,
-                                    "$1$functionName($2)$3" ,
+
+            $input = preg_replace(
+                                    // $ [^ ? >]    takes care of only applying the method to the proper block, i think there is some reg-exp modifier for that too, but dont know yet
+                                    // (->)?        takes care of class operators to be included in the translation
+                                    '/('.$begin.'<\?=)(\$([^?>](->)?)*)(\?>'.$end.')/i' ,
+                                    "$1$functionName($2)$5" ,
                                     $input );
         }
         return $input;
+
+/*
+    TEST CASES THAT PASSED:
+    1. the problem here was the class-operator '->', since the '>' is also in the possibleMarkUpDelimiter
+    <td class="listContent">< ?=$language->getName($aBookmark['language'])? ></td>
+
+*/
     }
 
     /**
