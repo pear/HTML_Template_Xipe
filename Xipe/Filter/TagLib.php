@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.8  2002/06/10 18:43:39  mccain
+*   - fix bug in applyHtmlEntities, was not greedy before
+*
 *   Revision 1.7  2002/05/21 23:03:33  mccain
 *   - added a filter which invokes all pre filters
 *      thanks to Alan Knowles' hint
@@ -149,6 +152,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
         $input = $this->block($input);
         // do block and include before other tags, so the other tags also work
         // when they were used in a block !!!
+        $input = $this->macro($input);
 
         // do trim words before trim!! so trim doesnt catch the tag first :-)
         $input = $this->trimByWords($input);
@@ -344,6 +348,8 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
     */
     function includeFile( $input )
     {
+# FIXXXME discover all the functions that are used in the current file, so only those functions are pasted inside the code!!!
+
         if( preg_match_all( '/{%\s*include\s+(.+)\s*%}/U' , $input , $includes ) )
         {
 #print_r($includes);
@@ -370,6 +376,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
 
     /**
     *   parses {%block xxx%} tags
+    *   DEPRECATED, use macro instead!!!!
     *
     *   @version    01/12/18
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
@@ -487,6 +494,40 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
                                 '/U' ,
                                 '<?=htmlentities($$1)?>' ,
                                 $input );
+        return $input;
+    }
+
+    /**
+    *
+    *
+    *   @version    02/06/21
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  $input  the original template code
+    *   @return     string  the modified input"
+    */
+    function macro( $input )
+    {
+
+        $openDel = preg_quote($this->getOption('delimiter',0));
+        $closeDel = preg_quote($this->getOption('delimiter',1));
+        $_openDel = $this->getOption('delimiter',0);
+        $_closeDel = $this->getOption('delimiter',1);
+
+        // replace 'macro' with 'function'
+        $regExp = '/'.$openDel.'%\s*(macro|function)\s+(.*)%'.$closeDel.'/Usi';
+        $input = preg_replace( $regExp , "$_openDel function $2 $_closeDel" , $input );
+
+        // replace {%macroName()%} with {macroName()}
+        $regExp = '/'.$openDel.'\s*function\s+(.*)\(.*\)\s*'.$closeDel.'/Usi';
+        preg_match_all( $regExp , $input , $macroCalls );
+
+        if( sizeof($macroCalls[1]) )
+        foreach( $macroCalls[1] as $aMacroCall )
+        {
+            $regExp = '/'.$openDel.'%\s*'.trim($aMacroCall).'\s*(\(.*\))%'.$closeDel.'/Uis';
+            $input = preg_replace( $regExp , "$_openDel $aMacroCall $1 $_closeDel" , $input );
+        }
+
         return $input;
     }
 
