@@ -86,12 +86,12 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
                         <file role="doc" name="index.tpl"/>
                         <dir name="tmp"/>
                     </dir>
-                    <dir name="SimpleTag">
+                    <dir name="simpleTags">
                         <file role="doc" name="index.php"/>
                         <file role="doc" name="index.tpl"/>
                         <dir name="tmp"/>
                     </dir>
-                    <dir name="XMLConfig">
+                    <dir name="xmlConfig">
                         <file role="doc" name="config.xml"/>
                         <file role="doc" name="index.php"/>
                         <file role="doc" name="index.tpl"/>
