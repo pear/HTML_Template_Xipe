@@ -1,3 +1,5 @@
+see package.xml for history
+
 1.7.2
 - including templates using {%include /template/path/file.tpl%}
   can be nested to any depth
