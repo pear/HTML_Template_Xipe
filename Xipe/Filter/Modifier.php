@@ -228,13 +228,13 @@ class HTML_Template_Xipe_Filter_Modifier extends HTML_Template_Xipe_Options
                     $newSelf =  $this->getOption('delimiter',0).'$_SERVER[\'PHP_SELF\']'.
                                 $this->getOption('delimiter',1);
                     $attribs['HREF'] = str_replace('PHP_SELF',$newSelf,$attribs['HREF']);
+                    // build the new tag
+                    $newTag = '<a';
+                    foreach ($attribs as $key=>$val) {
+                        $newTag.= " $key=\"$val\"";
+                    }
+                    $input = str_replace($aTag,$newTag.'>',$input);      
                 }
-                // build the new tag
-                $newTag = '<a';
-                foreach ($attribs as $key=>$val) {
-                    $newTag.= " $key=\"$val\"";
-                }
-                $input = str_replace($aTag,$newTag.'>',$input);      
             }
         }
         return $input;
