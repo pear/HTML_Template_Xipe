@@ -28,4 +28,24 @@ This shows a lot of the available features SimpleTemplate has to offer.
 It also serves as a short documentation of how to use SimpleTemplate,
 the filters and the tagLib.
 
+README
+------
+this file :-)
+
+style.css
+---------
+just a style sheet for the examples
+
+translate.sql
+-------------
+The DB-Data used for translation.
+
+
+Have fun,
+and let me know if it was worth.
+
+Thanks for using it
+
+Wolfram Kriesing
+
 
