@@ -309,18 +309,24 @@ but this works:
     */
     function addIfBeforeForeach($input)
     {
-        return preg_replace('/\n(\s*)'.             // get the indented spaces in $1, starting at the beginning of a line (^ didnt work here, at least not for me)
-                            preg_quote($this->options['delimiter'][0]).
-                            '\s*foreach\s*\('.    // check for the '{foreach(' and spaces anywhere inbetween, '\s*' does that
-                            '\s*'.                  // spaces after the '(' might be allowed
-                            '(\$.*)'.               // get the variable name in $2
-                            '\s'.                   // and search for the next space, since that means the variable name ended here
-                            '/U',                   // and be greedy ... dont know why but we need it (i dont understand what greedy means anyway)
+        // this i.e. doesnt work with autoBraces off
+        // {if(...):}  {foreach(...):}{endforeach}{else:}{endif}  ... :-(
+        if ($this->getOption('autoBraces')==false) {
+            return $input;
+        } else {
+            return preg_replace('/\n(\s*)'.             // get the indented spaces in $1, starting at the beginning of a line (^ didnt work here, at least not for me)
+                                preg_quote($this->options['delimiter'][0]).
+                                '\s*foreach\s*\('.    // check for the '{foreach(' and spaces anywhere inbetween, '\s*' does that
+                                '\s*'.                  // spaces after the '(' might be allowed
+                                '(\$.*)'.               // get the variable name in $2
+                                '\s'.                   // and search for the next space, since that means the variable name ended here
+                                '/U',                   // and be greedy ... dont know why but we need it (i dont understand what greedy means anyway)
 
-                            "\n$1".
-                            $this->options['delimiter'][0].
-                            "if(is_array(@$2) && sizeof(@$2)>0)foreach($2 ",
-                            $input);
+                                "\n$1".
+                                $this->options['delimiter'][0].
+                                "if(is_array(@$2) && sizeof(@$2)>0)foreach($2 ",
+                                $input);
+        }
     }
 
     /**
