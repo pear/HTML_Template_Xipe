@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.5  2002/04/15 20:23:44  mccain
+*   - removed translate stuff
+*
 *   Revision 1.4  2002/03/22 19:48:24  mccain
 *   - fixed a bug in the applyTranslate... now also method calls work
 *
@@ -363,6 +366,21 @@ but this works:
 
         return preg_replace('/\{\$([a-zA-Z0-9_]*|'.
                             '[a-zA-Z0-9_]*->[a-zA-Z0-9_]*\(.*)\}/',"<?=\$$1 ?>",$input);
+    }
+
+    /**
+    *   applies htmlentites to all the '{$' strings, so the
+    *   printout will always be valid html
+    *   do only use as a POST-filter!!
+    *
+    *   @version    02/05/13
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  $input  the original template code
+    *   @return     string  the modified input
+    */
+    function applyHtmlEntites($input)
+    {
+        return preg_replace( '/(<\?php=|<\?=)\$(.*)\?>/sU' , '<?=htmlentities($$2)?>' , $input );
     }
 
 }
