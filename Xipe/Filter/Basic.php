@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.6  2002/05/13 11:56:07  mccain
+*   - added filter which converts everything to proper html by default
+*
 *   Revision 1.5  2002/04/15 20:23:44  mccain
 *   - removed translate stuff
 *
@@ -130,8 +133,46 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
 # but therefore we have to move addIfBeforeForeach too, since it depends on having the delimiters
 
     /**
+    *   apply (almost) all filters available in this class
+    *   thanks to hint from Alan Knowles
+    *   i am only applying those filters which i think are useful in mostly every case
+    *   i.e. applyHtmlEntites i am not applying since it would convert every output to html
+    *   and that is not desired in every case
+    *
+    *   @version    02/05/22
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  the actual input string, to which the filters will be applied
+    *   @return     string  the resulting string
+    */
+    function allPrefilters( $input )
+    {
+        $input = $this->removeHtmlComments($input);
+        $input = $this->removeCStyleComments($input);
+        $input = $this->addIfBeforeForeach($input);
+        return $input;
+    }
+
+    /**
+    *   see allPrefilters()
+    *
+    *   @see        allPrefilters()
+    *   @version    02/05/22
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  the actual input string, to which the filters will be applied
+    *   @return     string  the resulting string
+    */
+    function allPostfilters( $input )
+    {
+        $input = $this->removeEmptyLines($input);
+        $input = $this->trimLines($input);
+        $input = $this->optimizeHtmlCode($input);
+        return $input;
+    }
+
+    /**
     *   remove unnecessary php-tags, looks for ? > only spaces here < ?php  and merges them
     *   but watch out might be dangerous, since it also does that on < ?=
+    *   better dont use it as it is if u are not 100% sure it will work (u were warned :-) )
     *
     *   @version    01/12/07
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
