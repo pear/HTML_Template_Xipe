@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.3  2002/02/07 22:45:55  mccain
+*   - make the options stuff work
+*
 *   Revision 1.2  2002/02/07 22:03:46  mccain
 *   - added informational comment
 *
@@ -345,7 +348,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
         // go thru all blocks to replace copy-tags that are still left
         // in the first foreach we had only replaced copy tags which use blocks that
         // are defined in the same file
-        if( sizeof($this->blocks) )
+        if( isset($this->blocks) && sizeof($this->blocks) )
         foreach( $this->blocks as $realBlockName=>$blockContent )
         {
             // we need to get the number of spaces before each '{%copy' to maintain indention

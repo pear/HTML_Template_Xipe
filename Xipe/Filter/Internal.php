@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.3  2002/02/07 22:45:55  mccain
+*   - make the options stuff work
+*
 *   Revision 1.2  2002/02/07 22:03:46  mccain
 *   - added informational comment
 *
@@ -189,7 +192,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
 # {%trim $x 20 ''%}
 #   {%trim $x 20 ''%}
 #
-# ths is also buggy the '{%' is translated to be '< ? php }' even though the '>' is before, the '}' should go before the '>' 
+# ths is also buggy the '{%' is translated to be '< ? php }' even though the '>' is before, the '}' should go before the '>'
 #     {if($aFolder['id'] == $fid)}
 #        class="curFolder"
 #     >{%trim $aFolder['extName'] after 40 "..."%}
@@ -201,7 +204,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
         // this way we dont run into problems if the line after an {if(...)} is empty but the next
         // indented (as i had it, to make the code more readable)
         $preFilter = new SimpleTemplate_Filter_Basic;
-        $input = call_user_method( 'removeEmptyLines' , $preFilter , $input );
+        $input = call_user_func( array($preFilter,'removeEmptyLines') , $input );
 
         // this ONLY works if '{$' is not replaced by '< ?php xxx'  but by '< ?=' as it is now
         $begin = '<?php';
@@ -216,7 +219,9 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
             // count number of spaces at the beginning of this, prev and next line
             $numSpaces = strlen($aLine) - strlen(ltrim($aLine));
 
-            $nextLine = $file[$curLineIndex+1];
+            $nextLine = '';
+            if( sizeof($file) >= $curLineIndex )    // check the array boundary, since php4.1 it throws a warning
+                $nextLine = $file[$curLineIndex+1];
             $numSpacesNextLine = strlen($nextLine) - strlen(ltrim($nextLine));
 
             $numSpacesPrevLine = 0;

@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.5  2002/03/04 18:36:07  mccain
+*   - only a comment
+*
 *   Revision 1.4  2002/02/26 12:34:48  mccain
 *   - added some nicer error handling and warning, so setup is easier
 *
@@ -376,7 +379,7 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
         $this->xmlConfigFiles = array();
 
         // if the compileDir doesnt start with a / then its under the template dir
-        if( strpos($this->options['compileDir'],$GLOBALS['DOCUMENT_ROOT'])!==0 )
+        if( strpos( $this->options['compileDir'] , $_SERVER['DOCUMENT_ROOT'] )!==0 )
             $this->setOption( 'compileDir' , $this->options['templateDir'].'/'.$this->options['compileDir']);
 
         // if the tempalteDir is at the beginning attached, remove it, since we add
@@ -786,7 +789,7 @@ else
 #            if( !$filters[get_class($curClass)] )
             {
                 $filters[get_class($curClass)] = true;
-                call_user_method( 'setOptions' , &$curClass , $setOptions );
+                call_user_func( array($curClass,'setOptions') , $setOptions );
             }
         }
     }
