@@ -18,6 +18,9 @@
 //
 //  restarting to write log messages at version 1.5
 //  $Log$
+//  Revision 1.6  2002/10/02 19:01:26  mccain
+//  - replace # by //
+//
 //  Revision 1.5  2002/09/22 20:36:32  mccain
 //  - encapsulated registerPre/Postfilter methods
 //  - enable language-filters
@@ -341,7 +344,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
 
     /**
     *   DONT USE YET, since i didnt find a way to make it workin, because no
-    *   variables in the template is known if i include it here
+    *   variable in the template is known if i include it here
     *   use: $ tpl->compile('index.tpl');
     *        include($ tpl->getCompiledTemplate());
     *   instead
