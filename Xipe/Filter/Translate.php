@@ -17,6 +17,9 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.2  2002/11/03 12:48:22  mccain
+//  - added translateMarkedOnly
+//
 //  Revision 1.1  2002/04/15 20:24:09  mccain
 //  - initial commit, moved here from Basic
 //
@@ -56,14 +59,14 @@ class SimpleTemplate_Filter_Translate extends SimpleTemplate_Options
         if( sizeof($possibleMarkUpDelimiters) )
         foreach( $possibleMarkUpDelimiters as $begin=>$end )  // go thru all the delimiters and try to translate the strings
         {
-# FIXXME the [ ^ ? > ] makes it impossible to translate the following string
-# automatically: < ?=$key? > --- < ?=$aLoop? >
-# if i had left a "." instead there it would result in: < ?=translateMathod($key? > --- < ?=$aLoop)? >
-# but now we have the problem that ONLY to stuff inside the $possibleMarkUpDelimiters
-# the translate function is applied, but we need the $possibleMarkUpDelimiters since
-# we dont want to translate every < ?=.. tag, since those might also just be formatting
-# things or in a style sheet simply a path or whatsoever, so $possibleMarkUpDelimiters IS DEFINITELY NEEDED
-# but must become better
+// FIXXME the [ ^ ? > ] makes it impossible to translate the following string
+// automatically: < ?=$key? > --- < ?=$aLoop? >
+// if i had left a "." instead there it would result in: < ?=translateMathod($key? > --- < ?=$aLoop)? >
+// but now we have the problem that ONLY to stuff inside the $possibleMarkUpDelimiters
+// the translate function is applied, but we need the $possibleMarkUpDelimiters since
+// we dont want to translate every < ?=.. tag, since those might also just be formatting
+// things or in a style sheet simply a path or whatsoever, so $possibleMarkUpDelimiters IS DEFINITELY NEEDED
+// but must become better
 
             $input = preg_replace(
                                     // $ [^ ? >]    takes care of only applying the method to the proper block,
@@ -107,9 +110,10 @@ class SimpleTemplate_Filter_Translate extends SimpleTemplate_Options
     */
     function translateMarkedOnly( $input , $functionName , $markString='T_' )
     {
-        $regExp = '/\\$'.preg_quote($markString).'([a-z0-9_\->]*)/i';
+//        $regExp = '/\\$'.preg_quote($markString).'([a-z0-9_\->]*)/i';
+        $regExp = '/\\$'.preg_quote($markString).'(.*)\\?>/Ui';
 
-        $input = preg_replace( $regExp , "$functionName($$1)" , $input );
+        $input = preg_replace( $regExp , "$functionName($$1) ?>" , $input );
 
         return $input;
     }
