@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.9  2002/04/02 23:09:59  mccain
+*   - additional check in isUpToDate
+*
 *   Revision 1.8  2002/03/13 19:47:59  mccain
 *   - alpha version !!! dont use
 *   - started to add caching stuff
@@ -448,8 +451,10 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
 
         $this->currentTemplate = $this->getOption('templateDir').'/'.$file;
         $this->_logFileName = $compileDest.'/'.$filename.'.'.$this->getOption('logFileExtension');
+
         // set this here, since isUpToDate needs it if isCached calls it :-)
-        $this->compiledTemplate = $compileDest.'/'.$filename.'.'.$this->options['locale'].'.php';
+        $language = $this->options['locale'] ? '.'.$this->options['locale'] : '';
+        $this->compiledTemplate = $compileDest.'/'.$filename.$language.'.php';
         return $compileDest.'/'.$filename.'.'.$this->getOption('locale');
     }
 
