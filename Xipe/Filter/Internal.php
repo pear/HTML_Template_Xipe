@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.9  2002/11/02 19:41:24  mccain
+*   - optimized and made makePhpTags work much better and smoother
+*
 *   Revision 1.8  2002/09/22 18:49:20  mccain
 *   - changed internal methods to be able to work with xml-files (dont use short tags anymore)
 *
@@ -139,7 +142,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
 //                                $input );
 
         // replace { by < ?php  ({ is the delimiter)
-        $regExp = "/([^\\\])$qBegin([^%])/Um";    // modifier m makes '{foo}{bar}' on one line work too
+        $regExp = "/(^|[^\\\])$qBegin([^%])/Um";    // modifier m makes '{foo}{bar}' on one line work too
         $input = preg_replace(  $regExp ,
                                 '$1<?php $2' ,
                                 $input );
