@@ -194,10 +194,11 @@ class HTML_Template_Xipe
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @return     boolean if the template was compiled
     */
-    function compiled( $file=null )
+    function compiled($file=null)
     {                            
-        if( $file )
-            return $this->_methodWrapper( $file , 'compiled' );
+        if ($file) {
+            return $this->_methodWrapper($file,'compiled');
+        }
         return $this->_objectPool[$this->_lastUsedObjectKey]->compiled();
     }
 
@@ -209,7 +210,7 @@ class HTML_Template_Xipe
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      string  the template file
     */
-    function show( $file )
+    function show($file)
     {
         return $this->_methodWrapper( $file , 'show' );
     }
@@ -222,11 +223,24 @@ class HTML_Template_Xipe
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      string  the template file
     */
-    function isCached( $file )
+    function isCached($file)
     {
-        return $this->_methodWrapper( $file , 'isCached' );
+        return $this->_methodWrapper($file,'isCached');
     }
 
+    /**
+    *   this method is implemented in Cache
+    *
+    *   @access     public
+    *   @version    03/03/04
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  the template file
+    */
+    function forceRecache($file)
+    {
+        return $this->_methodWrapper($file,'forceRecache');
+    }    
+    
     /**
     *   call the given method of the object that can be identified by the
     *   filename
@@ -237,7 +251,7 @@ class HTML_Template_Xipe
     *   @param      string      the file name for which the object shall be retreived
     *   @return     object      a reference to an object from the object pool
     */
-    function _methodWrapper( $filename , $method )
+    function _methodWrapper($filename,$method)
     {
         $templateDir = $this->getOption('templateDir');
         // if we are on a windows, which we check using the directory-separator (is there an easier way?)
@@ -265,17 +279,15 @@ class HTML_Template_Xipe
 //print "$objKey .... $filename, call: $method<br>";
 //        return $this->_objectPool[$objKey];
 
-        if( PEAR::isError($ret=$obj->setup( $filename )) ) {
+        if (PEAR::isError($ret=$obj->setup( $filename ))) {
             return $ret;
         }
 
         // check if the method exists, this might be necessary if 'enable-Cache' is false but someone calls 'isCached'
-        if( method_exists($obj,$method) )
+        if (method_exists($obj,$method)) {
             return $obj->$method();
-        else
-        {
-            switch( $method )
-            {
+        } else {
+            switch ($method) {
                 case 'isCached':    // we return false for isCached since this keeps the application working
                     return false;
                     break;

@@ -84,6 +84,13 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
     var $_cacheObjReference = '';
 
     /**
+    *   this can be set to true using forceRecache()
+    *   and it will rebuild the cached file, no matter if it is already cached
+    *   @see    forceRecache()
+    */
+    var $_forceRecache = false;
+    
+    /**
     *   checks if the file is cached
     *
     *   @access     public
@@ -93,11 +100,9 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
     */
     function isCached()
     {
-        if( $this->getOption('cache','time') === false )
-        {
+        if ($this->getOption('cache','time')===false) {
             return false;
         }
-
         // lets make sure that we define the object reference globally, which is called
         // from within the template
         // if we wouldnt do this here we would have a problem if a compiled template
@@ -105,10 +110,15 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
         // at the end of the template
         $this->_createCacheObjRef();
 
+        // check the forceRecache after creating the cacheObjRef, so the
+        // template can access it
+        if ($this->_forceRecache) {                 // if _forceRecache is true we say the file is not cached
+            return false;
+        }
+
         $cacheFile = $this->_getCacheFileName();
 
-        if( !file_exists( $cacheFile ) )            // if the cached file doesnt exist
-        {
+        if (!file_exists($cacheFile)) {             // if the cached file doesnt exist
             $this->_log('CACHE: cached file doenst exist: '.$cacheFile);
             return false;
         }
@@ -116,12 +126,10 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
         // has the cached file expired?
         // the filetime is the time when it expires, this way we dont have to save the
         // caching time anywhere
-        if( time() > filemtime( $cacheFile ) )
-        {
+        if (time()>filemtime($cacheFile)) {
             // if the caching time is 0 it shall be cached forever, so set the expire time to one year ahead
             // again
-            if( $this->getOption('cache','time') === 0 )
-            {
+            if ($this->getOption('cache','time')===0) {
                 touch( $cacheFile , time()+60*60*24*365 );
                 return true;
             }
@@ -130,8 +138,7 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
         }
 
         // if the template needs a recompile we dont cache
-        if( $this->_needsRecompile() )
-        {
+        if ($this->_needsRecompile()) {
             $this->_log('CACHE: template needs recompile');
             // remove the cached file so we know that we will recreate it
             // i am doing this because getCompiledTemplate() would return the old cached filename
@@ -145,6 +152,18 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
     }
 
     /**
+    *   tell the engine to rebuild the cached file
+    *
+    *   @access     public
+    *   @version    03/03/04
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    */
+    function forceRecache()
+    {
+        $this->_forceRecache = true;
+    }    
+    
+    /**
     *   get the filename of the destination file
     *
     *   @access     public
@@ -154,22 +173,20 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
     */
     function _getCacheFileName()
     {
-        if( $this->_cachedFile )
+        if ($this->_cachedFile) {
             return $this->_cachedFile;
-
+        }
         // add the hash which is calculated over the dependency data, like $_REQUEST, to have a unique filename
         // for the different dependency data
 
         $extension = '';
-        if( ($depends = $this->getOption('cache','depends')) )
-        {
+        if (($depends = $this->getOption('cache','depends'))) {
 //print $depends;
             $depends = explode(' ',$depends);
             // init $vars with the names that shall be cached, to be sure that if the values dont change but the names
             // we have to create a new name
             $vars = $depends;
-            foreach( $depends as $aDepend )
-            {
+            foreach ($depends as $aDepend) {
                 // if the variable name is like $var['varName'] do only globalize '$var'
                 // even though things like _REQUEST,_SESSION, etc. dont need to be globalized - but it does no harm either
                 // and if it is a $class-> globalize only $class
@@ -207,15 +224,15 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
 
 //print '_cacheEnd write into: '.$file.' <br><br>';
 
-        if( file_exists($file) )
+        if (file_exists($file)) {
             unlink($file);
-
-        if( ($cfp = fopen( $file , 'w' )) )
-        {
-            if( $this->getOption('debug') > 0 )
+        }
+        if (($cfp = fopen( $file , 'w' ))) {
+            if ($this->getOption('debug')>0) {
                 fwrite($cfp,'CACHED CONTENT<br>'.$content);
-            else
+            } else {
                 fwrite($cfp,$content);
+            }
             fclose($cfp);
             chmod($file,0777);
         }
@@ -223,12 +240,11 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
         // set file modification time to the time when it expires,
         // this saves us the checking of the config data, either in options array or the xml file
         $expires = time()+$this->getOption('cache','time');
-        if( $this->getOption('cache','time') === 0 )    // if the caching time is 0 set it to one year ahead
-        {
+        if ($this->getOption('cache','time')===0) { // if the caching time is 0 set it to one year ahead
             $expires = time()+60*60*24*365;
         }
 
-        touch( $file , $expires );
+        touch($file,$expires);
 
         $this->_log('CACHE: caching file for '.$this->getOption('cache','time').' seconds (0 means forever), until: '.
                     date( 'd.m.Y H:i:s' , $expires ));
@@ -266,8 +282,9 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
     */
     function _createCacheObjRef()
     {
-        if( $this->_cacheObjReference )
+        if ($this->_cacheObjReference) {
             return $this->_cacheObjReference;
+        }
         // create global (!) object which can be called from within the template file
         // to call the cacheStart/cacheEnd-methods
         $this->_cacheObjReference = '_'.md5($this->_templateFile.'cache');   // has to start with a valid character for a varibale name, '_'
@@ -278,8 +295,6 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
 //print "_createCacheObjRef = {$this->_cacheObjReference} for {$this->_templateFile}<br>";
         return $this->_cacheObjReference;
     }
-
-
 
     //
     //  overwritten methods
@@ -296,8 +311,7 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
     */
     function getCompiledTemplate()
     {
-        if( $this->isCached() )
-        {
+        if ($this->isCached()) {
             return $this->_cachedFile;
         }
         return parent::getCompiledTemplate();
@@ -313,8 +327,9 @@ class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
     */
     function compile()
     {
-        if( $this->isCached() )
+        if ($this->isCached()) {
             return true;
+        }
         return parent::compile();
     }
 
