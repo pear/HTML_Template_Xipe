@@ -19,6 +19,10 @@
 /**
 *
 *   $Log$
+*   Revision 1.7  2002/03/06 23:03:26  mccain
+*   - start to implement caching stuff
+*   - use call_user_func since ..._method is deprecated
+*
 *   Revision 1.6  2002/03/04 19:05:15  mccain
 *   - made files compatible to run on php4.1.1 with stricter php.ini settings
 *
@@ -196,6 +200,8 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
                             'xmlConfigFile' =>  'config.xml', // name of the xml config file which might be found anywhere in the directory structure
                             'locale'        =>  'en',   // default language
                             'cache'         =>  '0',    // set this to the number of seconds for which the final (html-)file shall be cached
+                            'cacheDepends'  =>  0,      // what does it depend on if the cache file can be reused
+                                                        // i.e. could be $_REQUEST $_COOKIES
                             'logFileExtension'=>'log',
                             'logLevel'      =>  1       // 1 - only logs new compiles, 0 - logs nothing, 2 - logs everything even only deliveries
                         );
@@ -232,6 +238,11 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
     *   @var    float   the time compiling/delivering took
     */
     var $compileTime = 0;
+
+    /**
+    *   @var    boolean if the final output shall be cached or not
+    */
+    var $_cacheThis = false;
 
     /**
     *   the constructor, pass the options to it as needed
@@ -329,6 +340,7 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
             $fileContent = '';                      // if the file doesnt exist, write a template anyway, an empty one but write one
 
         // parse the template file for xml-config tags
+        // set the xml config and remove the xml-tags
         $fileContent = $this->checkForXmlConfigInTemplate( $fileContent );
 
         // pass option to know the delimiter in the filter, but parse the xml-config before!!!, see line above
@@ -362,34 +374,27 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
     }
 
     /**
-    *   compile the template
+    *   gets the destination file name prefix
+    *   i.e.
+    *   for a template in /path/to/tpl/file.tpl
+    *   it returns  <templateDir>/<compileDir>/<rest of the path>/file.tpl.<locale>
     *
-    *   @see        SimpleTemplate
-    *   @access     public
-    *   @version    01/12/03
+    *   @access     private
+    *   @version    2002/03/11
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      string  $file   relative to the 'templateDir' which you set when calling the constructor
     *   @return
     */
-    function compile( $file )
+    function _getDestFileName( $file )
     {
-
-        $timer = new Benchmark_Timer;
-        $timer->start();
-
-        // reset those variables so this instance can be called multiple times
-        // and doesnt use old values
-        $this->xmlConfigUpdated = false;
-        $this->xmlConfigFiles = array();
-
         // if the compileDir doesnt start with a / then its under the template dir
-        if( strpos( $this->options['compileDir'] , $_SERVER['DOCUMENT_ROOT'] )!==0 )
-            $this->setOption( 'compileDir' , $this->options['templateDir'].'/'.$this->options['compileDir']);
+        if( strpos( $this->getOption('compileDir') , $_SERVER['DOCUMENT_ROOT'] )!==0 )
+            $this->setOption( 'compileDir' , $this->getOption('templateDir').'/'.$this->getOption('compileDir'));
 
         // if the tempalteDir is at the beginning attached, remove it, since we add
         // it automatically in here ... that's how it first worked :-)
-        if(strpos($file,$this->options['templateDir'])===0)
-            $file = str_replace( $this->options['templateDir'] , '' , $file );
+        if(strpos($file,$this->getOption('templateDir'))===0)
+            $file = str_replace( $this->getOption('templateDir') , '' , $file );
 
         // remove the slash if there is one in front, just to be clean
         if( $file[0] == '/' )
@@ -412,7 +417,7 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
 
 #print "file=$file<br>";
         $directory = dirname( $file );
-        $filename = basename($file);
+        $filename = basename( $file );
 
         // extract dirname to create directori(es) in compileDir in case they dont exist yet
         // we just keep the directory structure as the application uses it, so we dont get into conflict with names
@@ -435,51 +440,111 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
             }
         }
 
-        $this->currentTemplate = $this->options['templateDir'].'/'.$file;
+        $this->currentTemplate = $this->getOption('templateDir').'/'.$file;
+        $this->_logFileName = $compileDest.'/'.$filename.'.'.$this->getOption('logFileExtension');
+        // set this here, since isUpToDate needs it if isCached calls it :-)
         $this->compiledTemplate = $compileDest.'/'.$filename.'.'.$this->options['locale'].'.php';
+        return $compileDest.'/'.$filename.'.'.$this->getOption('locale');
+    }
 
-        $logFile = $compileDest.'/'.$filename.'.'.$this->getOption('logFileExtension');
 
-        // cant the log-class do that???
-        $startTime = split(" ",microtime());
-        $startTime = $startTime[1]+$startTime[0];
-
-#        $this->logObject = Log::factory('file',$logFile);
-// actually the above line should work :-(
-require_once('Log/file.php');
-$this->logObject = new Log_file($logFile);
-
-        $this->logObject->log('compilation/deliverance started');
-        $this->logObject->log('Locale:'.$this->options['locale']);
-
-        $this->checkXmlConfig();
-
+    /**
+    *   checks if the current template needs to be recompiled
+    *   this is the case for either case:
+    *   - if forceCompile option is on
+    *   - if the template has changed/was removed, etc.
+    *
+    *   @access     private
+    *   @version    2002/03/11
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @return     true if the template should be recompiled, false otherwise
+    */
+    function _needsRecompile()
+    {
         $recompile = false;
         if( $this->getOption('forceCompile') )
         {
             if( $this->getOption('logLevel') > 0 )
                 $this->logObject->log('recompile because option "forceCompile" is true');
-            $recompile = true;
+            return true;
         }
 
-        if( $recompile==false )                     // if recompile is true dont bother to check if template has changed
-        if( !$this->isUpToDate() )                  // check if the template has changed
+        if( !$this->isUpToDate() )              // check if the template has changed
         {
             if( $this->getOption('logLevel') > 0 )
                 $this->logObject->log('recompile because tpl has changed/was removed: '.$this->currentTemplate);
-            $recompile = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+    *   applies the xml-config files if needed and returns if needed or not
+    *   does apply if any xml-config file along the path to the template has changed
+    *
+    *   @access     private
+    *   @version    2002/03/11
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @return     true if the template should be recompiled, false otherwise
+    */
+    function _applyXmlConfigIfNeeded()
+    {
+        $this->checkXmlConfig();
+
+        if( !$this->xmlConfigUpdated )
+            return false;
+
+        if(sizeof($this->xmlConfigFiles))
+        {
+            foreach( $this->xmlConfigFiles as $aConfigFile )
+                $this->applyXmlConfig($aConfigFile);
+        }
+        return true;
+    }
+
+    /**
+    *   compile the template
+    *
+    *   @see        SimpleTemplate
+    *   @access     public
+    *   @version    01/12/03
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  $file   relative to the 'templateDir' which you set when calling the constructor
+    *   @return
+    */
+    function compile( $file )
+    {
+
+        if( $this->isCached($file) )
+        {
+#print "$file is cached (in compile)<br><br>";
+            return true;
         }
 
-        if( $recompile ||
-            $this->xmlConfigUpdated )               // or any of the config files
-        {
-            if(sizeof($this->xmlConfigFiles))
-                foreach( $this->xmlConfigFiles as $aConfigFile )
-                    $this->applyXmlConfig($aConfigFile);
+        $timer = new Benchmark_Timer;
+        $timer->start();
 
+        // reset those variables so this instance can be called multiple times
+        // and doesnt use old values
+        $this->xmlConfigUpdated = false;
+        $this->xmlConfigFiles = array();
+        $this->compiledTemplate = $this->_getDestFileName($file).'.php';
+
+        // cant the log-class do that???
+        $startTime = split(" ",microtime());
+        $startTime = $startTime[1]+$startTime[0];
+
+        $this->logObject = Log::factory('file',$this->_logFileName);
+// actually the above line should work :-(
+#require_once('Log/Log/file.php');
+#$this->logObject = new Log_file($logFile);
+
+        $this->logObject->log('compilation/deliverance started');
+        $this->logObject->log('Locale:'.$this->options['locale']);
+
+        if( $this->_needsRecompile() || $this->_applyXmlConfigIfNeeded() )
             if( !$this->parse() )
                 return false;
-        }
 
         $endTime = split(" ",microtime());
         $endTime = $endTime[1]+$endTime[0];
@@ -656,9 +721,89 @@ $this->logObject = new Log_file($logFile);
     *   @version    02/03/06
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     */
-    function isCached()
+    function isCached( $templateFile )
     {
-        return false;
+
+        // reset those variables so this instance can be called multiple times
+        // and doesnt use old values
+        $this->xmlConfigUpdated = false;
+        $this->xmlConfigFiles = array();
+
+# FIXXME add the hash which is calculated over the dependency data, like $_REQUEST, to have a unique filename
+# for the different dependency data
+#        $this->_cachedOutput = $this->_getDestFileName($templateFile).'.'.md5(implode(':',$_REQUEST)).'.html';
+        $this->_cachedOutput = $this->_getDestFileName($templateFile).'.html';
+        $this->logObject = Log::factory('file',$this->_logFileName);
+#print "isCached: $this->_cachedOutput<br>";
+
+        $doCache = false;
+        // simply cache the new output all the xml-config setting is done
+        // when the php calls '$this->compile', to recompile the template
+        if( $this->_needsRecompile() )
+            $doCache = true;
+
+        if( $this->_applyXmlConfigIfNeeded() ||
+            !file_exists( $this->_cachedOutput ) )
+        {
+            // get xml config from external files and
+            // from the in-the-template-embedded xml
+            $this->checkForXmlConfigInTemplate( implode( '' ,@file($this->currentTemplate)) );
+#print "removed, caching time: ".$this->getOption('cache');
+            $doCache = true;
+        }
+
+        if( file_exists( $this->_cachedOutput ) &&
+            time() > filemtime( $this->_cachedOutput ) )
+        {
+            // get caching time from filemtime-filectime
+            $stat = stat($this->_cachedOutput);
+            $this->setOption( 'cache' ,$stat['mtime'] - $stat['ctime'] );
+#print "caching time: ".$this->getOption('cache');
+            $doCache = true;
+        }
+
+        if( $doCache == true )
+        {
+            $this->_cacheThis = true;
+            return false;
+        }
+        $this->compiledTemplate = $this->_cachedOutput;
+        return true;
+    }
+
+    function _cacheStart()
+    {
+        if( $this->_cacheThis )
+            ob_start();
+    }
+
+    function _cacheEnd( $filename )
+    {
+#        if( $this->_cacheThis != true )
+#            return;
+
+        $this->_cachedOutput = $filename.'.html';
+
+        $content = ob_get_contents();
+print '_cacheEnd write into: '.$this->_cachedOutput.' <br><br>';
+
+        if( file_exists($this->_cachedOutput) )
+            unlink($this->_cachedOutput);
+        if( ($cfp = fopen( $this->_cachedOutput , 'w' )) )
+        {
+            fwrite($cfp,'----------'.$content.'----------');
+#            fwrite($cfp,$content);
+            fclose($cfp);
+            chmod($this->_cachedOutput,0770);
+        }
+
+        // set file modification time to the time when it expires,
+        // this saves us the checking of the config data, either in options array or the xml file
+        touch($this->_cachedOutput,time()+$this->getOption('cache'));
+
+        $this->_cacheThis = false;
+
+        ob_end_flush();
     }
 
     /**
@@ -708,17 +853,15 @@ $this->logObject = new Log_file($logFile);
     */
     function applyXmlConfig( $configFileOrString , $isString=false )
     {
-/*
-if( $isString )
-{
-    print "__APPLY config string in $this->currentTemplate<br>";
-}
-else
-    print "__APPLY config file: $configFileOrString<br>";
-*/
         // include this so i can get the xml file prepared in the tree shape
         // and i can use the tree methods to retreive the options i need to set :-)
-        require_once('Tree/Tree.php');
+        if( !@include_once('Tree/Tree.php') )
+        {
+            $this->showError(   "xml-config could not be parsed, because the class 'Tree/Tree.php' could not be included<br>".
+                                '1. pleace be sure to have the latest of those classes from the pear-cvs '.
+                                '(<a href="http://cvs.php.net/cvs.php/pear/Tree">here</a>)');
+            return false;
+        }
 
         if( $isString )
         {
@@ -765,15 +908,25 @@ else
                 {
                     switch(strtolower($unit))
                     {
-                        case 'week':    $time = $time*7;
-                        case 'day':     $time = $time*24;
-                        case 'hour':    $time = $time*60;
-                        case 'minute':  $time = $time*60;
+                        case 'week':
+                        case 'weeks':   $time = $time*7;
+                        case 'day':
+                        case 'days':    $time = $time*24;
+                        case 'hour':
+                        case 'hours':   $time = $time*60;
+                        case 'minute':
+                        case 'minutes': $time = $time*60;
                         case 'second':  break;
                     }
                 }
+#print "XML: cache this page for $time seconds<br><br>";
                 if( $time )
-                    $setOptions['cache'] = $time;
+                    $this->setOption('cache',$time);
+
+                if( $cacheDepends = $config->data[$cacheId]['attributes']['depends'] )
+                {
+                    $this->setOption('cacheDepends',$cacheDepends);
+                }
             }
 
             // apply the options to this class
