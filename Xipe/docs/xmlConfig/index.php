@@ -14,7 +14,7 @@
     #
     #   make template class instance
     #
-    $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/xmlConfig',
+    $options = array(   'templateDir'   => dirname(__FILE__),
                         'compileDir'    => 'tmp',
                         'enable-XMLConfig'=>true,
                         'logLevel'      => 1 );

@@ -10,7 +10,7 @@
     #
     require_once('SimpleTemplate/Engine.php');
 
-    $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/fullFeatured',
+    $options = array(   'templateDir'   => dirname(__FILE__),
                         'compileDir'    => 'tmp'    //
                         #,'debug'=>true
                         );

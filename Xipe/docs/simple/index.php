@@ -12,7 +12,7 @@
     #
     #   make template class instance
     #
-    $options = array(   'templateDir'   => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/simple',
+    $options = array(   'templateDir'   => dirname(__FILE__),
                         'compileDir'    => 'tmp',   // use the compile dir 'tmp' under the tempalte dir
                         // or use the following line to specifiy a complete path
                         //'compileDir'    => $DOCUMENT_ROOT.'/libs/php/SimpleTemplate/examples/simple/tmp',
