@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.11  2002/07/26 10:40:17  mccain
+*   - search for a file to include also in the include path
+*
 *   Revision 1.10  2002/06/26 18:48:25  mccain
 *   - remove unnecessary spaces
 *
@@ -127,6 +130,17 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
 
 # remove the constructor one day, i feel that passing the delimiters to this class makes it all somehow unclean
 # but therefore we have to move addIfBeforeForeach too, since it depends on having the delimiters
+
+    /**
+    *   @var    array   all the files that get included
+    */
+    var $_includedFiles = array();
+
+    /**
+    *   @var    array   all the macros that are defined
+    */
+    var $_macros = array();
+
 
     /**
     *   actually i made a constructor only to pass the delimiters to this class
@@ -363,16 +377,36 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
             foreach( $includes[1] as $index=>$aInclude )
             {
                 // get the relative path to templateDir or absolute if given
+# FIXXME unix specific!!!!
                 if( $aInclude[0] != '/' )           // add trailing slash if missing
                     $_aInclude = '/'.$aInclude;
                 $fileToInclude = $this->options['templateDir'].$_aInclude;
 
                 // do only include a file that really exists, otherwise the tag also stays there, so the programmer removes it
                 // do also search for the file in the include path, but as the second option only!
-                if( ($content = @file($fileToInclude)) || ($content = @file($aInclude,true)) )
+                if($content = @file($fileToInclude))
+                    $contentFile = $fileToInclude;
+                else
+                    if( $content = @file($aInclude,true))
+                        $contentFile = $aInclude;
+
+                if( $content )
                 {
-                    // read the file
-                    $fileContent = implode("\n",$content);
+                    // do only include the files content if we didnt include it yet
+                    // just like 'include_once' only that it does it by default :-)
+                    if( !in_array($contentFile,$this->_includedFiles) )
+                    {
+#print "including: $contentFile<br>";
+                        $this->_includedFiles[] = $contentFile;
+                        // read the file
+                        $fileContent = implode("\n",$content);
+                    }
+                    else
+                    {
+#print "already included: $contentFile<br>";
+                        $fileContent = '';
+                    }
+
                     // replace the string from $includes[0] with the file
                     $input = preg_replace( '/'.preg_quote($includes[0][$index],'/').'/' , $fileContent , $input );
                 }
@@ -529,8 +563,14 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
         $regExp = '/'.$openDel.'\s*function\s+(.*)\(.*\)\s*'.$closeDel.'/Usi';
         preg_match_all( $regExp , $input , $macroCalls );
 
-        if( sizeof($macroCalls[1]) )
-        foreach( $macroCalls[1] as $aMacroCall )
+        // merge the macros found now with the macros already found
+        // do this because we might have some macros which are not defined in the current file
+        // but we assume, that all the files that are being processed by the same instance of this filter
+        // are merged to one big php-file, so the macro will be defined and available!
+        $this->_macros = array_unique(array_merge($this->_macros,$macroCalls[1]));
+
+        if( sizeof($this->_macros) )
+        foreach( $this->_macros as $aMacroCall )
         {
             $regExp = '/'.$openDel.'%\s*'.trim($aMacroCall).'\s*(\(.*\))%'.$closeDel.'/Uis';
             $input = preg_replace( $regExp , $_openDel.$aMacroCall.'$1'.$_closeDel , $input );
