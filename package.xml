@@ -42,21 +42,14 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
             <role>lead</role>
         </maintainer>
     </maintainers>
-
     <release>
-        <version>1.7.4</version>
-        <date>2003-06-17</date>
+        <version>1.7.5</version>
+        <date>2003-??-??</date>
         <license>PHP License</license>
         <state>stable</state>
         <notes>
-* added getRenderedTemplate()
-* now {CONSTANT} is also echoed
-* add unit test for Filter_Internal::makePhpTags(), for the printing of constant
-* {@$var} does also print automatically now
-* exclude addIfBeforeForeach when autoBraces is off
-* use {endmacro} for ending a macro with autoBraces off
-* fix some windows issues
-* various smaller bugfixes
+* obviously PEAR::Log has changed, thanks for the hint to Tom Van de Velde
+  now using writeOut() to write to the log file
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="HTML/Template">
@@ -133,7 +126,8 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
 
         <deps>
             <dep type="pkg" rel="ge" version="0.2">Tree</dep>
-            <dep type="pkg" rel="ge" version="1.5">Log</dep>
+            <!-- the next version 1.7, of Log changed its API again :-/ -->
+            <dep type="pkg" rel="eq" version="1.6.7">Log</dep>
         </deps>
 
     </release>
@@ -141,6 +135,24 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
 
     <changelog>
         <release>
+            <version>1.7.4</version>
+            <date>2003-06-17</date>
+            <license>PHP License</license>
+            <state>stable</state>
+            <notes>
+    * added getRenderedTemplate()
+    * now {CONSTANT} is also echoed
+    * add unit test for Filter_Internal::makePhpTags(), for the printing of constant
+    * {@$var} does also print automatically now
+    * exclude addIfBeforeForeach when autoBraces is off
+    * use {endmacro} for ending a macro with autoBraces off
+    * fix some windows issues
+    * various smaller bugfixes
+            </notes>
+        </release>
+
+        <release>
+            
             <version>1.7.3</version>
             <date>2003-03-10</date>
             <license>PHP License</license>
