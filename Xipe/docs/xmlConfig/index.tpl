@@ -1,3 +1,7 @@
+<!--
+    $Log: not supported by cvs2svn $
+-->
+
 <SimpleTemplate>
     <options override="yes">
         <delimiter begin="[" end="]"/>
