@@ -273,7 +273,7 @@ class HTML_Template_Xipe_Filter_Modifier extends HTML_Template_Xipe_Options
     */
     function form($input,$attributes=array())
     {
-        if (preg_match_all('~<form.*>~iU',$input,$_formTags)) {
+        if (preg_match_all('~<form(\s.*)?>~iU',$input,$_formTags)) {
             $formTags = array_unique($_formTags[0]);
 
             if (!isset($attributes['action'])) {
