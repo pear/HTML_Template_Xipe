@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.6  2002/05/20 20:51:21  mccain
+*   - added trimWords method
+*
 *   Revision 1.5  2002/05/13 12:14:26  mccain
 *   - added tagLib filter for applyHtmlEntities
 *
@@ -90,8 +93,8 @@ require_once('SimpleTemplate/Options.php');
 *       {%trim $x after 20 characters and add '...'%}
 *       {%trim $x 20 '...'%}
 *
-*       {%trim words $x after 20 characters and add '...'%}
-*       {%trim words $x 20 '...'%}
+*       {%trim $x by words after 20 characters and add '...'%}
+*       {%trim $x by words 20 '...'%}
 *
 *   @package    SimpleTemplate/Filter
 *   @version    01/12/15
@@ -124,6 +127,32 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
         if(sizeof($options))
             foreach( $options as $key=>$aOption )
                 $this->setOption( $key , $aOption );
+    }
+
+    /**
+    *   apply all filters available in this class
+    *   thanks to hint from Alan Knowles
+    *
+    *   @version    02/05/22
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  the actual input string, to which the filters will be applied
+    *   @return     string  the resulting string
+    */
+    function allPrefilters( $input )
+    {
+        $input = $this->includeFile($input);
+        $input = $this->block($input);
+        // do block and include before other tags, so the other tags also work
+        // when they were used in a block !!!
+
+        // do trim words before trim!! so trim doesnt catch the tag first :-)
+        $input = $this->trimByWords($input);
+        $input = $this->trim($input);
+        $input = $this->repeat($input);
+
+        $input = $this->applyHtmlEntites($input);
+
+        return $input;
     }
 
     /**
@@ -254,22 +283,23 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
         $exp =  $this->options['delimiter'][0].
                 'echo ((strlen($1) > $2))?(substr($1,0,$2)."$4"):$1'.
                 $this->options['delimiter'][1];
-        if( $extra == ' words' )
+        if( $extra == 'by words' )
         {
             $exp =  $this->options['delimiter'][0].
                     'echo ((strlen($1) > $2))?(substr($1,0,(($2)-(strlen(strrchr(substr($1,0,$2),\' \')))))."$4"):$1'.
                     $this->options['delimiter'][1];
 
-            $extra = '\s+words';
+            $extra = '\s+by\s+words';
         }
 
 
 
 
         return preg_replace(    '/'.preg_quote($this->options['delimiter'][0]).
-                                '%\s*trim'.$extra.'\s+'.    // find the "{%trim $extra" with at least one space behind and any number of spaces between % and trim
-                                '(\$[^\s]+)'.       // find all until the next space, that will be our variable name $1
-                                '[^\d]+'.           // find anything until a decimal number comes
+                                '%\s*trim\s+'.      // find at least one space behind and any number of spaces between % and trim
+                                '([^\s]+)'.         // find all until the next space, that will be our variable name $1
+                                $extra.
+                                '[^\d]+'.           // find anything until a decimal number comes, at least one character
                                 '(\d+)'.            // put the decimal number in $2
                                 '(\s+.*"(.*)")?'.   // this is saucy, we only need the most inner pair of (),
                                                     // that will be our string we use to add at the end in case we trim it
@@ -286,6 +316,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
 
     /**
     *   this trims strings but only after a space
+    *   NOTE: be sure to put this filter before "trim"
     *
     *   @version    02/05/30
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
@@ -293,9 +324,9 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
     *   @param      string  this is an extra string which can be added behind trim, is used i.e. for "trim words"
     *   @return     string  the modified template
     */
-    function trimWords( $input )
+    function trimByWords( $input )
     {
-        return $this->trim( $input , ' words' );
+        return $this->trim( $input , 'by words' );
     }
 
     /**
