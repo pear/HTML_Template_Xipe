@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.13  2002/10/16 19:00:44  mccain
+*   - include every macro only once, so i set a if-def kinda around it
+*
 *   Revision 1.12  2002/07/26 20:48:00  mccain
 *   - made include work like include_once, corrected macro to work properly with it
 *
@@ -592,7 +595,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
         if( sizeof($this->_macros) )
         foreach( $this->_macros as $aMacroCall )
         {
-            $regExp = '/'.$openDel.'%\s*'.trim($aMacroCall).'\s*(\(.*\))%'.$closeDel.'/Uis';
+            $regExp = '/'.$openDel.'%\s*'.trim($aMacroCall).'\s*(\(.*\))%'.$closeDel.'/Ui';
             $input = preg_replace( $regExp , $_openDel.$aMacroCall.'$1'.$_closeDel , $input );
         }
 
