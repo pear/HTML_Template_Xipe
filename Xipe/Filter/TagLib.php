@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.12  2002/07/26 20:48:00  mccain
+*   - made include work like include_once, corrected macro to work properly with it
+*
 *   Revision 1.11  2002/07/26 10:40:17  mccain
 *   - search for a file to include also in the include path
 *
@@ -128,8 +131,8 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
     var $options = array(   'delimiter'     =>  array(),    // first value of the array is the begin delimiter, second the end delimiter
                             'templateDir'   =>  '' );       // we need the template dir for the include directive
 
-# remove the constructor one day, i feel that passing the delimiters to this class makes it all somehow unclean
-# but therefore we have to move addIfBeforeForeach too, since it depends on having the delimiters
+// remove the constructor one day, i feel that passing the delimiters to this class makes it all somehow unclean
+// but therefore we have to move addIfBeforeForeach too, since it depends on having the delimiters
 
     /**
     *   @var    array   all the files that get included
@@ -219,7 +222,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
                                 '%\s*repeat\s+([^\s%]+)([^\$]*)%'.preg_quote($this->options['delimiter'][1]).
                                 '/',
 
-                                #"PRE-REPEAT:<br>1='$1'<br>2='$2'<br>3='$3'<br>4='$4'<br>5='$5'<br>" , // for testing
+                                //"PRE-REPEAT:<br>1='$1'<br>2='$2'<br>3='$3'<br>4='$4'<br>5='$5'<br>" , // for testing
                                 $this->options['delimiter'][0].
                                 "%repeat $1 $counterName%".
                                 $this->options['delimiter'][1],
@@ -240,7 +243,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
                                 "for($5=0;$5<$2;$5++)".
                                 $this->options['delimiter'][1],
 
-                                #"REPEAT:<br>1='$1'<br>2='$2'<br>3='$3'<br>4='$4'<br>5='$5'<br>6='$6'<br>" , // for testing
+                                //"REPEAT:<br>1='$1'<br>2='$2'<br>3='$3'<br>4='$4'<br>5='$5'<br>6='$6'<br>" , // for testing
                                 $input);  // replace unnecessary spaces, so the next regexp is shorter and easier
 
         return $input;
@@ -338,7 +341,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
                                 '/i' ,              // search case insensitive
 
                                 $exp,
-                                #"TRIM:<br>1='$1'<br>2='$2'<br>3='$3'<br>4='$4'<br>5='$5'<br>" , // for testing
+                                //"TRIM:<br>1='$1'<br>2='$2'<br>3='$3'<br>4='$4'<br>5='$5'<br>" , // for testing
 
                                 $input );
     }
@@ -368,16 +371,22 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
     */
     function includeFile( $input )
     {
-# FIXXXME discover all the functions that are used in the current file, so only those functions are pasted inside the code!!! //"
+//print "<br>includeFile<br>";
+//print_r($this->getOptions());
+        $openDel = preg_quote($this->getOption('delimiter',0));
+        $closeDel = preg_quote($this->getOption('delimiter',1));
+        $_openDel = $this->getOption('delimiter',0);
+        $_closeDel = $this->getOption('delimiter',1);
 
-        if( preg_match_all( '/{%\s*include\s+(.+)\s*%}/U' , $input , $includes ) )
+// FIXXXME discover all the functions that are used in the current file, so only those functions are pasted inside the code!!! //"
+        if( preg_match_all( '/'.$openDel.'%\s*include\s+(.+)\s*%'.$closeDel.'/U' , $input , $includes ) )
         {
-#print_r($includes);
+//print_r($includes);
             if(sizeof($includes[1]))
             foreach( $includes[1] as $index=>$aInclude )
             {
                 // get the relative path to templateDir or absolute if given
-# FIXXME unix specific!!!!
+// FIXXME unix specific!!!!
                 if( $aInclude[0] != '/' )           // add trailing slash if missing
                     $_aInclude = '/'.$aInclude;
                 $fileToInclude = $this->options['templateDir'].$_aInclude;
@@ -394,16 +403,28 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
                 {
                     // do only include the files content if we didnt include it yet
                     // just like 'include_once' only that it does it by default :-)
+                    // this only works if we are only using one instance of the filter, which is not the case
+                    // since every file might have different options, i.e. delimiters, so i changed 
+                    // it to make a new instance for every file, which means this has almost no effect
                     if( !in_array($contentFile,$this->_includedFiles) )
                     {
-#print "including: $contentFile<br>";
+//print "including: $contentFile<br>";
                         $this->_includedFiles[] = $contentFile;
                         // read the file
                         $fileContent = implode("\n",$content);
+                         
+                        // put an if around the entire macro file, so it wont even be parsed
+                        // if it is already once in the code, this takes care of not multiple
+                        // times defining functions (macros in this case)
+                        // it also works if you compile multiple files with different instances of this filter
+                        // since php checks the variable $___SimpleTemplate_TagLib_includedFile given here
+                        $fileContent =  "$_openDel if(!\$___SimpleTemplate_TagLib_includedFile['$fileToInclude'])\\\{ $_closeDel".
+                                        $fileContent.
+                                        $_openDel." \$___SimpleTemplate_TagLib_includedFile['$fileToInclude']=true;\\\}".$_closeDel;
                     }
                     else
                     {
-#print "already included: $contentFile<br>";
+//print "already included: $contentFile<br>";
                         $fileContent = '';
                     }
 
@@ -549,7 +570,6 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
     */
     function macro( $input )
     {
-
         $openDel = preg_quote($this->getOption('delimiter',0));
         $closeDel = preg_quote($this->getOption('delimiter',1));
         $_openDel = $this->getOption('delimiter',0);
