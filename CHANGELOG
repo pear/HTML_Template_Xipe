@@ -1,3 +1,16 @@
+Version 1.6
+
+- XMLConfig can also contain filters now, and autoBraces works properly now
+- changed handling of the instances in the Engine.php
+- fix bug in Cache-dependencies
+- doc updated
+- added translate filter, which only translates on request
+- include macros only once, using kind of ifdef
+- added SimpleTag language
+- completely redesigned makePhpTags and fixed major bug in autoBraces
+- added default Basic filter: decodeHtmlEntities, which translates stuff like &apos; inside delimiters
+- optimized Basic filter 'optimizePhpTags'
+
 Version 1.5.1
 
 - documentation available, finally after a looong time
@@ -18,7 +31,7 @@ Version 1.5.1
 - and many bugfixes
 
 Version 1.5
- 
+
 Added caching of the final output, can be configured using XML inside the file or in a config file.
 Changed the entire engine, to work properly on multiple tpl-files in one page, by creating an instance for each tpl-file internally.
 
