@@ -18,6 +18,9 @@
 //
 //
 //  $Log$
+//  Revision 1.19  2002/10/02 19:00:01  mccain
+//  - made it work properly on multipl instances, which might change any option and use make registerPre/PostFilters work properly on that too
+//
 //  Revision 1.18  2002/09/22 20:24:26  mccain
 //  - added closing php tag ... oops
 //
@@ -259,7 +262,21 @@ class SimpleTemplate_Engine
 
         if( PEAR::isError($ret=$obj->setup( $filename )) )
             return $ret;
-        return $obj->$method();
+
+        // check if the method exists, this might be necessary if 'enable-Cache' is false but someone calls 'isCached'
+        if( method_exists($obj,$method) )
+            return $obj->$method();
+        else
+        {
+            switch( $method )
+            {
+                case 'isCached':    // we return false for isCached since this keeps the application working
+                    return false;
+                    break;
+                default:
+                    return $obj->_error( "ERROR SimpleTemplate_Engine: method $method does not exist" , PEAR_ERROR_RETURN );
+            }
+        }
     }
 
     // wrapper methods
