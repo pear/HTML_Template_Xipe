@@ -1,6 +1,25 @@
+Version 1.5.1
+
+- documentation available, finally after a looong time
+- bugfix in autoBraces which was buggy for this piece of code:
+  {if( $x )}
+      some html
+  <br>{$somePhp}
+  it was putting the closing braces in the {$somePhp} piece
+- added Filter_Modifier::imgSrc (cool thing check it out, saves a lot of time :-) )
+- Taglib: added 'macro' use this instead of block from now on!!!
+- TagLib: includeFile looks in the php-include_path too
+- TagLib: includeFile works like include_once now
+- save the cache-generated files with mode 777
+- added filterLevel 8 and 9
+- added method unregisterFilter
+- added option makePhpTags
+- create compiled tpl's and dirs with the right 777
+- and many bugfixes
+
 Version 1.5
  
-Added caching of the final output, can be configured using XML inside the file or in a config file. 
+Added caching of the final output, can be configured using XML inside the file or in a config file.
 Changed the entire engine, to work properly on multiple tpl-files in one page, by creating an instance for each tpl-file internally.
 
 ATTENTION: dont access properties directly anymore, use get-/set-methods! Especially for compiledTemplate, use getCompiledTemplate()-method.
