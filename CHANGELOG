@@ -1,3 +1,10 @@
+Version 1.6.1
+- Basic-Filter: added escapeShortTags, so xml-files can also be parsed with short_open_tags
+- fixed bug which didnt parse files properly where the very first character was a php-tag
+- TagLib-Filter: removed 's' modifier in macro-method, which is not needed anyway and caused problems with multiple appearances
+  of 'macro'
+
+
 Version 1.6
 
 - XMLConfig can also contain filters now, and autoBraces works properly now
