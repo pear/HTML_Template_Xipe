@@ -7,7 +7,7 @@
         <locale value="en"/>
 
         <cache>
-            <time value="10" unit="minutes">
+            <time value="10" unit="minutes"/>
         </cache>
 
     </options>
