@@ -18,6 +18,9 @@
 //
 //
 //  $Log$
+//  Revision 1.18  2002/09/22 20:24:26  mccain
+//  - added closing php tag ... oops
+//
 //  Revision 1.17  2002/06/27 16:05:11  mccain
 //  - added comment
 //
@@ -60,20 +63,15 @@ class SimpleTemplate_Engine
 {
 
     /**
-    *   @var    object      the default object which is simply copied to create
-    *                       instances for each tpl-file that is worked on
-    *   @access private
-    */
-    var $_defaultObject = null;
-
-    /**
     *   @var    array       here we save the objects, one for each tpl-file
     *   @access private
     */
     var $_objectPool = array();
 
-    var $_lastUsedObject = null;
+    var $_lastUsedObjectKey = null;
 
+    var $_preFilters = array();
+    var $_postFilters = array();
 
     /**
     *
@@ -101,15 +99,13 @@ class SimpleTemplate_Engine
             die('could not include SimpleTemplate/'.$tplClass.'.php');
 
         $tplClass = 'SimpleTemplate_'.$tplClass;
-        $this->_defaultObject = new $tplClass( $options );
+        $this->_objectPool['defaultObject'] = new $tplClass( $options );
         // set it to a defined value so methods like 'getOption' is available after the constructor call
-        $this->_lastUsedObject = &$this->_defaultObject;
+        $this->_lastUsedObjectKey = 'defaultObject';
 
         // copy all the options in here, so external use of $tpl->options work properly - using $tpl->options is deprectated!!!
-        // ATTENTION: use $tpl->getOption() instead
-        $this->options = $this->_defaultObject->getOptions();
-
-        $this->_activateFilterLevel();
+        // ATTENTION: use $tpl->getOption[s]() instead
+        $this->options = $this->_objectPool['defaultObject']->getOptions();
     }
 
     /**
@@ -120,23 +116,23 @@ class SimpleTemplate_Engine
     *   @version    02/06/21
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     */
-    function _activateFilterLevel()
+    function _activateFilterLevel( $objKey )
     {
-# FIXXME all filters that get registered before $tpl->setOption('filterLevel',x) will be lost !!!!
-# because of the following line!!!
-        $this->_defaultObject->unregisterFilter();
-        $filterLevel = $this->_defaultObject->getOption('filterLevel');
+// FIXXME all filters that get registered before $tpl->setOption('filterLevel',x) will be lost !!!!
+// because of the following line!!!
+        $this->_objectPool[$objKey]->unregisterFilter();
+        $filterLevel = $this->_objectPool[$objKey]->getOption('filterLevel');
         if( $filterLevel > 0 )
         {
             require_once('SimpleTemplate/Filter/TagLib.php');
             // pass the options used in the template class, so we set the same delimiters in the filter
-            $tagLib = new SimpleTemplate_Filter_TagLib($this->_defaultObject->getOptions());
-            $this->registerPrefilter(array(&$tagLib,'allPrefilters'),$filterLevel);
+            $tagLib = new SimpleTemplate_Filter_TagLib($this->_objectPool[$objKey]->getOptions());
+            $this->_objectPool[$objKey]->registerPrefilter(array(&$tagLib,'allPrefilters'),$filterLevel);
 
             require_once('SimpleTemplate/Filter/Basic.php');
-            $tplFilter = new SimpleTemplate_Filter_Basic($this->_defaultObject->getOptions());
-            $this->registerPrefilter(array(&$tplFilter,'allPrefilters'),$filterLevel);
-            $this->registerPostfilter(array(&$tplFilter,'allPostfilters'),$filterLevel);
+            $tplFilter = new SimpleTemplate_Filter_Basic($this->_objectPool[$objKey]->getOptions());
+            $this->_objectPool[$objKey]->registerPrefilter(array(&$tplFilter,'allPrefilters'),$filterLevel);
+            $this->_objectPool[$objKey]->registerPostfilter(array(&$tplFilter,'allPostfilters'),$filterLevel);
         }
     }
 
@@ -152,7 +148,7 @@ class SimpleTemplate_Engine
     */
     function registerPostfilter( $functionName , $params=null )
     {
-        return $this->_defaultObject->registerPostfilter( $functionName , $params );
+        $this->_postFilters[] = array( $functionName , $params );
     }
 
     /**
@@ -166,7 +162,22 @@ class SimpleTemplate_Engine
     */
     function registerPrefilter( $functionName , $params=null )
     {
-        return $this->_defaultObject->registerPrefilter( $functionName , $params );
+        $this->_preFilters[] = array( $functionName , $params );
+    }
+
+    function _setAllFilters( $objKey )
+    {   
+        // process the given filter level
+        $this->_activateFilterLevel($objKey);
+
+        // add all pre and post filters, dont use references here, so the filters are each an instance of its own
+        // this is necessary since the options might be changed by any xml-config!
+        if( sizeof($this->_preFilters) )
+            foreach( $this->_preFilters as $aFilter )
+                $this->_objectPool[$objKey]->registerPrefilter($aFilter[0],$aFilter[1]);
+        if( sizeof($this->_postFilters) )
+            foreach( $this->_postFilters as $aFilter )
+                $this->_objectPool[$objKey]->registerPostfilter($aFilter[0],$aFilter[1]);
     }
 
     /**
@@ -181,8 +192,8 @@ class SimpleTemplate_Engine
     function compile( $file )
     {
         $ret = $this->_methodWrapper( $file , 'compile' );
-# just to be backwards compatible - should be removed one day!!!
-# this doesnt work with caching, so use getCompiledTemplate() !!!
+// just to be backwards compatible - should be removed one day!!!
+// this doesnt work with caching, so use getCompiledTemplate() !!!
         $this->compiledTemplate = $this->getCompiledTemplate();
         return $ret;
     }
@@ -237,12 +248,14 @@ class SimpleTemplate_Engine
             // use __clone in php5
             // copy the default object with all its properties, yes COPY,
             // this is important we dont want a reference here
-            $this->_objectPool[$objKey] = $this->_defaultObject;
+            $this->_objectPool[$objKey] = $this->_objectPool['defaultObject'];
+            $this->_setAllFilters( $objKey );
         }
-        $this->_lastUsedObject = &$this->_objectPool[$objKey];
+        $this->_lastUsedObjectKey = $objKey;
         $obj = &$this->_objectPool[$objKey];
-#print "$objKey .... $filename, call: $method<br>";
-#        return $this->_objectPool[$objKey];
+
+//print "$objKey .... $filename, call: $method<br>";
+//        return $this->_objectPool[$objKey];
 
         if( PEAR::isError($ret=$obj->setup( $filename )) )
             return $ret;
@@ -261,7 +274,7 @@ class SimpleTemplate_Engine
     */
     function getBeginDelimiter()
     {
-        return $this->_lastUsedObject->getOption('delimiter',0);
+        return $this->_objectPool[$this->_lastUsedObjectKey]->getOption('delimiter',0);
     }
 
     /**
@@ -274,7 +287,7 @@ class SimpleTemplate_Engine
     */
     function getEndDelimiter()
     {
-        return $this->_lastUsedObject->getOption('delimiter',1);
+        return $this->_objectPool[$this->_lastUsedObjectKey]->getOption('delimiter',1);
     }
 
     /**
@@ -287,7 +300,7 @@ class SimpleTemplate_Engine
     */
     function getTemplateDir()
     {
-        return $this->_lastUsedObject->getOption('templateDir');
+        return $this->_objectPool[$this->_lastUsedObjectKey]->getOption('templateDir');
     }
 
     /**
@@ -300,7 +313,7 @@ class SimpleTemplate_Engine
     */
     function getCompiledTemplate()
     {
-        return $this->_lastUsedObject->getCompiledTemplate();
+        return $this->_objectPool[$this->_lastUsedObjectKey]->getCompiledTemplate();
     }
 
     //
@@ -309,22 +322,28 @@ class SimpleTemplate_Engine
 
     function getOption( $option )
     {
-        return $this->_lastUsedObject->getOption( $option );
+        return $this->_objectPool[$this->_lastUsedObjectKey]->getOption( $option );
     }
     function getOptions()
     {
-        return $this->_lastUsedObject->getOptions();
-    }
+        return $this->_objectPool[$this->_lastUsedObjectKey]->getOptions();
+    }                                 
+    
+    /**
+    *   setting options is always done on the default object!!!!
+    *   this means before using a real tpl-object (by calling any method that goes on a file, like compile, isCached, etc.)
+    *   the options stuff should be done, this does not effect the xml-options!!!
+    */
     function setOptions( $options , $force=false )
     {
-# i think we should better set the option for each object and the lastUsed !!!
-        return $this->_lastUsedObject->setOptions( $options , $force );
+// i think we should better set the option for each object and the lastUsed !!!
+        return $this->_objectPool['defaultObject']->setOptions( $options , $force );
     }
     function setOption( $option , $value , $force=false )
     {
-        $ret = $this->_lastUsedObject->setOption( $option , $value , $force );
+        $ret = $this->_objectPool['defaultObject']->setOption( $option , $value , $force );
         if( $option == 'filterLevel' ) // handle the filterLevel special, since it is handled in this file here!!!
-            $this->_activateFilterLevel();
+            $this->_setAllFilters('defaultObject');
         return $ret;
     }
 
