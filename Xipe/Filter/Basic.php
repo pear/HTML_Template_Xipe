@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.12  2002/09/27 16:57:43  mccain
+*   - removed experimental not working new feature :-)
+*
 *   Revision 1.11  2002/09/22 18:47:24  mccain
 *   - added decodeHtmlEntities, added it to the allPrefilters too
 *   - enhanced optimizePhpTags
@@ -166,8 +169,8 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
         {
             $input = $this->removeHtmlComments($input);
             $input = $this->removeCStyleComments($input);
-            $input = $this->decodeHtmlEntities($input);
         }
+        $input = $this->decodeHtmlEntities($input);
         $input = $this->addIfBeforeForeach($input);
         return $input;
     }
@@ -314,11 +317,11 @@ but this works:
     */
     function optimizeHtmlCode($input)
     {
-# all those in here are in use, but not tested all the way, i.e. what happens with compares in JS/PHP using < or >"
+// all those in here are in use, but not tested all the way, i.e. what happens with compares in JS/PHP using < or >"
 
         // make lines at least 100 characters long
-# dont know hoe yet...
-#        $input = preg_replace('/((.*)\n(.*)){100,}/Us','$2 $3',$input);
+// dont know hoe yet...
+//        $input = preg_replace('/((.*)\n(.*)){100,}/Us','$2 $3',$input);
 
         // removes new lines before > and />
         // this only works for tags where there are no PHP tags inside :-(
@@ -347,9 +350,9 @@ but this works:
     */
     function concatLines($input)
     {
-# i think i better dont write this filter, since it might be screwy for
-# <pre> tags, JS and what every else ... think about it
-# its not done yet anyway
+// i think i better dont write this filter, since it might be screwy for
+// <pre> tags, JS and what every else ... think about it
+// its not done yet anyway
 
 /*        $lines = explode("\n",$input);
 
@@ -438,10 +441,10 @@ but this works:
     */
     function convertEcho($input)
     {
-# FIXXME problem here is if i want to replace {$x} but not {$x=7} with {echo $x}
-# then i also have to check for $class->property, $a['array'] and so on ... dont know what to do now
+// FIXXME problem here is if i want to replace {$x} but not {$x=7} with {echo $x}
+// then i also have to check for $class->property, $a['array'] and so on ... dont know what to do now
 
-# i wanted this filter so i dont always have to write { $x=7}, the space is what i need now, so it doesnt get an 'echo' inserted
+// i wanted this filter so i dont always have to write { $x=7}, the space is what i need now, so it doesnt get an 'echo' inserted
 
         return preg_replace('/\{\$([a-zA-Z0-9_]*|'.
                             '[a-zA-Z0-9_]*->[a-zA-Z0-9_]*\(.*)\}/',"<?=\$$1 ?>",$input);
@@ -459,7 +462,7 @@ but this works:
     */
     function applyHtmlEntites($input)
     {
-        return preg_replace( '/(<\?php=|<\?=)\$(.*)\?>/sU' , '<?=htmlentities($$2)?>' , $input );   //"
+        return preg_replace( '/(<\?php=|<\?=)\$(.*)\?>/sU' , '<? echo htmlentities($$2)?>' , $input );   //"
     }
 
     /**
@@ -468,18 +471,72 @@ but this works:
     */
     function decodeHtmlEntities( $input )
     {   
-        /*
         $open = preg_quote($this->getOption('delimiter',0));
         $close = preg_quote($this->getOption('delimiter',1));
 
-        $transTable = get_html_translation_table (HTML_SPECIALCHARS);
-        $transTable = array_flip ($transTable);
+        $transTable = get_html_translation_table(HTML_SPECIALCHARS);
+        $transTable = array_flip($transTable);
         $transTable['&apos;'] = '\'';
 
-        $input = preg_replace(  '/([^\\\]'.$open.'.*[^\\\]'.$close.')/Ue',
-                                "strtr('$1',\$transTable)",
+        // for some reason this reg-exp doesnt find when a closing delimiter is
+        // right before an opening delimiter i.e. '}{$x[&apos;' strange .. i think i have no idea of regexps :-)
+        $regExp = "/[^\\\]$open.*[^\\\]$close/Usm";    //"
+        // so we search just for that what the above dont find
+        $regExp1 = "/$close$open.*[^\\\]$close/Usm";    //"
+
+        // since all the below dont work we use this, this looks like it works :-)
+        // it also shows how much time+code reg-exps can save (if i was able enough :-( )
+        preg_match_all($regExp,$input,$res);
+        $allReplaceables = $res[0];
+        preg_match_all($regExp1,$input,$res1);
+        $allReplaceables = array_merge($allReplaceables,$res1[0]);
+
+        $allReplaceables = array_unique($allReplaceables);
+        $replaced = array();
+        foreach( $allReplaceables as $key=>$aReplaceable )
+        {
+            foreach( $transTable as $old=>$new )
+            {
+                if( strpos($aReplaceable,$old) !== false )
+                {
+                    // we write something in $replaced only when there is something to replace
+                    // this way we will execute less reg-exps later
+                    if( !isset($replaced[$key]) )
+                        $replaced[$key] = $aReplaceable;
+                    // we only modify the strings in $replaced, so we can simply use the regexp to replace the string later
+                    // and we still have the origins in $allReplaceables
+                    $replaced[$key] = str_replace($old,$new,$replaced[$key]);
+                }
+            }
+        }
+
+        foreach( $replaced as $key=>$aReplaced )
+        {
+            $input = preg_replace( '/'.preg_quote($allReplaceables[$key]).'/' , $aReplaced , $input );
+        }
+
+
+/*
+    this doesnt work, see comment on stripslashes :-(
+
+        $input = preg_replace(  //'/([^\\\]'.$open.'.*[^\\\]'.$close.')/Ue',
+                                //'/([^\\\]{.*[^\\\]})/Use',
+                                $regExp,
+                                // its strange that i need stripslashes here, i think
+                                // this is necessary because a string like 'foo["bar"]' is given as 'foo[\"bar\"]'
+                                // i dont know why but that's how it is :-( took me some time :-)
+                                // cant use stripslashes either, since that screws up \{ inside delimiters, and SimpleTag needs that
+                                "strtr(stripslashes('$0'),\$transTable)",
                                 $input );
-        */
+*/
+/*  this works on each entry in $transTable but still the problem with stripslashes as described above exists here too :-(
+        foreach( $transTable as $old=>$new )
+        {
+            $regExp = "/[^\\\]$open.*[^\\\]$close/Use";    //"
+            $input = preg_replace( $regExp , "str_replace(\$old,\$new,stripslashes('$0'))" , $input );
+        }
+*/
+
         return $input;
     }
 
