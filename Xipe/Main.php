@@ -18,6 +18,9 @@
 //
 //  restarting to write log messages at version 1.5
 //  $Log$
+//  Revision 1.3  2002/06/26 09:30:36  mccain
+//  - create tpl's and dirs with rights for everybody ... i hope that doesnt create a security leak, it makes working at least eaiser
+//
 //  Revision 1.2  2002/06/21 20:54:38  mccain
 //  - added filterLevels 8,9
 //  - added option which lets you turn off making php tags, so the engine can be used for individual means too
@@ -80,7 +83,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
     *   @var    array   $options    the options for initializing the template class
     */
 
-    var $options = array(   'compileDir'    =>  '',      // by default its always the same one as where the template lies in, this might not be desired
+    var $options = array(   'compileDir'    =>  'tmp',  // by default its always the same one as where the template lies in, this might not be desired
                             'delimiter'     =>  array('{','}'),
                             'templateDir'   =>  '',
                             'autoBraces'    =>  true,   // see method 'autoBraces' for explaination
