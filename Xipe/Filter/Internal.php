@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.5  2002/03/08 18:20:19  mccain
+*   - removed some warnings
+*
 *   Revision 1.4  2002/03/04 19:05:15  mccain
 *   - made files compatible to run on php4.1.1 with stricter php.ini settings
 *
@@ -317,6 +320,19 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
         return implode("\n",$file);
     }
 
+    /**
+    *   removes the xml-config string
+    *
+    *   @access     public
+    *   @version    02/05/25
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string      the input string, template file
+    *   @return     string      the modified string
+    */
+    function removeXmlConfigString( $input )
+    {
+        return preg_replace( '/<SimpleTemplate>.*<\/SimpleTemplate>/Uis' , '' , $input );
+    }
 
 }
 ?>
