@@ -45,6 +45,17 @@ class tests_Filter_Internal_makePhpTags extends UnitTest
     }
     
     /**
+    *   {@$var} is also printed just like before ....
+    *   actually this is bullshit 
+    *
+    *
+    */
+    function test_echoAtCharacter()
+    {
+        $this->test_echoConstants();
+    }
+    
+    /**
     *   This is just a special assert, which removes whitepsaces, so we can easier check.
     *
     *
