@@ -25,12 +25,12 @@
 
     $tplFilter = new SimpleTemplate_Filter_Basic($tpl->options);
     // pre filter
-    $tpl->registerPrefilter('removeHtmlComments',$tplFilter);
-    $tpl->registerPrefilter('removeCStyleComments',$tplFilter);
-    $tpl->registerPrefilter('addIfBeforeForeach',$tplFilter);   // this filter makes the foreach-blocks conditional, so they are only shown if they contain data, see api-doc
+    $tpl->registerPrefilter(array(&$tplFilter,'removeHtmlComments'));
+    $tpl->registerPrefilter(array(&$tplFilter,'removeCStyleComments'));
+    $tpl->registerPrefilter(array(&$tplFilter,'addIfBeforeForeach'));   // this filter makes the foreach-blocks conditional, so they are only shown if they contain data, see api-doc
     // post filter
-    $tpl->registerPostfilter('trimLines',$tplFilter);
-    $tpl->registerPostfilter('optimizeHtmlCode',$tplFilter);
+    $tpl->registerPostfilter(array(&$tplFilter,'trimLines'));
+    $tpl->registerPostfilter(array(&$tplFilter,'optimizeHtmlCode'));
 
 
 
@@ -41,12 +41,12 @@
     require_once('SimpleTemplate/Filter/TagLib.php');
 
     $tagLib = new SimpleTemplate_Filter_TagLib($tpl->options);
-    $tpl->registerPrefilter('includeFile',$tagLib);
-    $tpl->registerPrefilter('block',$tagLib);
+    $tpl->registerPrefilter(array(&$tagLib,'includeFile'));
+    $tpl->registerPrefilter(array(&$tagLib,'block'));
     // do 'block' and 'include' before other tags, so the other tags also work
     // when they were used in a block !!!
-    $tpl->registerPrefilter('trim',$tagLib);
-    $tpl->registerPrefilter('repeat',$tagLib);
+    $tpl->registerPrefilter(array(&$tagLib,'trim'));
+    $tpl->registerPrefilter(array(&$tagLib,'repeat'));
 
 
 
@@ -58,6 +58,7 @@
     // for more info see: http://www.php.net/anoncvs.php
     // source is at: http://cvs.php.net/cvs.php/pear/I18N
     require_once('I18N/Messages/Translate.php');
+    require_once('SimpleTemplate/Filter/Translate.php');
 
     $translator = new I18N_Messages_Translate($DB_DSN,array('tablePrefix'=>'translate_'));
 
@@ -72,14 +73,16 @@
     {
 
         $tpl->setOption('locale',$lang);
-        $tpl->registerPostfilter('translateMarkUpString',array( $translator , $lang ) );
+        $tpl->registerPostfilter(array(&$translator,'translateMarkUpString'), $lang );
 
         // this filter translates PHP-generated text
         // it simply does out of < ? =$text ? >  this < ? =translateAndPrint($text) ? >
         // but only within the $translator->possibleMarkUpDelimiters, so not every
         // < ?= is translated !!! since that is not wanted anyway,
         // i.e. think of "<td colspan={$colspan}>" - doesnt need translation
-        $tpl->registerPostfilter('applyTranslateFunction',array($tplFilter,'translateAndPrint',$translator->possibleMarkUpDelimiters) );
+        $translateFilter = new SimpleTemplate_Filter_Translate($tpl->options);
+        $tpl->registerPostfilter(   array(&$translateFilter,'applyTranslateFunction'),
+                                    array('translateAndPrint',$translator->possibleMarkUpDelimiters) );
 
     }
 

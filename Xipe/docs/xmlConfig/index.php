@@ -26,9 +26,9 @@
     #
     $tplFilter = new SimpleTemplate_Filter_Basic($tpl->options);
     // pre filter
-    $tpl->registerPrefilter('removeHtmlComments',$tplFilter);
-    $tpl->registerPrefilter('removeCStyleComments',$tplFilter);
-    $tpl->registerPrefilter('addIfBeforeForeach',$tplFilter);   // this filter makes the foreach-blocks conditional, so they are only shown if they contain data, see api-doc
+    $tpl->registerPrefilter(array(&$tplFilter,'removeHtmlComments'));
+    $tpl->registerPrefilter(array(&$tplFilter,'removeCStyleComments'));
+    $tpl->registerPrefilter(array(&$tplFilter,'addIfBeforeForeach'));   // this filter makes the foreach-blocks conditional, so they are only shown if they contain data, see api-doc
 
     // post filter
 #    $tpl->registerPostfilter('trimLines',$tplFilter);
