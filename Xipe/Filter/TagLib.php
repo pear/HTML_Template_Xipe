@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.4  2002/03/04 19:05:15  mccain
+*   - made files compatible to run on php4.1.1 with stricter php.ini settings
+*
 *   Revision 1.3  2002/02/07 22:45:55  mccain
 *   - make the options stuff work
 *
@@ -397,6 +400,26 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
 
         */
     }
+
+    /**
+    *   applies htmlentites to all the '{%$xxxx%}' strings, so the
+    *   printout will always be valid html
+    *
+    *   @version    02/05/13
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  $input  the original template code
+    *   @return     string  the modified input
+    */
+    function applyHtmlEntites($input)
+    {
+        $input = preg_replace(  '/'.preg_quote($this->options['delimiter'][0]).
+                                '%\$(.*)%'.preg_quote($this->options['delimiter'][1]).
+                                '/' ,
+                                '<?=htmlentities($$1)?>' ,
+                                $input );
+        return $input;
+    }
+
 }
 
 ?>
