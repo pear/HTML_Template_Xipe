@@ -17,11 +17,12 @@
     // +----------------------------------------------------------------------+
     //  $Id$
 
+ini_set('include_path',realpath(dirname(__FILE__).'/../../../../../').':'.realpath(dirname(__FILE__).'/../../../../../../includes').':'.ini_get('include_path'));
+ini_set('error_reporting',E_ALL);
 
     //
     //   include the files needed
     //
-ini_set('include_path',ini_get('include_path').':'.dirname(__FILE__).'/../../../../..'.':'.dirname(__FILE__).'/../../../../../../includes/');
     require_once('HTML/Template/Xipe.php');
     require_once('HTML/Template/Xipe/Filter/Basic.php');
 

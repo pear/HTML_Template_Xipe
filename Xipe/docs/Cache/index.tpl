@@ -15,7 +15,7 @@
 // +----------------------------------------------------------------------+
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
-//  $Id: index.tpl,v 1.4 2003-01-10 13:20:58 cain Exp $
+//  $Id: index.tpl,v 1.5 2003-01-29 11:58:03 cain Exp $
 -->
 
 
@@ -28,13 +28,13 @@
     which needs to be located under the templateDir
 
 -->
-<Template-Xipe>
+<HTML_Template_Xipe>
     <options>
         <cache>
             <time value="10" unit="seconds"/>
         </cache>
     </options>
-</Template-Xipe>
+</HTML_Template_Xipe>
 
 
 
