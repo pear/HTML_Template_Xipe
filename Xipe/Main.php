@@ -18,6 +18,9 @@
 //
 //  restarting to write log messages at version 1.5
 //  $Log$
+//  Revision 1.4  2002/08/04 16:16:48  mccain
+//  - changed a comment
+//
 //  Revision 1.3  2002/06/26 09:30:36  mccain
 //  - create tpl's and dirs with rights for everybody ... i hope that doesnt create a security leak, it makes working at least eaiser
 //
@@ -403,6 +406,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
         //  apply post filter
         $fileContent = $this->applyFilters( $fileContent , $this->_postFilters );
 
+
         // write the compiled template into the compiledTemplate-File
         if( ($cfp = fopen( $this->_compiledTemplate , 'w' )) )
         {
@@ -426,7 +430,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
     */
     function compile()
     {
-
+//print $this->_templateFile.'<br>';
         // cant the log-class do that???
         $startTime = split(" ",microtime());
         $startTime = $startTime[1]+$startTime[0];
@@ -529,14 +533,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
     */
     function registerPrefilter( $functionName , $params=null )
     {
-        if( $params != null )
-        {
-            settype($params,'array');
-            $this->_preFilters[] = array($functionName,$params);   // use reference here !!! see comment above in registerPrefilter
-        }
-        else
-            $this->_preFilters[] = $functionName;
-
+        $this->_registerFilter( 'pre' , $functionName , $params );
     }
 
     /**
@@ -551,13 +548,41 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
     */
     function registerPostfilter( $functionName , $params=null )
     {
+        $this->_registerFilter( 'post' , $functionName , $params );
+    }
+
+    /**
+    *   put the filter either in the pre or postFilter array
+    *   check for language filters too! those have to go first
+    *
+    *   @access     public
+    *   @version    02/09/22 (day of the elections in germany :-) )
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      mixed       the funtion to call, or an array(&$object,'methodname')
+    *   @param      mixed       if given parameters are passed to the function/method
+    */
+    function _registerFilter( $which , $functionName , $params )
+    {
+        $langFilter = false;
+        if( is_array($functionName) )
+        {
+            if( method_exists($functionName[0],'isLanguageFilter') )
+                $langFilter = call_user_func( array($functionName[0],'isLanguageFilter') );
+        }
+
         if( $params != null )
         {
             settype($params,'array');
-            $this->_postFilters[] = array($functionName,$params);
+            $thisFilter = array($functionName,$params);   // use reference here !!! see comment above in registerPrefilter
         }
         else
-            $this->_postFilters[] = $functionName;
+            $thisFilter = $functionName;
+
+        $arrayName = &$this->{'_'.$which.'Filters'};
+        if( $langFilter )   // language filters have to be applied first, so all other filters also have effect on it
+            array_unshift($arrayName,$thisFilter);
+        else
+            $arrayName[] = $thisFilter;
     }
 
     /**
