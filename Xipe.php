@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.12  2002/05/13 12:51:04  mccain
+*   - added _log method to handle logging according to the logLevel properly
+*
 *   Revision 1.11  2002/04/15 20:25:35  mccain
 *   - changed the way methods and objects are passed to a filter !!!
 *   - !! caching doesnt work yet either !!
@@ -162,7 +165,8 @@
 require_once('Benchmark/Timer.php');
 require_once('SimpleTemplate/Options.php');
 require_once('SimpleTemplate/Filter/Internal.php');
-require_once('Log.php');
+if( !@include_once('Log/Log.php') )
+    @include_once('Log.php');
 
 /**
 *   the intention is to use normal php in the template without the need to write
