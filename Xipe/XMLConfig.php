@@ -17,6 +17,9 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.2  2002/06/02 22:35:44  mccain
+//  - made the tags lower case, since the Tree-XML converts them to lower case by default now
+//
 //  Revision 1.1  2002/05/26 17:04:30  mccain
 //  - initial commit, after restructuring and enhancing the engine
 //
@@ -141,6 +144,7 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
 # TODO check for prefilter defines in xml config
         if( $id = $config->getIdByPath('simpletemplate/prefilter') )  // are any preFilter given?
         {
+            $this->_applyFiltersFromXMLConfig( $config , $id , true );
         }
 
         //
@@ -160,9 +164,9 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
             }
             if( $autoBraces = $config->getIdByPath('autobraces',$id) )// set autoBraces?
             {
-                $setOptions['autobraces'] = false;
+                $setOptions['autoBraces'] = false;
                 if( strtolower(trim($config->data[$autoBraces]['attributes']['value'])) == 'true' )
-                    $setOptions['autobraces'] = true;
+                    $setOptions['autoBraces'] = true;
             }
             if( $localeId = $config->getIdByPath('locale',$id) )// set locale?
             {
@@ -266,6 +270,38 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
                     call_user_func( array(&$aFilter[0][0],'setOptions') , $setOptions );
             }
         }
+    }
+
+    /**
+    *   apply filter that are given in the xml-config
+    */
+    function _applyFiltersFromXMLConfig( &$treeObj , $elementId , $preFilter=false )
+    {
+        $filters = $treeObj->getChildrenIds($elementId);
+
+        $registerMethod = $preFilter ? 'registerPrefilter' : 'registerPostfilter' ;
+        $allFilterMethod = $preFilter ? 'allPrefilters' : 'allPostfilters' ;
+
+        foreach( $filters as $aFilter )
+        {
+// FIXXME we only handle a tiny bit of all possible settings yet
+            $class = $treeObj->data[$aFilter]['attributes']['class'];
+            $classFile = $treeObj->data[$aFilter]['attributes']['classFile'];
+            // do we have a class name? then make an instance of it and apply all[Pre|Post]Filters
+            if( $class )
+            {
+                if( !$classFile )
+                    $classFile = str_replace('_','/',$class).'.php';
+                require_once($classFile);
+                $filterInstance = new $class($this->options);
+                // for some reason php doesnt see 0 as a real param, so it would bring an error if this->getOp... returns 0
+                // so i have to pass it as a string :-/ very strange
+                $fLevel = $this->getOption('filterLevel') ? $this->getOption('filterLevel') : '0';
+                $this->$registerMethod(array(&$filterInstance,$allFilterMethod),$fLevel);
+            }
+
+        }
+
     }
 
     /**
