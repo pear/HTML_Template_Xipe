@@ -15,19 +15,19 @@
 // +----------------------------------------------------------------------+
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
+//  $Id$
 //
-//  $Log$
 
 /**
 *   this class only defines commonly used methods, etc.
 *   it is worthless without being extended
 *
-*   @package  SimpleTemplate
+*   @package  HTML_Template_Xipe
 *   @access   public
 *   @author   Wolfram Kriesing <wolfram@kriesing.de>
 *
 */
-class SimpleTemplate_Options
+class HTML_Template_Xipe_Options
 {
     /**
     *   @var    array   $options    you need to overwrite this array and give the keys, that are allowed
@@ -47,7 +47,7 @@ class SimpleTemplate_Options
     *   @param      boolean     if set to true options are also set
     *                           even if no key(s) was/were found in the options property
     */
-    function SimpleTemplate_Options( $options=array() , $force=false )
+    function HTML_Template_Xipe_Options( $options=array() , $force=false )
     {
         $this->_forceSetOption = $force;
 
@@ -134,7 +134,7 @@ class SimpleTemplate_Options
         if (isset($this->options[$option])) {
             return $this->options[$option];
         }
-#        return $this->raiseError("unknown option $option");
+//        return $this->raiseError("unknown option $option");
         return false;
     }
 

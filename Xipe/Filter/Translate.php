@@ -15,27 +15,20 @@
 // +----------------------------------------------------------------------+
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
-//
-//  $Log$
-//  Revision 1.2  2002/11/03 12:48:22  mccain
-//  - added translateMarkedOnly
-//
-//  Revision 1.1  2002/04/15 20:24:09  mccain
-//  - initial commit, moved here from Basic
-//
+//  $Id$
 //
 
-require_once('SimpleTemplate/Options.php');
+require_once 'HTML/Template/Xipe/Options.php';
 
 /**
 *   translation filters and helpers
 *
-*   @package    SimpleTemplate/Filter
+*   @package    HTML_Template_Xipe
 *   @access     public
 *   @version    02/04/14
 *   @author     Wolfram Kriesing <wolfram@kriesing.de>
 */
-class SimpleTemplate_Filter_Translate extends SimpleTemplate_Options
+class HTML_Template_Xipe_Filter_Translate extends HTML_Template_Xipe_Options
 {
 
     /**

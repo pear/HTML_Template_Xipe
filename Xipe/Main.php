@@ -15,43 +15,13 @@
 // +----------------------------------------------------------------------+
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
-//
-//  restarting to write log messages at version 1.5
-//  $Log$
-//  Revision 1.8  2002/11/03 12:52:40  mccain
-//  - preperation for version 1.6.1
-//
-//  Revision 1.7  2002/11/02 19:43:03  mccain
-//  - whitespaces
-//
-//  Revision 1.6  2002/10/02 19:01:26  mccain
-//  - replace # by //
-//
-//  Revision 1.5  2002/09/22 20:36:32  mccain
-//  - encapsulated registerPre/Postfilter methods
-//  - enable language-filters
-//
-//  Revision 1.4  2002/08/04 16:16:48  mccain
-//  - changed a comment
-//
-//  Revision 1.3  2002/06/26 09:30:36  mccain
-//  - create tpl's and dirs with rights for everybody ... i hope that doesnt create a security leak, it makes working at least eaiser
-//
-//  Revision 1.2  2002/06/21 20:54:38  mccain
-//  - added filterLevels 8,9
-//  - added option which lets you turn off making php tags, so the engine can be used for individual means too
-//  - added method unregisterFilter
-//
-//  Revision 1.1  2002/05/26 17:04:30  mccain
-//  - initial commit, after restructuring and enhancing the engine
-//
+//  $Id$
 //
 
-require_once('PEAR.php');
-require_once('SimpleTemplate/Options.php');
-require_once('SimpleTemplate/Filter/Internal.php');
-if( !@include_once('Log/Log.php') )
-    @include_once('Log.php');
+require_once 'PEAR.php';
+require_once 'HTML/Template/Xipe/Options.php';
+require_once 'HTML/Template/Xipe/Filter/Internal.php';
+require_once 'Log.php';
 
 /**
 *   the intention is to use normal php in the template without the need to write
@@ -61,10 +31,10 @@ if( !@include_once('Log/Log.php') )
 *   making the code look so ugly as it sometimes does, only because you want to write a varibale
 *   so this template engine will not do much, but fulfill my needs
 *
-*   @package    SimpleTemplate
+*   @package    HTML_Template_Xipe
 *
 */
-class SimpleTemplate_Main extends SimpleTemplate_Options
+class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
 {
 
 // FIXXME a problem we have here: is that if i use {include(a.php)} the varibales of this file overwrite the ones
@@ -185,7 +155,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     */
-    function SimpleTemplate_Main( $options=array() )
+    function HTML_Template_Xipe_Main( $options=array() )
     {
         foreach( $options as $key=>$aOption )
             $this->setOption( $key , $aOption );
@@ -337,7 +307,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
                         return $this->_error(   "couldn't make directory: <b>'$aDir'</b> under <b>'".
                                                 $this->getOption('compileDir')."'</b><br>".
                                                 "1. please give write permission to the 'compileDir', ".
-                                                "so SimpleTemplate can create directories inside" , PEAR_ERROR_DIE );
+                                                "so Xipe can create directories inside" , PEAR_ERROR_DIE );
                     }
                 }
             }
@@ -397,7 +367,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
             $fileContent = '';                      // if the file doesnt exist, write a template anyway, an empty one but write one
 
         // pass option to know the delimiter in the filter, but parse the xml-config before!!!, see line above
-        $defaultFilter = new SimpleTemplate_Filter_Internal($this->options);
+        $defaultFilter = new HTML_Template_Xipe_Filter_Internal($this->options);
 
         //  apply pre filter
         $fileContent = $this->applyFilters( $fileContent , $this->_preFilters );
@@ -441,7 +411,6 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
     /**
     *   compile the template
     *
-    *   @see        SimpleTemplate
     *   @access     public
     *   @version    01/12/03
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
@@ -692,7 +661,7 @@ class SimpleTemplate_Main extends SimpleTemplate_Options
     {
         if( $this->getOption('verbose') == true )
         {
-            echo '<span style="color:red; background-color:FBFEA1; font-weight:bold;">SimpleTemplate ERROR</span><br>';
+            echo '<span style="color:red; background-color:FBFEA1; font-weight:bold;">HTML_Template_Xipe ERROR</span><br>';
             echo '<span style="color:008000; background-color:FBFEA1;">';
             echo $message;
             echo '</span><br><br>';

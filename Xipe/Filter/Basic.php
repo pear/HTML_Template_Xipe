@@ -15,136 +15,19 @@
 // +----------------------------------------------------------------------+
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
-//
-/**
-*
-*   $Log$
-*   Revision 1.14  2002/11/08 22:49:31  mccain
-*   - added escapeShortTags, so xml-files can also be parsed with short_open_Tags
-*
-*   Revision 1.13  2002/11/02 19:40:40  mccain
-*   - finsished decodeHtmlEntities, finally :-)
-*
-*   Revision 1.12  2002/09/27 16:57:43  mccain
-*   - removed experimental not working new feature :-)
-*
-*   Revision 1.11  2002/09/22 18:47:24  mccain
-*   - added decodeHtmlEntities, added it to the allPrefilters too
-*   - enhanced optimizePhpTags
-*   - execute addIfBeforeForeach only if autoBraces is on, since it depends on it (for now)
-*
-*   Revision 1.10  2002/08/04 16:16:25  mccain
-*   - some optimization in optimizeHtmlCode
-*
-*   Revision 1.9  2002/06/21 20:52:16  mccain
-*   - check filter level
-*
-*   Revision 1.8  2002/05/26 17:07:00  mccain
-*   - remove old comment
-*
-*   Revision 1.7  2002/05/21 23:01:55  mccain
-*   - added a filter which invokes all pre filters and one for all post filters too
-*
-*   Revision 1.6  2002/05/13 11:56:07  mccain
-*   - added filter which converts everything to proper html by default
-*
-*   Revision 1.5  2002/04/15 20:23:44  mccain
-*   - removed translate stuff
-*
-*   Revision 1.4  2002/03/22 19:48:24  mccain
-*   - fixed a bug in the applyTranslate... now also method calls work
-*
-*   Revision 1.3  2002/02/07 22:45:55  mccain
-*   - make the options stuff work
-*
-*   Revision 1.2  2002/02/07 22:03:46  mccain
-*   - added informational comment
-*
-*   Revision 1.1.1.1  2002/02/07 21:52:23  mccain
-*
-*   ##### those are my local revisions, from before moving it to sourceforge :-) #####
-*   ##### just kept for informational reasons, might be removed one day
-*
-*   Revision 1.22  2002/01/21 23:01:53  cain
-*   - added license statement
-*
-*   Revision 1.21  2002/01/15 23:57:12  cain
-*   - bugfixed the applyTranslateFuntion
-*
-*   Revision 1.20  2002/01/15 11:24:49  cain
-*   - commit a little bug, which didnt let me use * ...
-*
-*   Revision 1.19  2002/01/09 05:28:12  cain
-*   - some phpdoc adjustment
-*
-*   Revision 1.18  2002/01/09 05:15:00  cain
-*   - removed the translate filter from here, which was only for playing
-*
-*   Revision 1.17  2001/12/30 08:13:40  cain
-*   - added some translation
-*
-*   Revision 1.16  2001/12/21 14:51:27  cain
-*   - started on the translation stuff
-*
-*   Revision 1.15  2001/12/19 22:39:28  cain
-*   - tried something with nested html comments
-*
-*   Revision 1.14  2001/12/18 00:12:56  cain
-*   - comments
-*
-*   Revision 1.13  2001/12/16 20:56:32  cain
-*   - added optimizeHtmlCode
-*
-*   Revision 1.12  2001/12/15 14:08:43  cain
-*   - fixed bug in addIfBeforeForeach
-*
-*   Revision 1.10  2001/12/12 18:27:21  cain
-*   - changed some comments
-*
-*   Revision 1.9  2001/12/11 09:51:50  cain
-*   - added constructor to pass the delimiters
-*   - added filters: makePhpTags, autoBraces
-*   - updated addIfBeforeForeach filter
-*
-*   Revision 1.8  2001/12/11 08:44:40  cain
-*   - added cool filter 'addIfBeforeForeach' (well the name is not cool, but it says what it does)
-*
-*   Revision 1.7  2001/12/10 15:12:07  cain
-*   - updated phpdocs
-*
-*   Revision 1.6  2001/12/10 13:38:35  cain
-*   - renamed method
-*
-*   Revision 1.5  2001/12/10 12:11:24  cain
-*   - started method applyHtmlEntities
-*
-*   Revision 1.4  2001/12/10 05:09:15  cain
-*   - added filter removeEmptyLines
-*   - fixed trimLines
-*
-*   Revision 1.3  2001/12/07 23:09:30  cain
-*   - add some filters
-*
-*   Revision 1.2  2001/12/07 22:35:49  cain
-*   - added some comment
-*
-*   Revision 1.1  2001/12/07 16:40:44  cain
-*   - first useful filter
-*
-*
-*/
+//  $Id$
 
-require_once('SimpleTemplate/Options.php');
+require_once 'HTML/Template/Xipe/Options.php';
 
 /**
-*   the default filter(s) i use and SimpleTemplate needs
+*   the default filter(s) i use and Xipe needs
 *
-*   @package    SimpleTemplate_Filter
+*   @package    HTML_Template_Xipe
 *   @access     public
 *   @version    01/12/10
 *   @author     Wolfram Kriesing <wolfram@kriesing.de>
 */
-class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
+class HTML_Template_Xipe_Filter_Basic extends HTML_Template_Xipe_Options
 {
 // i need the method setOption, that's why i extend myPEAR_Common
 

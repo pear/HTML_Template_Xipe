@@ -15,31 +15,17 @@
 // +----------------------------------------------------------------------+
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
-//
-//  $Log$
-//  Revision 1.4  2002/10/02 19:01:28  mccain
-//  - replace # by //
-//
-//  Revision 1.3  2002/09/22 18:51:55  mccain
-//  - make xml-config for autoBraces work, was buggy
-//  - enable applying filters via xml-config
-//
-//  Revision 1.2  2002/06/02 22:35:44  mccain
-//  - made the tags lower case, since the Tree-XML converts them to lower case by default now
-//
-//  Revision 1.1  2002/05/26 17:04:30  mccain
-//  - initial commit, after restructuring and enhancing the engine
-//
+//  $Id$
 //
 
-require_once('SimpleTemplate/Main.php');
+require_once 'HTML/Template/Xipe/Main.php';
 
 /**
 *
-*   @package    SimpleTemplate
+*   @package    HTML_Template_Xipe
 *   @author     Wolfram Kriesing <wolfram@kriesing.de>
 */
-class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
+class HTML_Template_Xipe_XMLConfig extends HTML_Template_Xipe_Main
 {
 
     /**
@@ -149,7 +135,7 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
         //  add the filters set in the xml config files
         //
 // TODO check for prefilter defines in xml config
-        if( $id = $config->getIdByPath('simpletemplate/prefilter') )  // are any preFilter given?
+        if( $id = $config->getIdByPath('template-xipe/prefilter') )  // are any preFilter given?
         {
             $this->_applyFiltersFromXMLConfig( $config , $id , true );
         }
@@ -157,7 +143,7 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
         //
         //  apply xml given options to this class, do this after applying the filters
         //
-        if( $id = $config->getIdByPath('simpletemplate/options') )  // are any options given?
+        if( $id = $config->getIdByPath('template-xipe/options') )  // are any options given?
         {
             $delimiter = $config->getElementByPath('delimiter',$id);
             if( $delimiter )// set new delimiters?
@@ -328,10 +314,10 @@ class SimpleTemplate_XMLConfig extends SimpleTemplate_Main
             return false;
 
         // remove all HTML-comments first, in case the config-part was commented out
-        require_once('SimpleTemplate/Filter/Basic.php');    // do only include if we really get here, should save some time
-        $fileContent = SimpleTemplate_Filter_Basic::removeHtmlComments($fileContent);
+        require_once('HTML/Template/Xipe/Filter/Basic.php');    // do only include if we really get here, should save some time
+        $fileContent = HTML_Template_Xipe_Filter_Basic::removeHtmlComments($fileContent);
 
-        if( preg_match( '/<SimpleTemplate>.*<\/SimpleTemplate>/Uis' , $fileContent , $configString ) )
+        if( preg_match( '/<template-xipe>.*<\/template-xipe>/Uis' , $fileContent , $configString ) )
         {
             return $configString[0];
         }

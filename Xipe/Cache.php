@@ -15,24 +15,10 @@
 // +----------------------------------------------------------------------+
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
-//
-//  $Log$
-//  Revision 1.4  2002/09/22 18:50:20  mccain
-//  - dont use short tags anymore, to be able to work with xml files
-//  - bugfix in dependencies
-//
-//  Revision 1.3  2002/07/31 13:43:47  mccain
-//  - change mode of the cache-file so the user can remove it too
-//
-//  Revision 1.2  2002/06/02 23:15:11  mccain
-//  - removed not needed require
-//
-//  Revision 1.1  2002/05/26 17:04:30  mccain
-//  - initial commit, after restructuring and enhancing the engine
-//
+//  $Id$
 //
 
-require_once('SimpleTemplate/XMLConfig.php');
+require_once 'HTML/Template/Xipe/XMLConfig.php';
 
 /**
 *   this class does the caching of final pages in pure html (or anything you use it for)
@@ -81,10 +67,10 @@ require_once('SimpleTemplate/XMLConfig.php');
 *   include( $tpl->getCompiledTemplate() );
 *
 *
-*   @package    SimpleTemplate
+*   @package    HTML_Template_Xipe
 *   @author     Wolfram Kriesing <wolfram@kriesing.de>
 */
-class SimpleTemplate_Cache extends SimpleTemplate_XMLConfig
+class HTML_Template_Xipe_Cache extends HTML_Template_Xipe_XMLConfig
 {
 
     /**

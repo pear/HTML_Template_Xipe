@@ -15,84 +15,20 @@
 // +----------------------------------------------------------------------+
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
-//
-/**
-*
-*   $Log$
-*   Revision 1.9  2002/11/02 19:41:24  mccain
-*   - optimized and made makePhpTags work much better and smoother
-*
-*   Revision 1.8  2002/09/22 18:49:20  mccain
-*   - changed internal methods to be able to work with xml-files (dont use short tags anymore)
-*
-*   Revision 1.7  2002/06/26 09:30:02  mccain
-*   - fixed bug in autoBraces
-*
-*   Revision 1.6  2002/05/26 17:06:38  mccain
-*   - added filter which removes the xml-config string
-*
-*   Revision 1.5  2002/03/08 18:20:19  mccain
-*   - removed some warnings
-*
-*   Revision 1.4  2002/03/04 19:05:15  mccain
-*   - made files compatible to run on php4.1.1 with stricter php.ini settings
-*
-*   Revision 1.3  2002/02/07 22:45:55  mccain
-*   - make the options stuff work
-*
-*   Revision 1.2  2002/02/07 22:03:46  mccain
-*   - added informational comment
-*
-*   Revision 1.1.1.1  2002/02/07 21:52:23  mccain
-*
-*   ##### those are my local revisions, from before moving it to sourceforge :-) #####
-*   ##### just kept for informational reasons, might be removed one day
-*
-*   Revision 1.11  2002/01/21 23:01:53  cain
-*   - added license statement
-*
-*   Revision 1.10  2002/01/18 05:53:34  cain
-*   - bugfix when replacing the escaped delimiters
-*
-*   Revision 1.9  2002/01/15 11:25:12  cain
-*   - replace print tags properly
-*
-*   Revision 1.8  2002/01/10 19:12:04  cain
-*   - added comment
-*
-*   Revision 1.7  2002/01/09 05:28:12  cain
-*   - some phpdoc adjustment
-*
-*   Revision 1.6  2002/01/09 05:15:54  cain
-*   - removed constructor, since myPEAR_Common does that
-*
-*   Revision 1.5  2001/12/21 14:51:42  cain
-*   - tried to make tpl->show work
-*
-*   Revision 1.4  2001/12/18 15:55:49  cain
-*   - comments
-*
-*   Revision 1.3  2001/12/18 00:13:06  cain
-*   - comments
-*
-*   Revision 1.2  2001/12/15 14:09:24  cain
-*   - use regExp to replace delimiters, which watch out for escaping and taglibs stuff
-*
-*
-*/
+//  $Id$
 
-require_once('SimpleTemplate/Options.php');
-require_once('SimpleTemplate/Filter/Basic.php');
+require_once 'HTML/Template/Xipe/Options.php';
+require_once 'HTML/Template/Xipe/Filter/Basic.php';
 
 /**
-*   the internal filter(s) i use and SimpleTemplate needs
+*   the internal filter(s) i use and Xipe needs
 *
-*   @package    SimpleTemplate/Filter
+*   @package    HTML_Template_Xipe
 *   @access     public
 *   @version    01/12/10
 *   @author     Wolfram Kriesing <wolfram@kriesing.de>
 */
-class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
+class HTML_Template_Xipe_Filter_Internal extends HTML_Template_Xipe_Options
 {
 // i need the method setOption, that's why i extend myPEAR_Common
 
@@ -101,7 +37,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
     *   @access private
     *   @var    array   $options    the options for initializing the filter class
     */
-    var $options = array(   'delimiter'     => array());    // see SimpleTemplate_Engine
+    var $options = array(   'delimiter'     => array());    // see HTML_Template_Xipe
 
     /**
     *   actually i made a constructor only to pass the delimiters to this class
@@ -111,7 +47,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      array   $options    need to be given, use the options from your tempalte class
     */
-/*    function SimpleTemplate_Filter_Internal($options)
+/*    function HTML_Template_Xipe_Filter_Internal($options)
     {
         foreach( $options as $key=>$aOption )
             $this->setOption( $key , $aOption );
@@ -218,7 +154,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
         // remove empty lines, so we can check if the _next_ line is indented (if you buy 'autoBraces' you get that too no way around :-)  )
         // this way we dont run into problems if the line after an {if(...)} is empty but the next
         // indented (as i had it, to make the code more readable)
-        $preFilter = new SimpleTemplate_Filter_Basic;
+        $preFilter = new HTML_Template_Xipe_Filter_Basic;
         $input = call_user_func( array($preFilter,'removeEmptyLines') , $input );
 
         // this ONLY works if '{$' is not replaced by '< ?php xxx'  but by '< ?=' as it is now
@@ -346,7 +282,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
     */
     function removeXmlConfigString( $input )
     {
-        return preg_replace( '/<SimpleTemplate>.*<\/SimpleTemplate>/Uis' , '' , $input );
+        return preg_replace( '/<Template-Xipe>.*<\/Template-Xipe>/Uis' , '' , $input );
     }
 
 }

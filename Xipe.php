@@ -16,25 +16,7 @@
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
 //
-//
-//  $Log$
-//  Revision 1.19  2002/10/02 19:00:01  mccain
-//  - made it work properly on multipl instances, which might change any option and use make registerPre/PostFilters work properly on that too
-//
-//  Revision 1.18  2002/09/22 20:24:26  mccain
-//  - added closing php tag ... oops
-//
-//  Revision 1.17  2002/06/27 16:05:11  mccain
-//  - added comment
-//
-//  Revision 1.16  2002/06/21 20:53:22  mccain
-//  - added _activateFilterLevel method
-//
-//  Revision 1.15  2002/05/26 17:05:25  mccain
-//  - moved actual content to Main.php
-//  - this is now the wrapper to make the tpl-engine useable with multiple files,
-//    which are internally handled as an instance each
-//
+//  $Id$
 //
 
 /**
@@ -59,10 +41,10 @@
 *   instance created for the current template file.
 *   (i hope i could make myself clear :-) )
 *
-*   @package    SimpleTemplate
+*   @package    HTML_Template_Xipe
 *
 */
-class SimpleTemplate_Engine
+class HTML_Template_Xipe
 {
 
     /**
@@ -84,7 +66,7 @@ class SimpleTemplate_Engine
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      array       the options
     */
-    function SimpleTemplate_Engine( $options=array() )
+    function HTML_Template_Xipe( $options=array() )
     {
         // just to let the constructor run once, so it can do some integrity checks (if needed)
         $tplClass = 'Main';
@@ -98,10 +80,10 @@ class SimpleTemplate_Engine
             $tplClass = 'Cache';
         }
 
-        if( !include_once('SimpleTemplate/'.$tplClass.'.php') )
-            die('could not include SimpleTemplate/'.$tplClass.'.php');
+        if( !include_once('HTML/Template/Xipe/'.$tplClass.'.php') )
+            die('could not include HTML/Template/Xipe/'.$tplClass.'.php');
 
-        $tplClass = 'SimpleTemplate_'.$tplClass;
+        $tplClass = 'HTML_Template_Xipe_'.$tplClass;
         $this->_objectPool['defaultObject'] = new $tplClass( $options );
         // set it to a defined value so methods like 'getOption' is available after the constructor call
         $this->_lastUsedObjectKey = 'defaultObject';
@@ -127,13 +109,13 @@ class SimpleTemplate_Engine
         $filterLevel = $this->_objectPool[$objKey]->getOption('filterLevel');
         if( $filterLevel > 0 )
         {
-            require_once('SimpleTemplate/Filter/TagLib.php');
+            require_once('HTML/Template/Xipe/Filter/TagLib.php');
             // pass the options used in the template class, so we set the same delimiters in the filter
-            $tagLib = new SimpleTemplate_Filter_TagLib($this->_objectPool[$objKey]->getOptions());
+            $tagLib = new HTML_Template_Xipe_Filter_TagLib($this->_objectPool[$objKey]->getOptions());
             $this->_objectPool[$objKey]->registerPrefilter(array(&$tagLib,'allPrefilters'),$filterLevel);
 
-            require_once('SimpleTemplate/Filter/Basic.php');
-            $tplFilter = new SimpleTemplate_Filter_Basic($this->_objectPool[$objKey]->getOptions());
+            require_once('HTML/Template/Xipe/Filter/Basic.php');
+            $tplFilter = new HTML_Template_Xipe_Filter_Basic($this->_objectPool[$objKey]->getOptions());
             $this->_objectPool[$objKey]->registerPrefilter(array(&$tplFilter,'allPrefilters'),$filterLevel);
             $this->_objectPool[$objKey]->registerPostfilter(array(&$tplFilter,'allPostfilters'),$filterLevel);
         }
@@ -274,7 +256,7 @@ class SimpleTemplate_Engine
                     return false;
                     break;
                 default:
-                    return $obj->_error( "ERROR SimpleTemplate_Engine: method $method does not exist" , PEAR_ERROR_RETURN );
+                    return $obj->_error( "ERROR HTML_Template_Xipe: method $method does not exist" , PEAR_ERROR_RETURN );
             }
         }
     }

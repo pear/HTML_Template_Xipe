@@ -15,32 +15,20 @@
 // +----------------------------------------------------------------------+
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
-//
-//  $Log$
-//  Revision 1.3  2002/07/03 09:58:30  mccain
-//  - added some comments
-//  - do also replace <input src> tags
-//  - write url w/o domain now, is shorter
-//
-//  Revision 1.2  2002/07/02 11:17:44  mccain
-//  - made imgSrc more flexible, now it also resolves paths with ../ in them
-//
-//  Revision 1.1  2002/06/27 16:04:47  mccain
-//  - added method imgSrc
-//
+//  $Id$
 //
 
-require_once('SimpleTemplate/Options.php');
+require_once 'HTML/Template/Xipe/Options.php';
 
 /**
 *
 *
-*   @package    SimpleTemplate/Filter
+*   @package    HTML_Template_Xipe
 *   @access     public
 *   @version    02/06/26
 *   @author     Wolfram Kriesing <wolfram@kriesing.de>
 */
-class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
+class HTML_Template_Xipe_Filter_Modifier extends HTML_Template_Xipe_Options
 {
 
     var $_imgDirs = array();

@@ -15,93 +15,10 @@
 // +----------------------------------------------------------------------+
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
+//  $Id$
 //
-/**
-*
-*   $Log$
-*   Revision 1.14  2002/11/08 22:51:28  mccain
-*   - removed 's' modifier in macro method, which is not needed anyway and caused problems with multiple appearances
-*
-*   Revision 1.13  2002/10/16 19:00:44  mccain
-*   - include every macro only once, so i set a if-def kinda around it
-*
-*   Revision 1.12  2002/07/26 20:48:00  mccain
-*   - made include work like include_once, corrected macro to work properly with it
-*
-*   Revision 1.11  2002/07/26 10:40:17  mccain
-*   - search for a file to include also in the include path
-*
-*   Revision 1.10  2002/06/26 18:48:25  mccain
-*   - remove unnecessary spaces
-*
-*   Revision 1.9  2002/06/21 20:52:53  mccain
-*   - added macro filter
-*
-*   Revision 1.8  2002/06/10 18:43:39  mccain
-*   - fix bug in applyHtmlEntities, was not greedy before
-*
-*   Revision 1.7  2002/05/21 23:03:33  mccain
-*   - added a filter which invokes all pre filters
-*      thanks to Alan Knowles' hint
-*   - renamed the trimWords method to trimByWords and corrected the behaviour of trim, to work properly again (the $ sign was searched before, again)
-*
-*   Revision 1.6  2002/05/20 20:51:21  mccain
-*   - added trimWords method
-*
-*   Revision 1.5  2002/05/13 12:14:26  mccain
-*   - added tagLib filter for applyHtmlEntities
-*
-*   Revision 1.4  2002/03/04 19:05:15  mccain
-*   - made files compatible to run on php4.1.1 with stricter php.ini settings
-*
-*   Revision 1.3  2002/02/07 22:45:55  mccain
-*   - make the options stuff work
-*
-*   Revision 1.2  2002/02/07 22:03:46  mccain
-*   - added informational comment
-*
-*   Revision 1.1.1.1  2002/02/07 21:52:23  mccain
-*
-*   ##### those are my local revisions, from before moving it to sourceforge :-) #####
-*   ##### just kept for informational reasons, might be removed one day
-*
-*   Revision 1.10  2002/01/21 23:01:53  cain
-*   - added license statement
-*
-*   Revision 1.9  2002/01/15 11:25:24  cain
-*   - comment
-*
-*   Revision 1.8  2002/01/09 05:28:12  cain
-*   - some phpdoc adjustment
-*
-*   Revision 1.7  2002/01/06 12:20:50  cain
-*   - fixed bug, which let blocks only be used when they have the same indention before the copy tag
-*
-*   Revision 1.6  2001/12/21 14:52:20  cain
-*   - make blocks useable in every template no matter if included via php or via tagLilb
-*
-*   Revision 1.5  2001/12/19 22:39:04  cain
-*   - added block and include tag parsers
-*
-*   Revision 1.4  2001/12/19 14:51:50  cain
-*   - added method includeFile
-*   - make use of the delimiters
-*
-*   Revision 1.3  2001/12/18 15:55:38  cain
-*   - added method trim
-*   - finished 'repeat'
-*
-*   Revision 1.2  2001/12/18 00:12:56  cain
-*   - comments
-*
-*   Revision 1.1  2001/12/15 14:03:07  cain
-*   - this file will contain tagLib like filters
-*
-*
-*
-*/
 
-require_once('SimpleTemplate/Options.php');
+require_once 'HTML/Template/Xipe/Options.php';
 
 /**
 *   this file is intended to realize stuff like this
@@ -122,10 +39,10 @@ require_once('SimpleTemplate/Options.php');
 *       {%trim $x by words after 20 characters and add '...'%}
 *       {%trim $x by words 20 '...'%}
 *
-*   @package    SimpleTemplate/Filter
+*   @package    HTML_Template_Xipe
 *   @version    01/12/15
 */
-class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
+class HTML_Template_Xipe_Filter_TagLib extends HTML_Template_Xipe_Options
 {
 // i need the method setOption, that's why i extend myPEAR_Common
 
@@ -159,7 +76,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      array   $options    need to be given, use the options from your tempalte class
     */
-    function SimpleTemplate_Filter_TagLib($options=array())
+    function HTML_Template_Xipe_Filter_TagLib($options=array())
     {
         if(sizeof($options))
             foreach( $options as $key=>$aOption )
@@ -428,9 +345,9 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
                         // times defining functions (macros in this case)
                         // it also works if you compile multiple files with different instances of this filter
                         // since php checks the variable $___SimpleTemplate_TagLib_includedFile given here
-                        $fileContent =  "$_openDel if(!\$___SimpleTemplate_TagLib_includedFile['$fileToInclude'])\\\{ $_closeDel".
+                        $fileContent =  "$_openDel if(!\$___HTML_Template_Xipe_TagLib_includedFile['$fileToInclude'])\\\{ $_closeDel".
                                         $fileContent.
-                                        $_openDel." \$___SimpleTemplate_TagLib_includedFile['$fileToInclude']=true;\\\}".$_closeDel;
+                                        $_openDel." \$___HTML_Template_Xipe_TagLib_includedFile['$fileToInclude']=true;\\\}".$_closeDel;
                     }
                     else
                     {

@@ -15,20 +15,19 @@
 // +----------------------------------------------------------------------+
 // | Authors: Wolfram Kriesing <wolfram@kriesing.de>                      |
 // +----------------------------------------------------------------------+
-//
-//  $Log$
+//  $Id$
 
-require_once('SimpleTemplate/Options.php');
+require_once 'HTML/Template/Xipe/Options.php';
 
 /**
 *
 *
-*   @package    SimpleTemplate_Filter
+*   @package    HTML_Template_Xipe
 *   @access     public
 *   @version    02/09/21
 *   @author     Wolfram Kriesing <wolfram@kriesing.de>
 */
-class SimpleTemplate_Filter_SimpleTag extends SimpleTemplate_Options
+class HTML_Template_Xipe_Filter_SimpleTag extends HTML_Template_Xipe_Options
 {
 
     /**
