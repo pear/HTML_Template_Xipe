@@ -19,6 +19,11 @@
 /**
 *
 *   $Log$
+*   Revision 1.7  2002/05/21 23:03:33  mccain
+*   - added a filter which invokes all pre filters
+*      thanks to Alan Knowles' hint
+*   - renamed the trimWords method to trimByWords and corrected the behaviour of trim, to work properly again (the $ sign was searched before, again)
+*
 *   Revision 1.6  2002/05/20 20:51:21  mccain
 *   - added trimWords method
 *
@@ -479,7 +484,7 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
     {
         $input = preg_replace(  '/'.preg_quote($this->options['delimiter'][0]).
                                 '%\$(.*)%'.preg_quote($this->options['delimiter'][1]).
-                                '/' ,
+                                '/U' ,
                                 '<?=htmlentities($$1)?>' ,
                                 $input );
         return $input;
