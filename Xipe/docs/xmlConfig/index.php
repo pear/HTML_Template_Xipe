@@ -15,7 +15,6 @@
     #   make template class instance
     #
     $options = array(   'templateDir'   => dirname(__FILE__),
-                        'compileDir'    => 'tmp',
                         'enable-XMLConfig'=>true,
                         'logLevel'      => 1 );
     $tpl = new SimpleTemplate_Engine($options);
@@ -26,12 +25,12 @@
     #
     #   make filter class instance
     #
-    $tplFilter = new SimpleTemplate_Filter_Basic($tpl->getOptions());
+/*    $tplFilter = new SimpleTemplate_Filter_Basic($tpl->getOptions());
     // pre filter
     $tpl->registerPrefilter(array(&$tplFilter,'removeHtmlComments'));
     $tpl->registerPrefilter(array(&$tplFilter,'removeCStyleComments'));
     $tpl->registerPrefilter(array(&$tplFilter,'addIfBeforeForeach'));   // this filter makes the foreach-blocks conditional, so they are only shown if they contain data, see api-doc
-
+*/
     // post filter
 #    $tpl->registerPostfilter('trimLines',$tplFilter);
 #    $tpl->registerPostfilter('optimizeHtmlCode',$tplFilter);
