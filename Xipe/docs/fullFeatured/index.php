@@ -14,8 +14,7 @@
     #
     require_once('SimpleTemplate/Engine.php');
 
-    $options = array(   'templateDir'   => dirname(__FILE__),
-                        'compileDir'    => 'tmp'    //
+    $options = array(   'templateDir'   => dirname(__FILE__)
                         #,'debug'=>true
                         );
 
@@ -52,8 +51,15 @@
         // < ?= is translated !!! since that is not wanted anyway,
         // i.e. think of "<td colspan={$colspan}>" - doesnt need translation
         $translateFilter = new SimpleTemplate_Filter_Translate($tpl->getOptions());
+/*
         $tpl->registerPostfilter(   array(&$translateFilter,'applyTranslateFunction'),
                                     array('translateAndPrint',$translator->possibleMarkUpDelimiters) );
+*/
+
+        // this filter will only translate PHP-variables that start with 'T_', i.e. $T_foo
+        // but not $foo as the method above would
+        $tpl->registerPostfilter(   array(&$translateFilter,'translateMarkedOnly'),
+                                    array('translateAndPrint','T_') );
 
     }
 
@@ -79,6 +85,8 @@
     $viewClassCodeUrl = $url.'Engine.php';
     $viewFilterCodeUrl = $url.'Filter/Basic.php';
     $viewTagLibCodeUrl = $url.'Filter/TagLib.php';
+
+    $languages = array('german','english');
 
     #####################################
     #

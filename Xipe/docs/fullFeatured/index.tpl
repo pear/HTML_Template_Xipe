@@ -35,6 +35,12 @@ here additionally used Features:<br>
 <a href="{$viewDbFile}">the DB file, for the translation</a><br>
 
 <br><br>
+available langauges:
+{foreach($languages as $aLang)}
+    <br>
+    {$aLang} = {$T_aLang}
+
+<br><br>
 
 <table>
     <tr>
@@ -356,7 +362,7 @@ $loop = {print_r($loop)}<br>
 
     <!--
      |
-     |  examples for " { % % } "
+     |  examples for " \{ % % \} "
      |
      +-->
     <tr>
