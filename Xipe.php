@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.13  2002/05/13 12:54:06  mccain
+*   - include the proper Log.php from PEAR, it has moved but we try to be compatible, to make it easier for users
+*
 *   Revision 1.12  2002/05/13 12:51:04  mccain
 *   - added _log method to handle logging according to the logLevel properly
 *
@@ -339,7 +342,7 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
             include( $this->compiledTemplate );
         }
         else
-            $this->showError("ERROR: couldnt get compiled template!!!<br>");
+            $this->showError( "ERROR: couldnt get compiled template!!!<br>" , __LINE__ );
     }
 
     /**
@@ -425,15 +428,15 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
 #print "compileDest=$compileDest<br>";
         if( !@is_dir($compileDest) )                // check if the compile dir has been created
         {
-            $this->showError(   "'compileDir' could not be accessed<br>".
-                                "1. pleace create the 'compileDir' which is: <b>'$compileDest'</b><br>2. give write-rights to it");
+            $this->showError(   "'compileDir' could not be accessed <br>".
+                                "1. pleace create the 'compileDir' which is: <b>'$compileDest'</b><br>2. give write-rights to it" , __LINE__ );
         }
 
-        if( !is_writeable($compileDest))
+        if( !@is_writeable($compileDest))
 # i dont know how to check if "enter" rights are given
         {
             $this->showError(   "can not write to 'compileDir', which is <b>'$compileDest'</b><br>".
-                                "1. pleace give write and enter-rights to it");
+                                "1. pleace give write and enter-rights to it" , __LINE__ );
         }
 
 #print "file=$file<br>";
@@ -455,7 +458,7 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
                     if( !@mkdir($compileDest,0770) )
                     {
                         $this->showError(   "couldn't make directory: <b>'$aDir'</b> under <b>'".$this->getOption('compileDir')."'</b><br>".
-                                            "1. please give write permission to the 'compileDir', so SimpleTemplate can create directories inside");
+                                            "1. please give write permission to the 'compileDir', so SimpleTemplate can create directories inside",__LINE__);
                     }
                 }
             }
@@ -846,7 +849,7 @@ print '_cacheEnd write into: '.$this->_cachedOutput.' <br><br>';
         {
             $this->showError(   "xml-config could not be parsed, because the class 'Tree/Tree.php' could not be included<br>".
                                 '1. pleace be sure to have the latest of those classes from the pear-cvs '.
-                                '(<a href="http://cvs.php.net/cvs.php/pear/Tree">here</a>)');
+                                '(<a href="http://cvs.php.net/cvs.php/pear/Tree">here</a>)',__LINE__);
             return false;
         }
 
