@@ -18,6 +18,9 @@
 //
 //
 //  $Log$
+//  Revision 1.17  2002/06/27 16:05:11  mccain
+//  - added comment
+//
 //  Revision 1.16  2002/06/21 20:53:22  mccain
 //  - added _activateFilterLevel method
 //
@@ -325,5 +328,5 @@ class SimpleTemplate_Engine
         return $ret;
     }
 
-
 }
+?>
