@@ -351,6 +351,26 @@ class HTML_Template_Xipe
         return $this->_objectPool[$this->_lastUsedObjectKey]->getCompiledTemplate();
     }
 
+    /**
+    *   Return the rendered content
+    *   Thanks to Michael Johnson
+    *
+    *   @param  string  the template file to be compiled.
+    *   @param  array   this is the array of values built using 'compact()'
+    *   @return string  the rendered content
+    */
+    function getRenderedTemplate($file,$data=array())
+    {
+        $this->compile($file);
+        ob_start();
+        extract($data);
+        include $this->getCompiledTemplate();
+        $ret = ob_get_contents();
+        ob_end_clean();
+        
+        return  $ret;
+    }
+    
     //
     //  pass on the options-method calls
     //
