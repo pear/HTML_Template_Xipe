@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.6  2002/05/26 17:06:38  mccain
+*   - added filter which removes the xml-config string
+*
 *   Revision 1.5  2002/03/08 18:20:19  mccain
 *   - removed some warnings
 *
@@ -204,7 +207,8 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
 #     >{%trim $aFolder['extName'] after 40 "..."%}
 
 
-
+        $openDel = $this->getOption('delimiter',0);
+        $closeDel = $this->getOption('delimiter',1);
 
         // remove empty lines, so we can check if the _next_ line is indented (if you buy 'autoBraces' you get that too no way around :-)  )
         // this way we dont run into problems if the line after an {if(...)} is empty but the next
@@ -249,18 +253,25 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
                     for( $i=0 ; $i<$openIndentions[0]['numSpaces'] ; $i++ )       // make the code look nice, indent the closing brace
                         $spaces.= ' ';
 
-                    // are delimiters on this line? then we only add our braces before them
+                    // are delimiters at the beginnig of this line!!!? then we only add our braces before them
+                    // dont add the closing brace after a piece of html, so that this works too:
+                    //  {if(...)}
+                    //      test
+                    //  <br>{somePhpCode}       // dont add the brace in the {somePhpCode} but before the <br> otherwise the logic would be false!
                     if( ( strpos( $file[$curLineIndex] , $begin )) !== false &&  // look for a template-tag start
-                        ( strpos( $file[$curLineIndex] , $end )) !== false       // and the end tag has to be on this line
+                        ( strpos( $file[$curLineIndex] , $end )) !== false &&    // and the end tag has to be on this line
+                        ( strpos( trim($file[$curLineIndex]) , $begin ) === 0 ) // make sure the $begin is at the beginning of the line, see comment above !!!
                       )
                     {
                         // this also fixes the problem i had with the 'else', which doesnt except closing the php-tag before or after it
                         // since we are always writing the braces inside the existing php-tag now :-)
-                        $file[$curLineIndex] = str_replace( $begin , $begin.' } ' , $file[$curLineIndex] );
+                        // replace only the first $begin with "$begin }" and dont forget to put the spaces back!! ($1)
+                        // and there needs to be a space between a opening php-tag and a closing curly brace, otherwise php brings an error!
+                        $file[$curLineIndex] = preg_replace( '/^(\s*)'.preg_quote($begin).'/' , "$1$begin $closeDel" , $file[$curLineIndex] );
                     }
                     else    // no delimiters on this line, so we new once
                     {
-                        $file[$curLineIndex] = $spaces.$begin.' } '.$end."\n".$file[$curLineIndex];
+                        $file[$curLineIndex] = $spaces.$begin.' '.$closeDel.$end."\n".$file[$curLineIndex];
                     }
 
                     array_shift( $openIndentions );
