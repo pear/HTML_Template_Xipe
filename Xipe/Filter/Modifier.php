@@ -17,6 +17,11 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.3  2002/07/03 09:58:30  mccain
+//  - added some comments
+//  - do also replace <input src> tags
+//  - write url w/o domain now, is shorter
+//
 //  Revision 1.2  2002/07/02 11:17:44  mccain
 //  - made imgSrc more flexible, now it also resolves paths with ../ in them
 //
@@ -71,8 +76,11 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
     function imgSrc( $input , $imageRoot , $vImgRoot , $preferedType='gif' , $dropDirs=array('CVS'))
     {
         $_imgTypes = array('gif','jpg','png');
+                                        
+        settype($imageRoot,'array');
+        settype($vImgRoot,'array');
 
-# FIXXME make img src tags relative if desired
+// FIXXME make img src tags relative if desired
         // put the prefered type first, so we find it first :-)
         $imgTypes = array($preferedType);
         foreach( $_imgTypes as $aImgType )
@@ -81,9 +89,10 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
 
         $found = array();
 
-        // modify the vImgRoot not to contain the 'http://domain' string in front
+        // modify the vImgRoot NOT to contain the 'http://domain' string in front
         // since this is only unnecessary text
-        $vImgRoot = preg_replace('/^http.?:\/\/[^\/]+/','',$vImgRoot);
+        foreach( $vImgRoot as $key=>$aDir )
+            $vImgRoot[$key] = preg_replace('/^http.?:\/\/[^\/]+/','',$vImgRoot[$key]);
 
         $regExp = '/<[img|input].+src="(.*)"/Ui';
         preg_match_all($regExp,$input,$images);
@@ -91,8 +100,11 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
         {
             if( !sizeof($this->_imgDirs) )  // get image dirs if we didnt yet, since this instance might be used multiple times
             {
-                $this->_getDirs($imageRoot,$dropDirs);
-                $this->_imgDirs = $this->_foundDirs;
+                foreach( $imageRoot as $aDir )
+                {
+                    $this->_getDirs($aDir,$dropDirs);
+                    $this->_imgDirs = array_merge($this->_imgDirs,$this->_foundDirs);
+                }
             }
 
             // go thru all the images we have found and find their path
@@ -112,17 +124,25 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
                         foreach( $_imgTypes as $aType ) // if no file extension given loop through all possible imgTypes
                         {
                             $aType = $aType ? ".$aType" : '';
-#print "....check $aDir $aImage$aType<br>";
+//print "....check $aDir $aImage$aType<br>";
                             if( @file_exists($aDir.$aImage.$aType))
                             {
-                                $this->_imgFiles[$aImage] = str_replace($imageRoot,$vImgRoot,realpath($aDir.$aImage.$aType));
-#print 'found <br>';
+                                foreach( $imageRoot as $key=>$aImgDir )
+                                {
+                                    if( strpos( realpath($aDir.$aImage.$aType),$aImgDir ) === 0 )
+                                        $this->_imgFiles[$aImage] = str_replace($aImgDir,$vImgRoot[$key],realpath($aDir.$aImage.$aType));
+                                }
+//print 'found use:'.$this->_imgFiles[$aImage].'<br>';
                                 break(2);
                             }
                             if( @file_exists($aDir.'/'.$aImage.$aType))
                             {
-                                $this->_imgFiles[$aImage] = str_replace($imageRoot,$vImgRoot,realpath($aDir.'/'.$aImage.$aType));
-#print 'found <br>';
+                                foreach( $imageRoot as $key=>$aImgDir )
+                                {
+                                    if( strpos( realpath($aDir.'/'.$aImage.$aType),$aImgDir ) === 0 )
+                                        $this->_imgFiles[$aImage] = str_replace($aImgDir,$vImgRoot[$key],realpath($aDir.'/'.$aImage.$aType));
+                                }
+//print 'found use:'.$this->_imgFiles[$aImage].'<br>';
                                 break(2);
                             }
                         }
@@ -195,5 +215,29 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
     {
     }
 
+    /**
+    *   replace text with links
+    *
+    *   @version    02/08/02
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  the original template code
+    *   @param      array   an array of text that shall be replaces by the links
+    *                       'text'  =>  'http://www.url.de'
+    *   @return     string  the modified template
+    */
+    function autoLink( $input , $links )
+    {
+//FIXXME replace ONLY text, not stuff like '<a href="....index.php">' dont replace the php there too !!!!
+// stuff like <a href>pear.php.net</a> would result in <a href><ahref>pear</a>.<ahref>php</a>.net</a>
+// if pear and php were to be linked automatically ... prevent from doing that !!!
+        if( sizeof($links) )
+        foreach( $links as $word=>$link )
+        {
+            $input = preg_replace(  '/(>[^<]*)('.$word.')([^>]*<)/Ui' ,
+                                    '$1<a href="'.$link.'" target="_blank">$2</a>$3' ,
+                                    $input );
+        }
+        return $input;
+    }
 }
 ?>
