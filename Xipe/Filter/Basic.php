@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.14  2002/11/08 22:49:31  mccain
+*   - added escapeShortTags, so xml-files can also be parsed with short_open_Tags
+*
 *   Revision 1.13  2002/11/02 19:40:40  mccain
 *   - finsished decodeHtmlEntities, finally :-)
 *
@@ -196,8 +199,15 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
             $input = $this->removeEmptyLines($input);
             $input = $this->trimLines($input);
             $input = $this->optimizeHtmlCode($input);
-            $input = $this->optimizePhpTags($input);
-        }
+        }                        
+        // this is default since, it enables you to also use 'switch case' blocks
+        // if we wouldnt optimize the php here then there would be spaces printed between switch and case
+        // which php doesnt allow! (only with autoBraces of course)
+        //  i.e.    {switch($which)} ....those spaces here bother php...
+        //              {case 'this':}
+        //
+        // and its better to optimize it always anyway!
+        $input = $this->optimizePhpTags($input);
         return $input;
     }
 
@@ -212,7 +222,7 @@ class SimpleTemplate_Filter_Basic extends SimpleTemplate_Options
     *   @return     string  the modified template
     */
     function optimizePhpTags($input)
-    {
+    {                             
         // replace ' } ? > <spaces> < ?php' by '}' AND
         // replace ' { ? > <spaces> < ?php' by '}'
         // since the big number of php tags only takes up a lot of parsing by php
@@ -274,10 +284,12 @@ but this works:
 <a href="http://www.home.de">home</a>
 
 
-*/
-
-
-        $input = preg_replace('/\/\*.+\*\//Us','',$input);  // remove /* */ on multiple lines too
+*/                                          
+        // remove // commments when they are at the beginning of the line or if there are only spaces before
+        $input = preg_replace('~^\s*//.*$~Um','',$input);
+                                           
+        // watch out, that weird strings, like reg-exps dont fuck this up!
+        $input = preg_replace('~/\*.+\*/~Us','',$input);  // remove /* */ on multiple lines too
         return $input;
     }
 
