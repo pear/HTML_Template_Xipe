@@ -17,6 +17,9 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.1  2002/06/27 16:04:47  mccain
+//  - added method imgSrc
+//
 //
 
 require_once('SimpleTemplate/Options.php');
@@ -34,7 +37,6 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
 
     var $_imgDirs = array();
     var $_imgFiles = array();
-    var $_imgExt = array();
 
     /**
     *   this filter trys to read all the <img src> tags and replaces the src tags with the complete file name
@@ -59,6 +61,7 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
     {
         $_imgTypes = array('gif','jpg','png');
 
+# FIXXME make img src tags relative if desired
         // put the prefered type first, so we find it first :-)
         $imgTypes = array($preferedType);
         foreach( $_imgTypes as $aImgType )
@@ -97,16 +100,14 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
 #print "....check $aDir $aImage$aType<br>";
                             if( @file_exists($aDir.$aImage.$aType))
                             {
-                                $this->_imgFiles[$aImage] = str_replace($imageRoot,$vImgRoot,$aDir);
-                                $this->_imgExt[$aImage] = $aType;
-#print 'found<br>';
+                                $this->_imgFiles[$aImage] = str_replace($imageRoot,$vImgRoot,realpath($aDir.$aImage.$aType));
+#print 'found <br>';
                                 break(2);
                             }
                             if( @file_exists($aDir.'/'.$aImage.$aType))
                             {
-                                $this->_imgFiles[$aImage] = str_replace($imageRoot,$vImgRoot,$aDir.'/');
-                                $this->_imgExt[$aImage] = $aType;
-#print 'found<br>';
+                                $this->_imgFiles[$aImage] = str_replace($imageRoot,$vImgRoot,realpath($aDir.'/'.$aImage.$aType));
+#print 'found <br>';
                                 break(2);
                             }
                         }
@@ -116,11 +117,11 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
         }
 
         if( sizeof($this->_imgFiles) )
-        foreach( $this->_imgFiles as $file=>$path )
+        foreach( $this->_imgFiles as $file=>$vName )
         {
             $_file = str_replace('/','\\/',preg_quote($file));  //"
             $regExp = '/<img(.+)src="'.$_file.'"/Ui';
-            $input = preg_replace($regExp,'<img$1src="'.$path.$file.$this->_imgExt[$file].'"',$input);
+            $input = preg_replace($regExp,'<img$1src="'.$vName.'"',$input);
         }
 
         return $input;
@@ -143,6 +144,7 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
         $dirs = array();
         if ($handle = @opendir($root))
         {
+            $dirs[] = '';   // do also include the directory itself
             while (false !== ($file = readdir($handle)))
             {
                 if( $file!='.' &&  $file!='..' && is_dir($root.'/'.$file) && !in_array($file,$dropDirs))
@@ -157,7 +159,8 @@ class SimpleTemplate_Filter_Modifier extends SimpleTemplate_Options
         foreach( $dirs as $aDir )
         {
             $this->_foundDirs[] = $root.'/'.$aDir;
-            $this->_getDirs($root.'/'.$aDir,$dropDirs);
+            if( $aDir )
+                $this->_getDirs($root.'/'.$aDir,$dropDirs);
         }
     }
 
