@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.4  2002/02/26 12:34:48  mccain
+*   - added some nicer error handling and warning, so setup is easier
+*
 *   Revision 1.3  2002/02/07 22:45:55  mccain
 *   - make the options stuff work
 *
@@ -386,6 +389,7 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
             $file = substr($file,1);
 
         $compileDest = $this->getOption('compileDir');
+#print "compileDest=$compileDest<br>";
         if( !@is_dir($compileDest) )                // check if the compile dir has been created
         {
             $this->showError(   "'compileDir' could not be accessed<br>".
@@ -399,13 +403,14 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
                                 "1. pleace give write and enter-rights to it");
         }
 
+#print "file=$file<br>";
         $directory = dirname( $file );
         $filename = basename($file);
 
         // extract dirname to create directori(es) in compileDir in case they dont exist yet
         // we just keep the directory structure as the application uses it, so we dont get into conflict with names
         // i dont see no reason for hashing the directories or the filenames
-        if( $directory!='.' )   // it is '.' also if no dir is given
+        if( $directory!='.' )   // $directory is '.' also if no dir is given
         {
             $path = explode('/',$directory);
             foreach( $path as $aDir )
