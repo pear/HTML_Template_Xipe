@@ -19,6 +19,11 @@
 /**
 *
 *   $Log$
+*   Revision 1.1.1.1  2002/02/07 21:52:23  mccain
+*
+*   ##### those are my local revisions, from before moving it to sourceforge :-) #####
+*   ##### just kept for informational reasons, might be removed one day
+*
 *   Revision 1.22  2002/01/21 23:01:53  cain
 *   - added license statement
 *

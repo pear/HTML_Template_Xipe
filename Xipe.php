@@ -19,6 +19,11 @@
 /**
 *
 *   $Log$
+*   Revision 1.1.1.1  2002/02/07 21:52:22  mccain
+*
+*   ##### those are my local revisions, from before moving it to sourceforge :-) #####
+*   ##### just kept for informational reasons, might be removed one day
+*
 *   Revision 1.28  2002/02/05 12:54:31  cain
 *   - use new Tree class interface
 *   - problem with Log-class
