@@ -282,7 +282,7 @@ class HTML_Template_Xipe_Filter_Internal extends HTML_Template_Xipe_Options
     */
     function removeXmlConfigString( $input )
     {
-        return preg_replace( '/<Template-Xipe>.*<\/Template-Xipe>/Uis' , '' , $input );
+        return preg_replace( '/<html_template_xipe>.*<\/html_template_xipe>/Uis' , '' , $input );
     }
 
 }

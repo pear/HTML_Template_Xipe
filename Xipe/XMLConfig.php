@@ -135,7 +135,7 @@ class HTML_Template_Xipe_XMLConfig extends HTML_Template_Xipe_Main
         //  add the filters set in the xml config files
         //
 // TODO check for prefilter defines in xml config
-        if( $id = $config->getIdByPath('template-xipe/prefilter') )  // are any preFilter given?
+        if( $id = $config->getIdByPath('html_template_xipe/prefilter') )  // are any preFilter given?
         {
             $this->_applyFiltersFromXMLConfig( $config , $id , true );
         }
@@ -143,7 +143,7 @@ class HTML_Template_Xipe_XMLConfig extends HTML_Template_Xipe_Main
         //
         //  apply xml given options to this class, do this after applying the filters
         //
-        if( $id = $config->getIdByPath('template-xipe/options') )  // are any options given?
+        if( $id = $config->getIdByPath('html_template_xipe/options') )  // are any options given?
         {
             $delimiter = $config->getElementByPath('delimiter',$id);
             if( $delimiter )// set new delimiters?
@@ -317,7 +317,7 @@ class HTML_Template_Xipe_XMLConfig extends HTML_Template_Xipe_Main
         require_once('HTML/Template/Xipe/Filter/Basic.php');    // do only include if we really get here, should save some time
         $fileContent = HTML_Template_Xipe_Filter_Basic::removeHtmlComments($fileContent);
 
-        if( preg_match( '/<template-xipe>.*<\/template-xipe>/Uis' , $fileContent , $configString ) )
+        if( preg_match( '/<html_template_xipe>.*<\/html_template_xipe>/Uis' , $fileContent , $configString ) )
         {
             return $configString[0];
         }
