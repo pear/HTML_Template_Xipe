@@ -87,10 +87,10 @@ class HTML_Template_Xipe_Filter_Internal extends HTML_Template_Xipe_Options
         $input = preg_replace(  $regExp ,
                                 '$1 ?>' ,
                                 $input );
-        // replace '< ?php $' by '< ?php echo $'
-        $regExp = "/<\?php\s\\$/Um";
+        // replace '< ?php $' by '< ?php echo @$' optionally a @ before a $
+        $regExp = "/<\?php\s(@)?\\$/Um";
         $input = preg_replace(  $regExp ,
-                                '<?php echo $' ,
+                                '<?php echo $1$' ,
                                 $input );
         // replace all php tags, where there is only one space after it
         // by echoing the stuff that follows, but not if a control structure follows
