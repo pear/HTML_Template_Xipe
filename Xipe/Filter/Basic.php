@@ -19,6 +19,11 @@
 /**
 *
 *   $Log$
+*   Revision 1.11  2002/09/22 18:47:24  mccain
+*   - added decodeHtmlEntities, added it to the allPrefilters too
+*   - enhanced optimizePhpTags
+*   - execute addIfBeforeForeach only if autoBraces is on, since it depends on it (for now)
+*
 *   Revision 1.10  2002/08/04 16:16:25  mccain
 *   - some optimization in optimizeHtmlCode
 *
@@ -462,7 +467,8 @@ but this works:
     *   this is needed i.e. if you have an xml-file from Openoffice.org
     */
     function decodeHtmlEntities( $input )
-    {
+    {   
+        /*
         $open = preg_quote($this->getOption('delimiter',0));
         $close = preg_quote($this->getOption('delimiter',1));
 
@@ -473,7 +479,7 @@ but this works:
         $input = preg_replace(  '/([^\\\]'.$open.'.*[^\\\]'.$close.')/Ue',
                                 "strtr('$1',\$transTable)",
                                 $input );
-
+        */
         return $input;
     }
 
