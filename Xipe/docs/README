@@ -7,6 +7,10 @@ simply click it and you can see the example at work.
 
 What the examples do:
 
+Cache
+-----
+Shows how to use the feature for caching the final output.
+                                                          
 simple
 ------
 Shows a simple example of how to use SimpleTemplate to create
