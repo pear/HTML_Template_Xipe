@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.6  2002/03/04 19:05:15  mccain
+*   - made files compatible to run on php4.1.1 with stricter php.ini settings
+*
 *   Revision 1.5  2002/03/04 18:36:07  mccain
 *   - only a comment
 *
@@ -192,6 +195,7 @@ class SimpleTemplate_Engine extends SimpleTemplate_Options
                             'forceCompile'  =>  false,  // only suggested for debugging
                             'xmlConfigFile' =>  'config.xml', // name of the xml config file which might be found anywhere in the directory structure
                             'locale'        =>  'en',   // default language
+                            'cache'         =>  '0',    // set this to the number of seconds for which the final (html-)file shall be cached
                             'logFileExtension'=>'log',
                             'logLevel'      =>  1       // 1 - only logs new compiles, 0 - logs nothing, 2 - logs everything even only deliveries
                         );
@@ -609,7 +613,7 @@ $this->logObject = new Log_file($logFile);
             {
                 if( !is_array($aFilter[1]) )
                 {
-                    $input = call_user_method( $aFilter[0] , $aFilter[1] , $input );
+                    $input = call_user_func( array($aFilter[1],$aFilter[0]) , $input );
                 }
                 else        // if $aFilter[1] is an array then additional parameters shall be passed to the function/method
                 {
@@ -643,6 +647,18 @@ $this->logObject = new Log_file($logFile);
 
 
         return $input;
+    }
+
+    /**
+    *
+    *
+    *   @access     public
+    *   @version    02/03/06
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    */
+    function isCached()
+    {
+        return false;
     }
 
     /**
@@ -741,6 +757,23 @@ else
                 $locale = trim($config->data[$localeId]['attributes']['value']);
                 if( $locale )
                     $setOptions['locale'] = $locale;
+            }
+            if( $cacheId = $config->getIdByPath('cache',$id) )// caching?
+            {
+                $time = $config->data[$cacheId]['attributes']['value'];
+                if( $unit = $config->data[$cacheId]['attributes']['unit'] )
+                {
+                    switch(strtolower($unit))
+                    {
+                        case 'week':    $time = $time*7;
+                        case 'day':     $time = $time*24;
+                        case 'hour':    $time = $time*60;
+                        case 'minute':  $time = $time*60;
+                        case 'second':  break;
+                    }
+                }
+                if( $time )
+                    $setOptions['cache'] = $time;
             }
 
             // apply the options to this class
