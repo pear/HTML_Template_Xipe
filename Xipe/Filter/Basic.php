@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.9  2002/06/21 20:52:16  mccain
+*   - check filter level
+*
 *   Revision 1.8  2002/05/26 17:07:00  mccain
 *   - remove old comment
 *
@@ -294,20 +297,23 @@ but this works:
     */
     function optimizeHtmlCode($input)
     {
-# all those in here are in use, but not tested all the way, i.e. what happens with compares in JS/PHP using < or >
+# all those in here are in use, but not tested all the way, i.e. what happens with compares in JS/PHP using < or >"
 
         // make lines at least 100 characters long
 # dont know hoe yet...
 #        $input = preg_replace('/((.*)\n(.*)){100,}/Us','$2 $3',$input);
 
         // removes new lines before > and />
+        // this only works for tags where there are no PHP tags inside :-(
         $input = preg_replace('/\n([\/>])/U','$1',$input);
 
         // concatenates HTML tags which are spread over many lines,
         // and replace spaces which are before and after the new line by one space only
-        $input = preg_replace('/<(.+)[\s\n\s]+(.+)>/U','<$1 $2>',$input);
+        // this only works for tags where there are no PHP tags inside :-(
+        $input = preg_replace('/<(.*)\n(.*)>/U','<$1 $2>',$input);
 
         // remove only spaces between > and <
+        // not the newlines, because this is supposed to be done before in this method
         $input = preg_replace('/>(\040)*</U','><',$input);
 
         return $input;
