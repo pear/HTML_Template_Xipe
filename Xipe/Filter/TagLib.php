@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.5  2002/05/13 12:14:26  mccain
+*   - added tagLib filter for applyHtmlEntities
+*
 *   Revision 1.4  2002/03/04 19:05:15  mccain
 *   - made files compatible to run on php4.1.1 with stricter php.ini settings
 *
@@ -87,6 +90,8 @@ require_once('SimpleTemplate/Options.php');
 *       {%trim $x after 20 characters and add '...'%}
 *       {%trim $x 20 '...'%}
 *
+*       {%trim words $x after 20 characters and add '...'%}
+*       {%trim words $x 20 '...'%}
 *
 *   @package    SimpleTemplate/Filter
 *   @version    01/12/15
@@ -241,27 +246,56 @@ class SimpleTemplate_Filter_TagLib extends SimpleTemplate_Options
     *   @version    01/12/18
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      string  $input  the original template code
+    *   @param      string  this is an extra string which can be added behind trim, is used i.e. for "trim words"
     *   @return     string  the modified template
     */
-    function trim( $input )
+    function trim( $input , $extra='' )
     {
+        $exp =  $this->options['delimiter'][0].
+                'echo ((strlen($1) > $2))?(substr($1,0,$2)."$4"):$1'.
+                $this->options['delimiter'][1];
+        if( $extra == ' words' )
+        {
+            $exp =  $this->options['delimiter'][0].
+                    'echo ((strlen($1) > $2))?(substr($1,0,(($2)-(strlen(strrchr(substr($1,0,$2),\' \')))))."$4"):$1'.
+                    $this->options['delimiter'][1];
+
+            $extra = '\s+words';
+        }
+
+
+
+
         return preg_replace(    '/'.preg_quote($this->options['delimiter'][0]).
-                                '%\s*trim\s+'.      // find the '{%trim ' with at least one space behind and any number of spaces between % and trim
-                                '([^\s]+)'.         // find all until the next space, that will be our variable name $1
+                                '%\s*trim'.$extra.'\s+'.    // find the "{%trim $extra" with at least one space behind and any number of spaces between % and trim
+                                '(\$[^\s]+)'.       // find all until the next space, that will be our variable name $1
                                 '[^\d]+'.           // find anything until a decimal number comes
                                 '(\d+)'.            // put the decimal number in $2
                                 '(\s+.*"(.*)")?'.   // this is saucy, we only need the most inner pair of (),
                                                     // that will be our string we use to add at the end in case we trim it
                                                     // all those other () are only for making each block optional (?), esp. for test 5 to work
                                 '\s*%'.preg_quote($this->options['delimiter'][1]).
-                                '/' ,               // allow any kind of spaces before the end delimiter
+                                                    // allow any kind of spaces before the end delimiter
+                                '/i' ,              // search case insensitive
 
-                                $this->options['delimiter'][0].
-                                'echo ((strlen($1) > $2))?(substr($1,0,$2)."$4"):$1'.
-                                $this->options['delimiter'][1],
+                                $exp,
                                 #"TRIM:<br>1='$1'<br>2='$2'<br>3='$3'<br>4='$4'<br>5='$5'<br>" , // for testing
 
                                 $input );
+    }
+
+    /**
+    *   this trims strings but only after a space
+    *
+    *   @version    02/05/30
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  $input  the original template code
+    *   @param      string  this is an extra string which can be added behind trim, is used i.e. for "trim words"
+    *   @return     string  the modified template
+    */
+    function trimWords( $input )
+    {
+        return $this->trim( $input , ' words' );
     }
 
     /**
