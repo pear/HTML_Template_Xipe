@@ -43,15 +43,12 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
     </maintainers>
 
     <release>
-        <version>1.6.1</version>
+        <version>1.6.2</version>
         <date>2002-11-10</date>
         <license>PHP License</license>
         <state>stable</state>
         <notes>
-            - Basic-Filter: added escapeShortTags, so xml-files can also be parsed with short_open_tags
-            - fixed bug which didnt parse files properly where the very first character was a php-tag
-            - TagLib-Filter: removed 's' modifier in macro-method, which is not needed anyway and caused problems with multiple appearances
-            of 'macro'
+            - bugfix in Filter_Translate, which prevented from properly translating when using translateMarkedOnly()
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="SimpleTemplate">
