@@ -17,6 +17,9 @@
 // +----------------------------------------------------------------------+
 //
 //  $Log$
+//  Revision 1.2  2002/06/02 23:15:11  mccain
+//  - removed not needed require
+//
 //  Revision 1.1  2002/05/26 17:04:30  mccain
 //  - initial commit, after restructuring and enhancing the engine
 //
@@ -213,7 +216,7 @@ class SimpleTemplate_Cache extends SimpleTemplate_XMLConfig
             else
                 fwrite($cfp,$content);
             fclose($cfp);
-            chmod($file,0770);
+            chmod($file,0777);
         }
 
         // set file modification time to the time when it expires,
