@@ -749,16 +749,13 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
 
         if ($this->logObject==null || !is_object($this->logObject) || !$this->_logFileName) {
             $this->_logFileName = $this->_compiledFilePrefix.$this->getOption('logFileExtension');
-            $this->logObject = Log::factory('file',$this->_logFileName);
+            $this->logObject =& Log::factory('file',$this->_logFileName);
             $this->_log('---------------------');
 //FIXXME write the options in the log-file but nicer!!! than here
             $this->_log('options: '.serialize($this->options));
             $this->_log( 'current logLevel is: '.$this->getOption('logLevel') );
         }
-
-//FIXXME this writes out the log data every time, which is really ineffective
         $this->logObject->log($message);
-        $this->logObject->writeOut();
     }
 }
 ?>
