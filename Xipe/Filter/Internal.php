@@ -19,6 +19,9 @@
 /**
 *
 *   $Log$
+*   Revision 1.7  2002/06/26 09:30:02  mccain
+*   - fixed bug in autoBraces
+*
 *   Revision 1.6  2002/05/26 17:06:38  mccain
 *   - added filter which removes the xml-config string
 *
@@ -118,14 +121,12 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
     */
     function makePhpTags($input)
     {
-        $begin = $this->options['delimiter'][0];
-        $end = $this->options['delimiter'][1];
-        $print = $this->options['delimiter'][0].'$';
+        $begin = $this->getOption('delimiter',0);
+        $end = $this->getOption('delimiter',1);
 
         // quote the strings
         $qBegin = preg_quote($begin);
         $qEnd = preg_quote($end);
-        $qPrint = preg_quote($print);
 
         // replace all varibales with $GLOBALS around it, so we can use the method "show"
 # dont replace $GLOBALS
@@ -134,34 +135,33 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
 #                                '{$1$GLOBALS[\'$3\']$4 /*...1=$1...2=$2...3=$3....4=$4....5=$5.... */}' ,
 #                                $input );
 
-        if( strpos( $input , $print ) !== false )   // look for a template-tag end
-        {
-            $regExp = '/([^\\\])'.$qPrint.'/U';
-            $input = preg_replace( $regExp , '$1<?=$' , $input );
-        }
+        //
+        //  replace the print tags, like: {$var}
+        //
+        // dont replace escaped delimiter \} or \{ and tagLib endtags %}
+        $input = preg_replace(  '/([^\\\])'.$qBegin.'\$(.*)([^\\\%])'.$qEnd.'/U' ,
+                                '$1<?php echo $$2$3; ?>' ,
+                                $input );
 
-        if( ($pos = strpos( $input , $begin )) !== false )   // look for a template-tag start
-        {
-            $regExp = '/([^\\\])'.$qBegin.'([^%])/U';
-            $input = preg_replace( $regExp , '$1<?php $2' , $input );
-        }
+        //
+        //  replace all other delimiter
+        //
+        //$regExp = '/([^\\\])'.$qBegin.'([^%])/U';
+        //$input = preg_replace( $regExp , '$1<?php $2' , $input );
+        $input = preg_replace(  "/([^\\\])$qBegin([^%])(.*)([^\\\%])$qEnd/U" ,
+                                '$1<?php $2$3$4 ?>' ,
+                                $input );
 
-        if( strpos( $input , $end ) !== false )     // look for a template-tag end, but dont replace \} or %}
-        {
-            $regExp = '/([^\\\%])'.$qEnd.'/U';
-            $input = preg_replace( $regExp , '$1?>' , $input );
-        }
+        //
+        // replace escaped delimiters like \{ or \}
+        //
+        // preg_quote the entire string, to be sure that reg-expr. characters are quoted too
+        // i.e. if $begin is '[' it is escaped and so is the '\\' too, well it works like this, it didnt properly before :-)
+        $regExp = preg_quote('/\\'.$begin.'/');
+        $input = preg_replace( $regExp , $begin , $input );
 
-        if( strpos( $input , $end ) !== false )     // replace escaped delimiters \{ or \}
-        {
-            // preg_quote the entire string, to be sure that reg-expr. characters are quoted too
-            // i.e. if $begin is '[' it is escaped and so is the '\\' too, well it works like this, it didnt properly before :-)
-            $regExp = preg_quote('/\\'.$begin.'/');
-            $input = preg_replace( $regExp , $begin , $input );
-
-            $regExp = preg_quote('/\\'.$end.'/');
-            $input = preg_replace( $regExp , $end , $input );
-        }
+        $regExp = preg_quote('/\\'.$end.'/');
+        $input = preg_replace( $regExp , $end , $input );
 
         return $input;
     }
@@ -217,6 +217,7 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
         $input = call_user_func( array($preFilter,'removeEmptyLines') , $input );
 
         // this ONLY works if '{$' is not replaced by '< ?php xxx'  but by '< ?=' as it is now
+        // so we gotta fix that, because short tags prevent from proper use for XML :-)
         $begin = '<?php';
         $end = '?>';
         $file = explode("\n",$input);
@@ -253,26 +254,26 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
                     for( $i=0 ; $i<$openIndentions[0]['numSpaces'] ; $i++ )       // make the code look nice, indent the closing brace
                         $spaces.= ' ';
 
-                    // are delimiters at the beginnig of this line!!!? then we only add our braces before them
+                    // are delimiters at the begining of this line!!!? then we only add our braces before them
                     // dont add the closing brace after a piece of html, so that this works too:
                     //  {if(...)}
                     //      test
                     //  <br>{somePhpCode}       // dont add the brace in the {somePhpCode} but before the <br> otherwise the logic would be false!
-                    if( ( strpos( $file[$curLineIndex] , $begin )) !== false &&  // look for a template-tag start
-                        ( strpos( $file[$curLineIndex] , $end )) !== false &&    // and the end tag has to be on this line
-                        ( strpos( trim($file[$curLineIndex]) , $begin ) === 0 ) // make sure the $begin is at the beginning of the line, see comment above !!!
-                      )
+                    if( preg_match( '/^\s*'.preg_quote($begin).'.+[^echo].*'.preg_quote($end).'/U' , $file[$curLineIndex] ) )
                     {
+#print "line = $curLineIndex --- ".htmlentities($file[$curLineIndex]);
                         // this also fixes the problem i had with the 'else', which doesnt except closing the php-tag before or after it
                         // since we are always writing the braces inside the existing php-tag now :-)
                         // replace only the first $begin with "$begin }" and dont forget to put the spaces back!! ($1)
                         // and there needs to be a space between a opening php-tag and a closing curly brace, otherwise php brings an error!
-                        $file[$curLineIndex] = preg_replace( '/^(\s*)'.preg_quote($begin).'/' , "$1$begin $closeDel" , $file[$curLineIndex] );
+                        $file[$curLineIndex] = preg_replace( '/^(\s*)'.preg_quote($begin).'/' , "$1$begin }" , $file[$curLineIndex] );
                     }
                     else    // no delimiters on this line, so we new once
                     {
-                        $file[$curLineIndex] = $spaces.$begin.' '.$closeDel.$end."\n".$file[$curLineIndex];
+#print "else line = $curLineIndex --- ".htmlentities($file[$curLineIndex]);
+                        $file[$curLineIndex] = $spaces.$begin.' }'.$end."\n".$file[$curLineIndex];
                     }
+#print " ....... after = $curLineIndex --- ".htmlentities($file[$curLineIndex])."<br>";
 
                     array_shift( $openIndentions );
                     $openIndentions_0_numSpaces = 0;
@@ -302,17 +303,15 @@ class SimpleTemplate_Filter_Internal extends SimpleTemplate_Options
             // line 3     <option value="{$aWritableFolder['id']}">
             // the parser would now have added a php tag with closing braces before line 3
             // and the following if _would_ find it, if we checked the modified line, as i used to, bummer
-            if( strpos( $aLine , $begin ) !== false &&  // look for a template-tag start
-                strpos( $aLine , $end ) !== false       // and the end tag has to be on this line
-              )
+            if( preg_match( '/^\s*'.preg_quote($begin).'.+[^echo].*'.preg_quote($end).'/U' , $aLine ) )
             {
                 // is the next line indented? if so we save this indention to remember to set the closing braces
                 if( $numSpacesNextLine > $numSpaces )
                 {
-#print("start indention ".htmlentities($file[$curLineIndex]).'<br>');
                     array_unshift( $openIndentions , array('numSpaces'=>$numSpaces,'lineNumber'=>$curLineIndex) );
                     // write the opening brace in the
                     $file[$curLineIndex] = str_replace( $end , ' { '.$end , $file[$curLineIndex] );
+#print("started indention ".htmlentities($file[$curLineIndex]).'<br>');
                 }
             }
 
