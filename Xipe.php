@@ -181,6 +181,24 @@ class HTML_Template_Xipe
 // this doesnt work with caching, so use getCompiledTemplate() !!!
         $this->compiledTemplate = $this->getCompiledTemplate();
         return $ret;
+    }                
+    
+    /**
+    *   tells if the current template needed to be compiled
+    *   if 'compile()' was called before and the template didnt
+    *   need to be recompiled this method will return false too
+    *
+    *   @see        compile()
+    *   @access     private
+    *   @version    2003/01/10
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @return     boolean if the template was compiled
+    */
+    function compiled( $file=null )
+    {                            
+        if( $file )
+            return $this->_methodWrapper( $file , 'compiled' );
+        return $this->_objectPool[$this->_lastUsedObjectKey]->compiled();
     }
 
     /**

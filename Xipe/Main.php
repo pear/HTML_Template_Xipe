@@ -146,6 +146,12 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
     *   @var    float   the time compiling/delivering took
     */
     var $_compileTime = 0;
+                           
+    /**
+    *   @var    boolean if the template was compiled
+    *   @see    compiled(), compile()
+    */
+    var $_compiled = false;
 
     /**
     *   the constructor, pass the options to it as needed
@@ -424,6 +430,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
         $startTime = split(" ",microtime());
         $startTime = $startTime[1]+$startTime[0];
 
+        $this->_compiled = false;
         if( $this->_needsRecompile() )
         {
             $this->_log( 'compile started' );
@@ -437,9 +444,27 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
             $endTime = $endTime[1]+$endTime[0];
             $itTook = ($endTime - $startTime)*100;
             $this->_log("(compilation and) deliverance took: $itTook ms" );
+
+            $this->_compiled = true;
         }
 
         return true;
+    }
+
+    /**
+    *   tells if the current template needed to be compiled
+    *   if 'compile()' was called before and the template didnt 
+    *   need to be recompiled this method will return false too
+    *                 
+    *   @see        compile()
+    *   @access     private
+    *   @version    2003/01/10
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @return     boolean if the template was compiled
+    */
+    function compiled()
+    {
+        return $this->_compiled;
     }
 
     /**
