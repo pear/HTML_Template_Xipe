@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
+// | Copyright (c) 1997, 1998, 1999, 2000, 2001, 2002, 2003 The PHP Group |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -115,8 +115,8 @@ class HTML_Template_Xipe_XMLConfig extends HTML_Template_Xipe_Main
         if( !@include_once('Tree/Tree.php') )
         {
             return $this->_error(   "xml-config could not be parsed, because the class 'Tree/Tree.php' could not be included<br>".
-                                    '1. pleace be sure to have the latest of those classes from the pear-cvs '.
-                                    '(<a href="http://cvs.php.net/cvs.php/pear/Tree">here</a>)' ,
+                                    '1. pleace be sure to have the latest PEAR::Tree package installed '.
+                                    '(<a href="http://pear.php.net/package-info.php?pacid=104">you get it from here</a>)' ,
                                     PEAR_ERROR_DIE );
         }
 

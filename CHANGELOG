@@ -1,3 +1,15 @@
+Version 1.7
+- porting SimpleTemplate into PEAR, where it is called HTML_Template_Xipe
+  changing all the class names and file names
+- the XML-Root-Tag is not 'SimpleTemplate' any longer, now it is 'Template-Xipe'
+
+
+.... in PEAR from here on ....
+             
+Version 1.6.3
+
+Version 1.6.2
+
 Version 1.6.1
 - Basic-Filter: added escapeShortTags, so xml-files can also be parsed with short_open_tags
 - fixed bug which didnt parse files properly where the very first character was a php-tag
