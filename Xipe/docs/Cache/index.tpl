@@ -1,17 +1,40 @@
 <!--
     $Log: not supported by cvs2svn $
+    Revision 1.2  2002/06/02 22:38:56  mccain
+    - convert all config-tags to lower case, this is secure for now
+      also if the Tree-package is not updated
+
     Revision 1.1  2002/06/02 22:34:28  mccain
     - initial commit
 
 -->
 
+
+
+
+<!--
+
+    the caching options
+    this could also be in a file 'config.xml' (as the name is by default)
+    which needs to be located under the templateDir
+
+-->
 <simpletemplate>
     <options>
         <cache>
-            <time value="10" />
+            <time value="10" unit="seconds"/>
         </cache>
     </options>
 </simpletemplate>
+
+
+
+
+
+
+
+
+
 
 
 <html>
