@@ -43,12 +43,12 @@ language code if required (i.e. a compiled index.tpl which is saved for english 
     </maintainers>
 
     <release>
-        <version>1.6.2</version>
-        <date>2002-11-10</date>
+        <version>1.6.3</version>
+        <date>2002-11-30</date>
         <license>PHP License</license>
         <state>stable</state>
         <notes>
-            - bugfix in Filter_Translate, which prevented from properly translating when using translateMarkedOnly()
+            - made switch-case work
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="SimpleTemplate">
