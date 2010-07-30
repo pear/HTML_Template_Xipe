@@ -177,7 +177,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
     *   @var    float   the time compiling/delivering took
     */
     var $_compileTime = 0;
-                           
+
     /**
     *   @var    boolean if the template was compiled
     *   @see    compiled(), compile()
@@ -185,7 +185,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
     var $_compiled = false;
 
     var $logObject = null;
-    
+
     /**
     *   the constructor, pass the options to it as needed
     *
@@ -454,7 +454,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
     {
 //print $this->_templateFile.'<br>';
         // cant the log-class do that???
-        $startTime = split(" ",microtime());
+        $startTime = explode(" ", microtime());
         $startTime = $startTime[1]+$startTime[0];
 
         $this->_compiled = false;
@@ -467,7 +467,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
             if( !$this->parse() )
                 return false;
 
-            $endTime = split(" ",microtime());
+            $endTime = explode(" ",microtime());
             $endTime = $endTime[1]+$endTime[0];
             $itTook = ($endTime - $startTime)*100;
             $this->_log("(compilation and) deliverance took: $itTook ms" );
@@ -480,9 +480,9 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
 
     /**
     *   tells if the current template needed to be compiled
-    *   if 'compile()' was called before and the template didnt 
+    *   if 'compile()' was called before and the template didnt
     *   need to be recompiled this method will return false too
-    *                 
+    *
     *   @see        compile()
     *   @access     private
     *   @version    2003/01/10
@@ -659,7 +659,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
         foreach( $filters as $aFilter )
         {
 // FIXXME use log class
-            $startTime = split(" ",microtime());
+            $startTime = explode(" ",microtime());
             $startTime = $startTime[1]+$startTime[0];
             $sizeBefore = strlen($input);
 
@@ -685,7 +685,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
 
             $sizeAfter = strlen($input);
 // FIXXME use log class
-            $endTime = split(" ",microtime());
+            $endTime = explode(" ",microtime());
             $endTime = $endTime[1]+$endTime[0];
             $itTook = ($endTime - $startTime)*100;
 
@@ -734,7 +734,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
     function _log($message)
     {
         if ($this->getOption('logLevel') == 0) {
-            return;                             
+            return;
         }
 
         if ($this->getOption('debug') > 0) {
@@ -744,7 +744,7 @@ class HTML_Template_Xipe_Main extends HTML_Template_Xipe_Options
         if (!empty($this->_loggedMessages[md5($message)])) {
             return;
         }
-        
+
         $this->_loggedMessages[md5($message)] = true;
 
         if ($this->logObject==null || !is_object($this->logObject) || !$this->_logFileName) {
