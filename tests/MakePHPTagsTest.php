@@ -3,13 +3,37 @@
 //  $Id$
 //
 
-require_once 'UnitTest.php';
+require_once 'PHPUnit/Framework.php';
+require_once 'HTML/Template/Xipe.php';
 
-class tests_Filter_Internal_makePhpTags extends UnitTest
+define('CONSTANT','constant');
+
+class MakePhpTagsTest extends PhpUnit_Framework_TestCase
 {
+    /**
+    *   @var    object  the Xipe object to use 
+    */
+    var $_xipe = null;
+
+    function setUp()
+    {
+        $options = array(   'templateDir'   => realpath(dirname(__FILE__)),
+                            'compileDir'    => 'tmp',   // use the compile dir 'tmp' under the tempalte dir
+                            'verbose'   => true,        // this is default too
+                            'logLevel'  => 0,           // dont write log files
+                            'filterLevel'   => 10,      // apply all the most common filters
+                            'locale'        =>  '_'    //
+                            ,'forceCompile' =>  true
+                            ,'autoBraces'   =>  false
+                            );
+        $this->_xipe =& new HTML_Template_Xipe($options);
+        
+    }
+
+
     function test_echoConstants()
     {
-        $content = $this->_xipe->getRenderedTemplate('tpl/simple.tpl',array('test'=>1));
+        $content = $this->_xipe->getRenderedTemplate('tpl/simple.tpl', array('test'=>1));
         $expected = "1constantconstantconstant";
         $this->assertEqualsString($expected,$content);
     }
@@ -44,16 +68,6 @@ class tests_Filter_Internal_makePhpTags extends UnitTest
         $this->assertEqualsString($expected,$content);
     }
     
-    /**
-    *   {@$var} is also printed just like before ....
-    *   actually this is bullshit 
-    *
-    *
-    */
-    function test_echoAtCharacter()
-    {
-        $this->test_echoConstants();
-    }
     
     /**
     *   This is just a special assert, which removes whitepsaces, so we can easier check.
