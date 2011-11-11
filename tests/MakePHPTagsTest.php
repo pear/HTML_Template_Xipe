@@ -3,7 +3,7 @@
 //  $Id$
 //
 
-require_once 'PHPUnit/Framework.php';
+require_once 'PHPUnit/Framework/TestCase.php';
 require_once 'HTML/Template/Xipe.php';
 
 define('CONSTANT','constant');
@@ -11,7 +11,7 @@ define('CONSTANT','constant');
 class MakePhpTagsTest extends PhpUnit_Framework_TestCase
 {
     /**
-    *   @var    object  the Xipe object to use 
+    *   @var    object  the Xipe object to use
     */
     var $_xipe = null;
 
@@ -27,7 +27,7 @@ class MakePhpTagsTest extends PhpUnit_Framework_TestCase
                             ,'autoBraces'   =>  false
                             );
         $this->_xipe =& new HTML_Template_Xipe($options);
-        
+
     }
 
 
@@ -67,8 +67,8 @@ class MakePhpTagsTest extends PhpUnit_Framework_TestCase
         $expected = '1';
         $this->assertEqualsString($expected,$content);
     }
-    
-    
+
+
     /**
     *   This is just a special assert, which removes whitepsaces, so we can easier check.
     *
@@ -87,5 +87,3 @@ class MakePhpTagsTest extends PhpUnit_Framework_TestCase
         $this->assertEquals($expected,$actual,$message);
     }
 }
-
-?>
