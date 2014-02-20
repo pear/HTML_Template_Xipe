@@ -1,0 +1,28 @@
+{
+    "authors": [
+        {
+            "email": "wolfram@kriesing.de",
+            "name": "Wolfram Kriesing",
+            "role": "Lead"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "HTML": "./"
+        }
+    },
+    "description": "More info available on: http://pear.php.net/package/HTML_Template_Xipe",
+    "include-path": [
+        "./"
+    ],
+    "license": "PHP License",
+    "name": "pear/html_template_xipe",
+    "support": {
+        "issues": "http:///bugs/search.php?cmd=display&package_name[]=HTML_Template_Xipe",
+        "source": "https://github.com/pear/HTML_Template_Xipe"
+    },
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}
